@@ -164,3 +164,5 @@ cython_debug/
 /.env
 /help.txt
 /development.docx
+**/postgres_data/**
+**/tests/**
