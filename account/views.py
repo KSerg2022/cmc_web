@@ -31,13 +31,11 @@ def register(request):
             # Создать профиль пользователя
             Profile.objects.create(user=new_user)
             return render(request,
-                          # 'account/register_done.html',
                           'account/template/register_done.html',
                           {'new_user': new_user})
     else:
         user_form = UserRegistrationForm()
     return render(request,
-                  # 'account/register.html',
                   'account/template/register.html',
                   {'user_form': user_form})
 
