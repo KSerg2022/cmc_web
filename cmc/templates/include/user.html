@@ -1,0 +1,44 @@
+<ul class="navbar-nav navbar-right">
+    {% if not user.is_authenticated %}
+        <li>
+            <a class="action nav-link" href="{% url "login" %}">
+                <i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+        <li>
+
+            <a class="action nav-link" href="{% url "register" %}">
+                <i class="fa-solid fa-user-plus"></i> Sign up</a></li>
+    {% endif %}
+
+    {#            {% if user.is_authenticated %}#}
+    <li class='nav-link'>
+        Hello, {% if user.first_name %} {{ user.first_name }}
+    {% else %} {{ user.username }}
+    {% endif %}
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">1111111</a></li>
+            <li><a class="dropdown-item" href="#">22222222</a></li>
+            <li><a class="dropdown-item" href="#">33333333333</a></li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" href="{% url "edit" %}">edit_detail</a>
+                <a class="dropdown-item" href="#">1111111</a>
+                <a class="dropdown-item" href="#">22222222</a>
+            </li>
+        </ul>
+    </li>
+
+    {% if user.is_authenticated %}
+        <li>
+            <a class='action  nav-link' href="{% url "logout" %}">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+    {% endif %}
+</ul>
