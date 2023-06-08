@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+{% load django_bootstrap5 %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% load static %}
+
+<html lang="{{ LANGUAGE_CODE|default:'en_us' }}">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Page title -->
+    <title>{% block bootstrap5_title %}django-bootstrap5 template title{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    {% bootstrap_css %}
+
+
+    <!-- Bootstrap JavaScript if it is in head -->
+    {% if 'javascript_in_head'|bootstrap_setting %}
+        {% bootstrap_javascript %}
+    {% endif %}
+
+    <link rel="stylesheet" href="{% static 'cmc/css/cmc.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'cmc/css/my_css.css' %}" type="text/css">
+
+    {% block bootstrap5_extra_head %}{% endblock %}
+
+</head>
+
+<body>
+{% include 'include/navbar.html' %}
+
+<main role="main">
+    <div class="container-fluid my_jumbotron">
+
+        {% include 'include/_message.html' %}
+
+
+        {#    {% block bootstrap5_before_content %}before_content{% endblock %}#}
+        {% block bootstrap5_content %} CONTENT {% endblock %}
+        {#    {% block bootstrap5_after_content %}after_content{% endblock %}#}
+
+        <!-- Bootstrap JavaScript if it is in body -->
+        {% if not 'javascript_in_head'|bootstrap_setting %}
+            {% bootstrap_javascript %}
+        {% endif %}
+
+        {% block bootstrap5_extra_script %}{% endblock %}
+
+        {% include 'include/_go_back.html' %}
+    </div>
+</main>
+
+{% include 'include/footer.html' %}
+</body>
+</html>
