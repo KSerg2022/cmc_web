@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Edit your account{% endblock %}
+
+{% block bootstrap5_content %}
+
+    <div class="container col-md-4">
+        <h1>Edit your account</h1>
+        <p>You can edit your account using the following form:</p>
+        <div class="profile-info">
+            <img src="{% thumbnail user.profile.photo 180x180 %}" class="user-detail">
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            <table class="table table-striped">
+                {{ user_form.as_table }}
+                {{ profile_form.as_table }}
+            </table>
+            {% csrf_token %}
+            <p><input type="submit" value="Save changes" class="btn btn-success"></p>
+        </form>
+    </div>
+
+{% endblock %}
