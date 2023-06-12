@@ -162,10 +162,12 @@ cython_debug/
 # my adding
 .idea/
 /.env
-/help.txt
+help.txt
 /development.docx
 **/postgres_data/**
 **/tests/**
+#!/tests/functional_tests/account/
+#!/tests/functional_tests/cmc/**
 media/
 **/migrations/**
 
