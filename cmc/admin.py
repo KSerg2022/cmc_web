@@ -5,7 +5,7 @@ from .models import Cryptocurrency
 
 @admin.register(Cryptocurrency)
 class CryptocurrencyAdmin(admin.ModelAdmin):
-    list_display = ('symbol', 'slug', 'name', 'site', 'contract')
+    list_display = ('symbol', 'slug', 'name', 'website', 'logo')
     list_filter = ('symbol', 'name')
     search_fields = ('symbol', 'name')
     prepopulated_fields = {'slug': ('name',)}
