@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -42,10 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # my adding
-    'cmc.apps.CmcConfig',
     'django.contrib.postgres',
     'django_bootstrap5',
     'easy_thumbnails',
+
+    'cmc.apps.CmcConfig',
 
 ]
 
@@ -137,7 +139,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+# STATICFILES_DIRS = [BASE_DIR / 'static/']
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # STATIC_DIR = os.path.join(BASE_DIR, 'static')
 # STATIC_URL = '/static/'
@@ -189,3 +192,6 @@ MESSAGE_TAGS = {
 #     # 'tests.functional_tests.test_sign_up',
 #
 #     ]
+
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
