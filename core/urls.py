@@ -19,10 +19,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from cmc.views import index
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls')),
-    path('', include('cmc.urls', namespace='cmc')),
+
+    path('cmc/', include('cmc.urls', namespace='cmc')),
+    path('', index, name='index'),
 ]
 
 if settings.DEBUG:
