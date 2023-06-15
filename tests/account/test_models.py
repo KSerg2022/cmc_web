@@ -35,6 +35,15 @@ class UserModelTest(TestCase):
             user.full_clean()
             user.save()
 
+    def test_user_fields(self):
+        fields = ['profile', 'logentry', 'id', 'password', 'last_login', 'is_superuser',
+                  'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',
+                  'date_joined', 'groups', 'user_permissions']
+        user = User.objects.create()
+        model_fields = [field.name for field in user._meta.get_fields()]
+
+        self.assertEqual(model_fields, fields, model_fields)
+
 
 class ProfileModelTest(TestCase):
     def setUp(self) -> None:
@@ -80,3 +89,10 @@ class ProfileModelTest(TestCase):
         profile = Profile.objects.create(user=self.user)
 
         self.assertEqual(str(profile), f'Profile of {self.user.username}', profile)
+
+    def test_profile_fields(self):
+        fields = ['id', 'user', 'date_of_birth', 'photo']
+        profile = Profile.objects.create(user=self.user)
+        model_fields = [field.name for field in profile._meta.get_fields()]
+
+        self.assertEqual(model_fields, fields, model_fields)
