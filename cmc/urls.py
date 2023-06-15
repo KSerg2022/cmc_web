@@ -5,6 +5,6 @@ from . import views
 app_name = 'cmc'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('detail/<slug:slug>/', views.detail, name='crypto_detail'),
 
 ]
