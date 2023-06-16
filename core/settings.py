@@ -173,25 +173,6 @@ MESSAGE_TAGS = {
  }
 
 
-# my adding for testing
-# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-# NOSE_ARGS = [
-#     '--with-coverage',
-#     '--cover-erase',
-#     '--cover-package=blog, user',
-#     '--verbosity=1',
-#
-#     # path to files with tests
-#
-#     # 'tests.blog.test_forms',
-#     # 'tests.blog.test_models',
-#     # 'tests.blog.test_views',
-#     # 'tests.functional_tests.test_add_post',
-#     # 'tests.functional_tests.test_index_page',
-#     # 'tests.functional_tests.test_published_posts',
-#     # 'tests.functional_tests.test_sign_up',
-#
-#     ]
-
+# settings for testing
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
