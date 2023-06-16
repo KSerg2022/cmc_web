@@ -26,6 +26,16 @@
 
     <link rel="stylesheet" href="{% static 'cmc/css/cmc.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'cmc/css/my_css.css' %}" type="text/css">
+<style>
+  html,body {
+    height: 100%;
+	margin: 0;
+  }
+   .height100 {
+      height: 100%;
+	  background-color: #cccccc;
+   }
+</style>
 
     {% block bootstrap5_extra_head %}{% endblock %}
 
@@ -35,7 +45,7 @@
 {% include 'include/navbar.html' %}
 
 <main role="main">
-    <div class="container-fluid my_jumbotron">
+    <div class="height100 container-fluid my_jumbotron">
 
         {% include 'include/_message.html' %}
 
