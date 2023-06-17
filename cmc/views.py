@@ -29,5 +29,10 @@ def index(request):
 
 
 def detail(request, slug):
-    return render(request, 'cmc/cmc/detail.html')
+    crypto = get_object_or_404(Cryptocurrency,
+                               slug=slug
+                               )
 
+    return render(request, 'cmc/cmc/detail.html',
+                  {'crypto': crypto}
+                  )

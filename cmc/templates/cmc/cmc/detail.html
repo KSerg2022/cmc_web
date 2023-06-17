@@ -1,10 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block bootstrap5_title %}detail_crypto{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+{% block bootstrap5_content %}
+
+    <div class="height100 main text-center">
+
+        <div class="main_content">
+
+        {% if crypto %}
+            <h1>{{ crypto.name }}</h1>
+
+            <p><img src="{{ crypto.logo }}" alt="{{ crypto.logo }}" width="80"></p>
+
+            <div class="container col-md-6">
+                <table class="table table-bordered" id="userTable">
+                    <thead class="table-primary">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col" class="text-center">Content</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr>
+                        <td>CMC id</td>
+                        <td><a href="https://coinmarketcap.com/currencies/{{ crypto.slug }}" target="_blank"
+                               class="link">
+                            {{ crypto.id }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>{{ crypto.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>symbol</td>
+                        <td>{{ crypto.symbol }}</td>
+                    </tr>
+                    <tr>
+                        <td>website</td>
+                        <td><a href="{{ crypto.website }}" target="_blank" class="link">
+                            {{ crypto.website }}</a></td>
+                    </tr>
+                    <tr>
+                        <td>contract</td>
+                        <td>
+                            {% if  crypto.contract %}{{ crypto.contract }}
+                            {% else %} ---
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td class="text-start">{{ crypto.description }}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            {% else %}
+                <h1>Crypto not find!</h1>
+            {% endif %}
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="">
+                <h2>Sidebar.</h2>
+            </div>
+
+        </aside>
+
+    </div>
+
+{% endblock %}
