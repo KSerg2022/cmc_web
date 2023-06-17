@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, get_object_or_404
+
 from django import forms
 
 from cmc.models import Cryptocurrency
@@ -9,11 +10,13 @@ PAGINATOR_QTY = 10
 
 
 def index(request):
-    cryptocurrencies_list = Cryptocurrency.objects.all().order_by('id')[:275]
-    paginator = Paginator(cryptocurrencies_list, per_page=PAGINATOR_QTY, orphans=PAGINATOR_QTY)
-    page_range = paginator.get_elided_page_range(number=10, on_each_side=3, on_ends=2)
 
+    cryptocurrencies_list = Cryptocurrency.objects.all().order_by('id')[:154]
+    paginator = Paginator(cryptocurrencies_list, per_page=PAGINATOR_QTY)
     page_numer = request.GET.get('page', 1)
+    page_range = []
+    if len(cryptocurrencies_list) > PAGINATOR_QTY:
+        page_range = paginator.get_elided_page_range(number=paginator.num_pages // 2, on_each_side=3, on_ends=2)
 
     try:
         cryptocurrencies = paginator.page(page_numer)
