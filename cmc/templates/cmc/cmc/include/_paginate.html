@@ -24,7 +24,8 @@
         {% for i in page_range|default_if_none:page.paginator.get_elided_page_range %}
             {% if page.number == i %}
                 <li class="page-item active" aria-current="page">
-                    <span class="page-link">{{ i }}<span class="sr-only">(current)</span></span>
+                    <a class="page-link" href="?page={{ i }}">{{ i }}
+                        <span class="sr-only">(current)</span></a>
                 </li>
 
             {% else %}

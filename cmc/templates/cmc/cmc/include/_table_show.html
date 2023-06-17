@@ -1,8 +1,8 @@
-<table class="table table-hover table-striped" id="userTable">
+<table class="table table-striped" id="userTable">
     <thead>
     <tr>
         <th scope="col">Select</th>
-        <th scope="col" class="text-center">#</th>
+        <th scope="col" class="text-center">CMC id</th>
         <th scope="col" class="text-center">Name</th>
         <th scope="col" class="text-center">Symbol</th>
     </tr>
@@ -14,15 +14,21 @@
                 <input type="checkbox" name="selectors" class="checkbox" value="{{ cryptocurrency.id }}"/>
             </td>
 
-            <td class="text-center">{{ cryptocurrency.id }}</td>
             <td class="text-center">
-                <a href="{{cryptocurrency.website}}">
+                <a href="https://coinmarketcap.com/currencies/{{cryptocurrency.slug}}" target="_blank" class="link">
+                {{ cryptocurrency.id }}<a>
+            </td>
+            <td class="text-center">
+                <a href="{% url "cmc:crypto_detail" cryptocurrency.slug %}" class="link">
                     {{ cryptocurrency.name }}</a>
             </td>
             <td class="text-center">{{ cryptocurrency.symbol }}</td>
-            <td class="text-center">{{ cryptocurrency.website }}</td>
+            <td class="text-center">
+                <a href="{{cryptocurrency.website}}" target="_blank" class="link">
+                    {{ cryptocurrency.website }}</a>
+            </td>
             <td class="warning text-center">
-                <img src="{{ cryptocurrency.logo }}" alt="{{ cryptocurrency.logo }}" width="40">
+                <img src="{{ cryptocurrency.logo }}" alt="{{ cryptocurrency.logo }}" width="30">
             </td>
         </tr>
     {% endfor %}
