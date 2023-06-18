@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'account.apps.AccountConfig',  # my
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
 
     'cmc.apps.CmcConfig',
+    'exchanger.apps.ExchangerConfig',
 
 ]
 
@@ -139,7 +141,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static/']
+
+
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -176,3 +179,5 @@ MESSAGE_TAGS = {
 # settings for testing
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+
+    # INTERNAL_IPS = ('127.0.0.1',)

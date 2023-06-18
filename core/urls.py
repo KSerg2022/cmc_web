@@ -25,9 +25,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls')),
 
+    path('exchanger/', include('exchanger.urls', namespace='exchanger')),
+
     path('cmc/', include('cmc.urls', namespace='cmc')),
     path('', index, name='index'),
 ]
+
+# from django.conf import settings
+# from django.conf.urls.static import static
+# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
