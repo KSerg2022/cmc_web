@@ -14,7 +14,7 @@ class Cryptocurrency(models.Model):
 
     contract = models.CharField(max_length=255, verbose_name='Contract', blank=True)
     description = models.TextField(verbose_name='Description', blank=True)
-    logo = models.ImageField(upload_to=f'{name}',
+    logo = models.ImageField(upload_to=f'cryptocurrency/%Y/%m/%d/',
                              blank=True,
                              validators=[validate_image_file_extension])
 
