@@ -17,6 +17,11 @@ class TestLoginPage(BaseTest):
             "Please enter a correct username and password. "
             "Note that both fields may be case-sensitive."))
 
+
+        self.browser.implicitly_wait(2) # ??????????????
+
+
+
         current_url = self.browser.current_url
         self.assertRegex(current_url, reverse('login'))
 

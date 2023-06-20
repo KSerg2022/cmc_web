@@ -30,7 +30,7 @@ def wait(fn):
     return modified_fn
 
 
-# class Test(LiveServerTestCase):
+# class BaseTest(LiveServerTestCase):
 class BaseTest(StaticLiveServerTestCase):
     """test new visitor"""
     MAX_WAIT = 2
