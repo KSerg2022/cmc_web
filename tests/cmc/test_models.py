@@ -29,7 +29,7 @@ class CryptocurrencyModelTest(TestCase):
         self.assertEqual(f'{self.name}. {self.symbol}', str(cryptocurrency), cryptocurrency)
 
     def test_cryptocurrency_fields(self):
-        fields = ['id', 'symbol', 'name', 'slug', 'website',
+        fields = ['portfolio_currency', 'id', 'symbol', 'name', 'slug', 'website',
                   'contract', 'description', 'logo']
         cryptocurrency = Cryptocurrency.objects.create()
         model_fields = [field.name for field in cryptocurrency._meta.get_fields()]
