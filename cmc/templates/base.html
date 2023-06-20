@@ -37,21 +37,18 @@
 <main role="main">
     <div class="height100 container-fluid my_jumbotron">
 
-        {% include 'include/_message.html' %}
-
-
-        {#    {% block bootstrap5_before_content %}before_content{% endblock %}#}
         {% block bootstrap5_content %} CONTENT {% endblock %}
-        {#    {% block bootstrap5_after_content %}after_content{% endblock %}#}
+
 
         <!-- Bootstrap JavaScript if it is in body -->
         {% if not 'javascript_in_head'|bootstrap_setting %}
             {% bootstrap_javascript %}
         {% endif %}
 
+
         {% block bootstrap5_extra_script %}{% endblock %}
 
-        {% include 'include/_go_back.html' %}
+{#        {% include 'include/_go_back.html' %}#}
     </div>
 </main>
 

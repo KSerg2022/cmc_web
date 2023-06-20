@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+
+{% block bootstrap5_content %}
+
+    <div class="height100 main">
+
+        <div class="main_content">
+            {% include 'include/_message.html' %}
+
+            {% block main_content %}
+            {% endblock main_content %}
+        </div>
+
+
+        <aside class="sidebar">
+            {% block sidebar %}{% endblock sidebar %}
+        </aside>
+
+    </div>
+
+{% endblock %}
