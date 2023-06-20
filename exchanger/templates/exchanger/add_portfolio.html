@@ -1,0 +1,55 @@
+{% extends "base_index.html" %}
+
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Exchangers{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+
+{% block main_content %}
+    <div class="text-center">
+        <h1>Exchanger - {{ exchanger.name }}</h1>
+        <p>
+            Here you can ...
+        </p>
+    </div>
+
+    <div class="container col-md-6 text-center">
+        <form method="post">
+            <table class="table table-borderless">
+                {{ form.as_table }}
+            </table>
+            {% csrf_token %}
+            <p><input type="submit" value="Create" class="btn btn-success"></p>
+        </form>
+    </div>
+
+
+{% endblock main_content %}
+
+
+{% block sidebar %}
+    <div class="container">
+        <h2 class="text-center">Users.</h2>
+        {% if user_exchangers %}
+            <ul>
+                {% for user_exchanger in user_exchangers %}
+                    <li>
+                        <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
+                        -
+                        <span class="badge rounded-pill bg-info">
+                            <a href="#" class="link">Get data</a>
+                        </span>
+                    </li>
+
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You did not create exchanger yet.</p>
+        {% endif %}
+    </div>
+
+{% endblock sidebar %}
+

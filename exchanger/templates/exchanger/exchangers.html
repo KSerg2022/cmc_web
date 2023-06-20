@@ -1,0 +1,86 @@
+{% extends "base_index.html" %}
+
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Exchangers{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+
+{% block main_content %}
+    <div class="text-center">
+        <h1>Exchangers.</h1>
+        <p>
+            Here you can add data for exchangers which using.
+        </p>
+    </div>
+
+    <div class="container col-md-6 text-center">
+        <h3>Please choose exchanger:</h3>
+        {% if exchangers %}
+            <div class="container col-md-8">
+            <table class="table table-striped align-middle" id="userTable">
+                <thead class="table-primary">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" class="text-center">Exchangers</th>
+                    <th scope="col" class="text-center">Logo</th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for exchanger in exchangers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="#" class="link">
+                            {{ exchanger.name }}</a>
+                        </td>
+                        <td>
+                            {#                            <img src="{{ exchanger.logo }}" alt="{{ exchanger.logo }}" width="80">#}
+                            <img src="{% thumbnail exchanger.logo 120x120 %}">
+                        </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-info">
+                            <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
+                            Create portfolio</a>
+                        </button>
+                    </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h1>Exchangers not found!</h1>
+        {% endif %}
+        </div>
+    </div>
+
+
+{% endblock main_content %}
+
+
+{% block sidebar %}
+    <div class="container">
+        <h2 class="text-center">Users.</h2>
+        {% if user_exchangers %}
+            <ul>
+                {% for user_exchanger in user_exchangers %}
+                    <li>
+                        <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
+                        -
+                        <span class="badge rounded-pill bg-info">
+                            <a href="#" class="link">Get data</a>
+                        </span>
+                    </li>
+
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You did not create exchanger yet.</p>
+        {% endif %}
+    </div>
+
+{% endblock sidebar %}
+
