@@ -1,9 +1,11 @@
 from django.core.validators import validate_image_file_extension, validate_slug, URLValidator
 from django.db import models
-
+from django.contrib.auth.models import User
 
 from django.urls import reverse
 from django.utils.text import slugify
+
+from cmc.models import Cryptocurrency
 
 
 class Exchanger(models.Model):
@@ -42,3 +44,42 @@ class Exchanger(models.Model):
     def get_absolute_url(self):
         return reverse('exchanger:detail',
                        args=[self.slug])
+
+
+class ExPortfolio(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CharField,
+                              related_name='exchanger_created')
+    exchanger = models.ForeignKey(Exchanger,
+                                  on_delete=models.CASCADE,
+                                  related_name='portfolio')
+    slug = models.SlugField(max_length=50,
+                            unique=True,
+                            validators=[validate_slug])
+    api_key = models.CharField(max_length=255)
+    api_secret = models.CharField(max_length=255)
+    password = models.CharField(max_length=255,
+                                blank=True)
+    comments = models.TextField(blank=True)
+    currencies = models.ManyToManyField(Cryptocurrency,
+                                        related_name='portfolio_currency',
+                                        blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['exchanger'])
+        ]
+        ordering = ['exchanger']
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.owner.username + '-' + self.exchanger.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.owner.username.capitalize()} have {self.exchanger.name} portfolio'
+
+    def get_absolute_url(self):
+        return reverse('exchanger:portfolio_detail',
+                       args=[
+                           self.owner.id,
+                           self.exchanger.name,
+                           self.slug])
