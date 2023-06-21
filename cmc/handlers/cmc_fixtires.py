@@ -16,7 +16,6 @@ class Cmc:
 
     def __init__(self):
         self.json = JsonFile()
-        # self.filename = 'cmc_currencies'
         self.filename = 'cryptocurrency'
         self.api_cmc = os.environ.get('API_COINMARCETCAP')
 
@@ -26,14 +25,6 @@ class Cmc:
             # 'id': "",
             'skip_invalid': True
         }
-
-        # self.url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'  # all cryptocurrencie
-        # self.parameters = {
-        #     'listing_status': 'active',
-        #     'start': '1',
-        #     'limit': '5',
-        #     'sort': 'id',
-        # }
 
         self.headers = {
             'Accepts': 'application/json',
@@ -47,12 +38,9 @@ class Cmc:
         while qwt < 17000:
             self.parameters = {
                 'id': ",".join(map(str, range(start, qwt))),
-                # 'id': "",
                 'skip_invalid': True
             }
             response = self.get_response()
-            # currencies = self.parse_cryptocurrencies_map(response)
-            # print(response)
             try:
                 data = response.json()
             except JSONDecodeError:
@@ -82,23 +70,6 @@ class Cmc:
         session.close()
         return response
 
-    # @staticmethod
-    # def parse_cryptocurrencies_map(response_data: dict[dict]) -> list[dict[str, str]]:
-    #     """Parse weather data"""
-    #     currencies = []
-    #     for currency in response_data['data']:
-    #         data = {
-    #             "model": "cmc.cryptocurrency",
-    #             'pk': currency['id'],
-    #             'fields': {
-    #                 'symbol': currency['symbol'],
-    #                 'name': currency['name'],
-    #                 'slug': currency['slug'],
-    #                 'cmc_id': currency['id'],
-    #             }
-    #         }
-    #         currencies.append(data)
-    #     return currencies
 
     @staticmethod
     def parse_cryptocurrencies_info(response_data: dict[dict]) -> list[dict[str, str]]:
@@ -121,7 +92,6 @@ class Cmc:
                     'logo': data['logo'],
                     'description': description,
                     'website': website,
-                    # 'explorer': data['urls']['explorer'],
                     'contract': '',
                 }
             }
@@ -133,4 +103,3 @@ if __name__ == '__main__':
     result = Cmc()
     result.get_cryptocurrency()
 
-# G:\Python_projects\cmc\cmc\handlers
