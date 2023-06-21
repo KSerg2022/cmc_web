@@ -4,7 +4,7 @@ from django.shortcuts import render, HttpResponse, get_object_or_404
 from django import forms
 
 from cmc.models import Cryptocurrency
-
+from exchanger.handlers import get_paginator
 
 PAGINATOR_QTY = 10
 
@@ -12,19 +12,7 @@ PAGINATOR_QTY = 10
 def index(request):
 
     cryptocurrencies_list = Cryptocurrency.objects.all().order_by('id')[:154]
-    paginator = Paginator(cryptocurrencies_list, per_page=PAGINATOR_QTY)
-    page_numer = request.GET.get('page', 1)
-    page_range = []
-    if len(cryptocurrencies_list) > PAGINATOR_QTY:
-        page_range = paginator.get_elided_page_range(number=paginator.num_pages // 2, on_each_side=3, on_ends=2)
-
-    try:
-        cryptocurrencies = paginator.page(page_numer)
-    except PageNotAnInteger:
-        cryptocurrencies = paginator.page(1)
-    except EmptyPage:
-        cryptocurrencies = paginator.page(paginator.num_pages)
-
+    cryptocurrencies, page_range = get_paginator(request, cryptocurrencies_list)
     return render(request,
                   'cmc/cmc/index.html',
                   {'cryptocurrencies': cryptocurrencies,
