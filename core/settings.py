@@ -79,6 +79,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'exchanger_tags': 'exchanger.templatetags.exchanger_tags',
+
+            }
         },
     },
 ]
