@@ -22,7 +22,10 @@
                 {{ form.as_table }}
             </table>
             {% csrf_token %}
-            <p><input type="submit" value="Create" class="btn btn-success"></p>
+            <p>
+                <input type="submit" value="{% if button == 'Create' %}Create{% elif button == 'Change' %}Change{% endif %}"
+                      class="btn btn-success">
+            </p>
         </form>
     </div>
 
@@ -31,25 +34,5 @@
 
 
 {% block sidebar %}
-    <div class="container">
-        <h2 class="text-center">Users.</h2>
-        {% if user_exchangers %}
-            <ul>
-                {% for user_exchanger in user_exchangers %}
-                    <li>
-                        <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
-                        -
-                        <span class="badge rounded-pill bg-info">
-                            <a href="#" class="link">Get data</a>
-                        </span>
-                    </li>
-
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You did not create exchanger yet.</p>
-        {% endif %}
-    </div>
-
 {% endblock sidebar %}
 

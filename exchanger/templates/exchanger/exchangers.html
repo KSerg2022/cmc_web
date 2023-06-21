@@ -19,14 +19,16 @@
     <div class="container col-md-6 text-center">
         <h3>Please choose exchanger:</h3>
         {% if exchangers %}
-            <div class="container col-md-8">
-            <table class="table table-striped align-middle" id="userTable">
+            <div class="container">
+            <table class="table table-striped align-middle" id="">
                 <thead class="table-primary">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col" class="text-center">Exchangers</th>
                     <th scope="col" class="text-center">Logo</th>
-                    <th></th>
+                    <th scope="col" class="text-center">Create</th>
+                    <th scope="col" class="text-center">Delete</th>
+                    <th scope="col" class="text-center">Change</th>
                 </tr>
                 </thead>
 
@@ -41,12 +43,24 @@
                             {#                            <img src="{{ exchanger.logo }}" alt="{{ exchanger.logo }}" width="80">#}
                             <img src="{% thumbnail exchanger.logo 120x120 %}">
                         </td>
-                    <td>
-                        <button type="button" class="btn btn-outline-info">
-                            <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
-                            Create portfolio</a>
-                        </button>
-                    </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-success">
+                                <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
+                                    Create portfolio</a>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-info">
+                                <a href="{% url "exchanger:change_portfolio" exchanger.id %}" class="link">
+                                    Change portfolio</a>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-danger">
+                                <a href="{% url "exchanger:delete_portfolio" exchanger.id %}" class="link">
+                                    Delete portfolio</a>
+                            </button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -62,25 +76,5 @@
 
 
 {% block sidebar %}
-    <div class="container">
-        <h2 class="text-center">Users.</h2>
-        {% if user_exchangers %}
-            <ul>
-                {% for user_exchanger in user_exchangers %}
-                    <li>
-                        <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
-                        -
-                        <span class="badge rounded-pill bg-info">
-                            <a href="#" class="link">Get data</a>
-                        </span>
-                    </li>
-
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You did not create exchanger yet.</p>
-        {% endif %}
-    </div>
-
 {% endblock sidebar %}
 

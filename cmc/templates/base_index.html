@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load exchanger_tags %}
 
 {% block bootstrap5_content %}
 
@@ -14,9 +14,43 @@
 
 
         <aside class="sidebar">
-            {% block sidebar %}{% endblock sidebar %}
-        </aside>
+            <div class="container">
+                <ul>
+                <li>Total coins on site: {% total_coins %}</li>
+                <li>Total users on site: {% total_users %}</li>
+                <li>Total portfolio on site: {% total_portfolios %}</li>
+                </ul>
+            </div>
 
+
+            <div class="container">
+                {% if user.is_authenticated %}
+                    {% get_users_portfolio user as users_portfolio %}
+                    <h2 class="text-center">{{ user }}.</h2>
+                    {% if users_portfolio %}
+                        <ul>
+                            {% for user_exchanger in users_portfolio %}
+                                <li>
+                                    <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
+                                    -
+                                    <span class="badge rounded-pill bg-info">
+                                        <a href="{% url "exchanger:get_data" user_exchanger.exchanger.id %}"
+                                           class=" link">Get data</a>
+                                    </span>
+                                </li>
+
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>You did not create exchanger yet.</p>
+                    {% endif %}
+                    </div>
+                {% endif %}
+
+
+            {% block sidebar %}{% endblock sidebar %}
+
+        </aside>
     </div>
 
 {% endblock %}
