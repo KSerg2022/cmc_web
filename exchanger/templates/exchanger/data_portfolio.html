@@ -1,0 +1,69 @@
+{% extends "base_index.html" %}
+
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Exchangers{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+
+{% block main_content %}
+    <div class="text-center">
+        <h1>Exchanger {{ exchanger.name }}.</h1>
+        <p>
+            Here you ...
+        </p>
+    </div>
+
+    <div class="container text-center">
+        <h3>Please choose exchanger:</h3>
+
+        <table class="table table-striped align-middle" id="">
+
+            <thead class="table-primary">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" class="text-center">Coin</th>
+                <th scope="col" class="text-center">Balance</th>
+                <th scope="col" class="text-center">Data</th>
+                <th scope="col" class="text-center">CMC id</th>
+                <th scope="col" class="text-center">Name</th>
+                <th scope="col" class="text-center">Price</th>
+                <th scope="col" class="text-center">Total</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <td colspan="6"></td>
+                <td><b>Total:</b></td>
+                <td><b>{{ total_sum }}</b></td>
+            </tr>
+            {% for crypto in data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ crypto.coin }}</td>
+                    <td>{{ crypto.bal }}</td>
+                    <td>{{ crypto.data }}</td>
+                    <td>{{ crypto.id }}</td>
+                    <td>{{ crypto.name }}</td>
+                    <td>{{ crypto.price }}</td>
+                    <td>{{ crypto.total }}</td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+
+    {% include 'cmc/cmc/include/_paginate.html' with page=data %}
+
+{% endblock main_content %}
+
+
+{% block sidebar %}
+{% endblock sidebar %}
+

@@ -19,10 +19,12 @@ class Exchanger(models.Model):
                             validators=[validate_slug])
     host = models.URLField(verbose_name='https://',
                            validators=[URLValidator])
-    url = models.URLField(verbose_name='/url/',
-                          blank=True)
-    prefix = models.URLField(verbose_name='/url/',
-                             blank=True)
+    url = models.CharField(max_length=250,
+                           verbose_name='url',
+                           blank=True)
+    prefix = models.CharField(max_length=250,
+                              verbose_name='prefix',
+                              blank=True)
     is_active = models.BooleanField(default=True)
     logo = models.ImageField(upload_to=f'exchangers/%Y_%m_%d/',
                              blank=True,

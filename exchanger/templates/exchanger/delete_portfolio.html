@@ -1,0 +1,55 @@
+{% extends "base_index.html" %}
+
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Exchangers{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+
+{% block main_content %}
+    <div class="container col-md-6 text-center">
+        <h1>Exchanger - {{ exchanger.name }}</h1>
+        <div class="container">
+            <table class="table table-striped align-middle" id="">
+                <thead class="table-primary">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" class="text-center">Exchangers</th>
+                    <th scope="col" class="text-center">Logo</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>1.</td>
+                    <td><a href="#" class="link">
+                        {{ exchanger.name }}</a>
+                    </td>
+                    <td>
+                        <img src="{% thumbnail exchanger.logo 120x120 %}">
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            <h3 class="text-danger">
+                Are you sure to delete portfolio "OLX" "{{ exchanger.name }}"
+            </h3>
+        </div>
+        <p>
+            <a href="{% url 'exchanger:delete_portfolio' exchanger.id %}?yes=yes">
+                <input type="button" value="Delete" class="btn btn-danger"/>
+            </a>
+        </p>
+    </div>
+
+
+{% endblock main_content %}
+
+
+{% block sidebar %}
+{% endblock sidebar %}
+
