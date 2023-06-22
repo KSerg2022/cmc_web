@@ -18,6 +18,7 @@ class Exchanger(models.Model):
                             unique=True,
                             validators=[validate_slug])
     host = models.URLField(verbose_name='https://',
+                           blank=True,
                            validators=[URLValidator])
     url = models.CharField(max_length=250,
                            verbose_name='url',

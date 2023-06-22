@@ -1,0 +1,73 @@
+{% extends "base_index.html" %}
+
+{% load exchanger_tags %}
+{% load thumbnail %}
+
+{% block bootstrap5_title %}Exchangers{% endblock %}
+
+{% block bootstrap5_extra_head %}
+{% endblock bootstrap5_extra_head %}
+
+
+{% block main_content %}
+    <div class="text-center">
+        <h1>Users portfolios data.</h1>
+        <p>
+            Here you ...
+        </p>
+    </div>
+
+    <div class="container text-center">
+        {% for portfolio in user_portfolios_data %}
+
+            {% for name, portfolio_data in portfolio.items %}
+                <h3>Users portfolios {{ name }}</h3>
+
+                <table class="table table-striped align-middle" id="">
+                    <thead class="table-primary">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col" class="text-center">Coin</th>
+                        <th scope="col" class="text-center">Balance</th>
+                        <th scope="col" class="text-center">Data</th>
+                        <th scope="col" class="text-center">CMC id</th>
+                        <th scope="col" class="text-center">Name</th>
+                        <th scope="col" class="text-center">Price</th>
+                        <th scope="col" class="text-center">Total:
+                            <span class="text-center h4">{% get_sum_portfolio portfolio_data %}</span>
+                        </th>
+                    </tr>
+                    </thead>
+
+                    {% for data in portfolio_data %}
+                        <tbody>
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ data.coin }}</td>
+                            <td>{{ data.bal }}</td>
+                            <td>{{ data.data }}</td>
+                            <td>{{ data.id }}</td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.price }}</td>
+                            <td>{{ data.total }}</td>
+                        </tr>
+                        </tbody>
+                    {% endfor %}
+                </table>
+
+            {% endfor %}
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {#    {% include 'cmc/cmc/include/_paginate.html' with page=data %}#}
+
+{% endblock main_content %}
+
+
+{% block sidebar %}
+{% endblock sidebar %}
+

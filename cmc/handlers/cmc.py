@@ -105,3 +105,11 @@ class Cmc:
         json_data = self.get_cryptocurrency()
         return self.parse_cryptocurrencies(json_data)
 
+    def get_data_from_cmc(self):
+        ## get info from coinmarketcap for cryptocurrencies
+        cryptocurrencies_data = self.get_cryptocurrency()
+
+        ## parse all data for using
+        cryptocurrencies_data = self.parse_cryptocurrencies(cryptocurrencies_data)
+
+        return cryptocurrencies_data

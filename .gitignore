@@ -163,6 +163,7 @@ cython_debug/
 .idea/
 /.env
 help.txt
+help
 /development.docx
 **/postgres_data/**
 **/tests/**
@@ -170,4 +171,4 @@ help.txt
 #!/tests/functional_tests/cmc/**
 media/
 **/migrations/**
-
+**/logo_axchangers/**

@@ -11,10 +11,10 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_users_portfolio(user):
+def get_users_portfolios(user):
     user = User.objects.get(id=user.id)
     user_exchangers = ExPortfolio.objects.all().filter(owner=user.id)
-    return user_exchangers
+    return [user_exchanger.exchanger for user_exchanger in user_exchangers]
 
 
 @register.simple_tag
@@ -30,6 +30,11 @@ def total_users():
 @register.simple_tag
 def total_portfolios():
     return ExPortfolio.objects.all().count()
+
+
+@register.simple_tag
+def get_sum_portfolio(portfolio):
+    return round(sum([coin['total'] for coin in portfolio]), 3)
 
 
 # @register.inclusion_tag('blog/latest_posts.html')

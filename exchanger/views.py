@@ -8,6 +8,7 @@ from cmc.handlers.cmc import Cmc
 from .handlers import get_paginator
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
+from .utils.main.main_2 import main
 
 
 @login_required
@@ -84,6 +85,7 @@ def delete_portfolio(request, exchanger_id):
 
 from exchanger.utils.ex_okx import ExOkx
 
+
 @login_required
 def get_data(request, exchanger_id):
     exchanger = get_object_or_404(Exchanger,
@@ -101,8 +103,8 @@ def get_data(request, exchanger_id):
     data_total = get_aggregation_data(data_from_cmc=data_cmc,
                                       data_from_exchangers=[data_exchanger])
     total_sum = sum([coin['total'] for coin in list(data_total[0].values())[0]])
-    id_s = [coin['id'] for coin in list(data_total[0].values())[0]]
-    print('1------', id_s)
+    # id_s = [coin['id'] for coin in list(data_total[0].values())[0]]
+    # print('1------', id_s)
 
     data_, page_range = get_paginator(request, list(data_total[0].values())[0])
     return render(request, 'exchanger/data_portfolio.html', {'exchanger': exchanger,
@@ -110,6 +112,23 @@ def get_data(request, exchanger_id):
                                                              'total_sum': total_sum,
                                                              'page_range': page_range
                                                              })
+
+
+@login_required
+def get_all_data(request, user_id):
+    user_portfolios = get_object_or_404(User,
+                                        id=user_id).exchanger_created.all()
+    print('1---', user_portfolios)
+
+    user_portfolios_data = main(user_id)
+
+    print('2---', user_portfolios)
+
+
+    # data_, page_range = get_paginator(request, list(data_total[0].values())[0])
+    return render(request, 'exchanger/data_all_portfolios.html',
+                  {'user_portfolios_data': user_portfolios_data})
+
 
 
 @login_required

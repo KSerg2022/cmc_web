@@ -16,31 +16,49 @@
         <aside class="sidebar">
             <div class="container">
                 <ul>
-                <li>Total coins on site: {% total_coins %}</li>
-                <li>Total users on site: {% total_users %}</li>
-                <li>Total portfolio on site: {% total_portfolios %}</li>
+                    <li>Total coins on site: {% total_coins %}</li>
+                    <li>Total users on site: {% total_users %}</li>
+                    <li>Total portfolio on site: {% total_portfolios %}</li>
                 </ul>
             </div>
 
 
             <div class="container">
                 {% if user.is_authenticated %}
-                    {% get_users_portfolio user as users_portfolio %}
+
+                    {% get_users_portfolios user as users_portfolios %}
                     <h2 class="text-center">{{ user }}.</h2>
-                    {% if users_portfolio %}
-                        <ul>
-                            {% for user_exchanger in users_portfolio %}
-                                <li>
-                                    <a href="#" class="link">{{ user_exchanger.exchanger }}</a>
-                                    -
-                                    <span class="badge rounded-pill bg-info">
-                                        <a href="{% url "exchanger:get_data" user_exchanger.exchanger.id %}"
+
+                    {% if users_portfolios %}
+
+                        <table class="table table-borderless align-middle" id="">
+                            <thead class="table-primary">
+                            <tr>
+                                <th scope="col">Exchangers</th>
+                                <th scope="col" class="text-center">Info</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for users_portfolio in users_portfolios %}
+                                <tr>
+                                <td>{{ users_portfolio }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-info">
+                                        <a href="{% url "exchanger:get_data" users_portfolio.id %}"
                                            class=" link">Get data</a>
                                     </span>
-                                </li>
-
+                                </td>
                             {% endfor %}
-                        </ul>
+                            </tbody>
+                        </table>
+
+                        <p class="text-center">
+                         <span class="badge bg-warning bg-lg">
+                            <a href="{% url "exchanger:get_all_data" user.id %}" class=" link">Get data for all portfolios</a>
+                        </span>
+                        </p>
+
                     {% else %}
                         <p>You did not create exchanger yet.</p>
                     {% endif %}
