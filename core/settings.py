@@ -47,9 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django_bootstrap5',
     'easy_thumbnails',
+    'django_json_widget',
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
+    'blockchain.apps.BlockchainConfig'
 
 ]
 
@@ -81,6 +83,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'exchanger_tags': 'exchanger.templatetags.exchanger_tags',
+                'blockchain_tags': 'blockchain.templatetags.blockchain_tags',
 
             }
         },
@@ -186,3 +189,22 @@ if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
     # INTERNAL_IPS = ('127.0.0.1',)
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG'
+#         },
+#     },
+#     'root': {'level': 'INFO'},
+# }
+
