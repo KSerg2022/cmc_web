@@ -1,0 +1,66 @@
+[
+{
+  "model": "blockchain.blockchain",
+  "pk": 1,
+  "fields": {
+    "name": "BSC",
+    "slug": "bsc",
+    "host": "https://api.bscscan.com/api",
+    "is_active": true,
+    "logo": "blockchains/2023_06_23/bnb-chain-full-binance-smart-chain-logo.png",
+    "website": "https://bnbchain.org/en",
+    "scan_site": "https://bscscan.com/"
+  }
+},
+{
+  "model": "blockchain.blockchain",
+  "pk": 2,
+  "fields": {
+    "name": "Ethereum",
+    "slug": "ethereum",
+    "host": "https://api.etherscan.io/api",
+    "is_active": true,
+    "logo": "blockchains/2023_06_23/etherium.png",
+    "website": "https://ethereum.org/en/",
+    "scan_site": "https://etherscan.io/"
+  }
+},
+{
+  "model": "blockchain.blockchain",
+  "pk": 3,
+  "fields": {
+    "name": "Fantom",
+    "slug": "fantom",
+    "host": "https://api.ftmscan.com/api'",
+    "is_active": true,
+    "logo": "blockchains/2023_06_23/CryptoMode-Fantom-Protocol-fMint-DeFi.png",
+    "website": "https://fantom.foundation/",
+    "scan_site": "https://ftmscan.com/"
+  }
+},
+{
+  "model": "blockchain.blockchain",
+  "pk": 4,
+  "fields": {
+    "name": "Polygon",
+    "slug": "polygon",
+    "host": "https://api.polygonscan.com/api",
+    "is_active": true,
+    "logo": "blockchains/2023_06_23/Polygon_blockchain_logo.png",
+    "website": "https://polygon.technology/",
+    "scan_site": "https://polygonscan.com/"
+  }
+},
+{
+  "model": "blockchain.blockchain",
+  "pk": 5,
+  "fields": {
+    "name": "Solscan",
+    "slug": "solscan",
+    "host": "https://public-api.solscan.io/account/tokens",
+    "is_active": true,
+    "logo": "blockchains/2023_06_23/full-solana-logo.png",
+    "website": "https://solana.com/ru",
+    "scan_site": "https://solscan.io/"
+  }
+}]

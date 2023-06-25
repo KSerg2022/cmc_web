@@ -97,13 +97,13 @@ class Cmc:
         }
         return result
 
-    @staticmethod
-    def normalize_data(data: list[str]) -> list[str]:
-        return [value.upper() for value in data]
+    # @staticmethod
+    # def normalize_data(data: list[str]) -> list[str]:
+    #     return [value.upper() for value in data]
 
-    def get_data(self):
-        json_data = self.get_cryptocurrency()
-        return self.parse_cryptocurrencies(json_data)
+    # def get_data(self):
+    #     json_data = self.get_cryptocurrency()
+    #     return self.parse_cryptocurrencies(json_data)
 
     def get_data_from_cmc(self):
         ## get info from coinmarketcap for cryptocurrencies

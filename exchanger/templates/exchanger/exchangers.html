@@ -1,6 +1,8 @@
 {% extends "base_index.html" %}
 
 {% load exchanger_tags %}
+{% load blockchain_tags %}
+
 {% load thumbnail %}
 
 {% block bootstrap5_title %}Exchangers{% endblock %}
@@ -17,85 +19,172 @@
         </p>
     </div>
 
-    <div class="container col-md-6 text-center">
-        <h3>Please choose exchanger:</h3>
-        {% if exchangers %}
-            <div class="container">
-            <table class="table table-striped align-middle" id="">
-                <thead class="table-primary">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col" class="text-center">Exchangers</th>
-                    <th scope="col" class="text-center">Logo</th>
-                    <th scope="col" class="text-center">Create</th>
-                    <th scope="col" class="text-center">Delete</th>
-                    <th scope="col" class="text-center">Change</th>
-                </tr>
-                </thead>
+{#    <div class="container col-md-6 text-center">#}
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Please choose exchanger:</h3>
+                {% if exchangers %}
+                    <div class="container">
+                    <table class="table table-striped align-middle" id="">
+                        <thead class="table-primary">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col" class="text-center">Exchangers</th>
+                            <th scope="col" class="text-center">Logo</th>
+                            <th scope="col" class="text-center">Create</th>
+                            <th scope="col" class="text-center">Delete</th>
+                            <th scope="col" class="text-center">Change</th>
+                        </tr>
+                        </thead>
 
-                <tbody>
-                {% get_users_portfolios user as users_portfolios %}
+                        <tbody>
+                        {% get_users_portfolios user as users_portfolios %}
 
-                {% for exchanger in exchangers %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="#" class="link">
-                            {{ exchanger.name }}</a>
-                        </td>
-                        <td>
-                            {#                            <img src="{{ exchanger.logo }}" alt="{{ exchanger.logo }}" width="80">#}
-                            <img src="{% thumbnail exchanger.logo 120x120 %}">
-                        </td>
+                        {% for exchanger in exchangers %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><a href="{{ exchanger.website }}" class="link" target="_blank" >
+                                    {{ exchanger.name }}</a>
+                                </td>
+                                <td>
+                                    <img src="{% thumbnail exchanger.logo 120x120 %}">
+                                </td>
 
-                        {% if exchanger in users_portfolios %}
-                            <td>
-                                <button type="button" class="btn btn-outline-success disabled">
-                                    <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
-                                        Create portfolio</a>
-                                </button>
+                                {% if exchanger in users_portfolios %}
+                                    <td>
+                                        <button type="button" class="btn btn-outline-success disabled">
+                                            <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
+                                                Create portfolio</a>
+                                        </button>
 
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-outline-info">
-                                    <a href="{% url "exchanger:change_portfolio" exchanger.id %}" class="link">
-                                        Change portfolio</a>
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-outline-danger">
-                                    <a href="{% url "exchanger:delete_portfolio" exchanger.id %}" class="link">
-                                        Delete portfolio</a>
-                                </button>
-                            </td>
-                        {% else %}
-                            <td>
-                                <button type="button" class="btn btn-outline-success">
-                                    <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
-                                        Create portfolio</a>
-                                </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info">
+                                            <a href="{% url "exchanger:change_portfolio" exchanger.id %}" class="link">
+                                                Change portfolio</a>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger">
+                                            <a href="{% url "exchanger:delete_portfolio" exchanger.id %}" class="link">
+                                                Delete portfolio</a>
+                                        </button>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <button type="button" class="btn btn-outline-success">
+                                            <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
+                                                Create portfolio</a>
+                                        </button>
 
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-outline-info" disabled>
-                                    <a href="{% url "exchanger:change_portfolio" exchanger.id %}" class="link">
-                                        Change portfolio</a>
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-outline-danger disabled">
-                                    <a href="{% url "exchanger:delete_portfolio" exchanger.id %}" class="link">
-                                        Delete portfolio</a>
-                                </button>
-                            </td>
-                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info" disabled>
+                                            <a href="{% url "exchanger:change_portfolio" exchanger.id %}" class="link">
+                                                Change portfolio</a>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger disabled">
+                                            <a href="{% url "exchanger:delete_portfolio" exchanger.id %}" class="link">
+                                                Delete portfolio</a>
+                                        </button>
+                                    </td>
+                                {% endif %}
 
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <h1>Exchangers not found!</h1>
-        {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h1>Exchangers not found!</h1>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <h3>Please choose exchanger:</h3>
+                {% if blockchains_list %}
+                    <div class="container">
+                    <table class="table table-striped align-middle" id="">
+                        <thead class="table-primary">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col" class="text-center">Exchangers</th>
+                            <th scope="col" class="text-center">Logo</th>
+                            <th scope="col" class="text-center">Create</th>
+                            <th scope="col" class="text-center">Delete</th>
+                            <th scope="col" class="text-center">Change</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% get_blockchain_portfolios user as blockchain_portfolios %}
+
+                        {% for blockchain in blockchains_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <a href="{{ blockchain.website }}" class="link" target="_blank" >
+                                    {{ blockchain.name }}</a>
+                                </td>
+                                <td>
+
+                                    <img src="{% thumbnail blockchain.logo 120x120 %}">
+                                </td>
+
+                                {% if blockchain in blockchain_portfolios %}
+                                    <td>
+                                        <button type="button" class="btn btn-outline-success disabled">
+                                            <a href="{% url "blockchain:create_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Create portfolio</a>
+                                        </button>
+
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info">
+                                            <a href="{% url "blockchain:change_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Change portfolio</a>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger">
+                                            <a href="{% url "blockchain:delete_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Delete portfolio</a>
+                                        </button>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <button type="button" class="btn btn-outline-success">
+                                            <a href="{% url "blockchain:create_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Create portfolio</a>
+                                        </button>
+
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info" disabled>
+                                            <a href="{% url "blockchain:change_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Change portfolio</a>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger disabled">
+                                            <a href="{% url "blockchain:delete_blockchain_portfolio" blockchain.id %}" class="link">
+                                                Delete portfolio</a>
+                                        </button>
+                                    </td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h1>Exchangers not found!</h1>
+                {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 

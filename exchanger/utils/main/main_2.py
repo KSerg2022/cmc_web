@@ -10,17 +10,7 @@ class Main:
     """"""
 
     def __init__(self, user_id,):
-        # self.cmc = Cmc([])
         self.exchanges = DataFromExchangers(user_id)
-
-    # def get_data_from_cmc(self):
-    #     ## get info from coinmarketcap for cryptocurrencies
-    #     cryptocurrencies_data = self.cmc.get_cryptocurrency()
-    #
-    #     ## parse all data for using
-    #     cryptocurrencies_data = self.cmc.parse_cryptocurrencies(cryptocurrencies_data)
-    #
-    #     return cryptocurrencies_data
 
     def get_data_from_exchangers(self):
         ## get info from exchangers for cryptocurrencies
@@ -47,6 +37,8 @@ class Main:
         for symbol, value in data_from_cmc.items():
             if symbol in time_data:
                 continue
+            if symbol in ['IOTA']:
+                continue
             else:
                 w.append({'coin': symbol,
                           'bal': 0,
@@ -61,6 +53,15 @@ class Main:
 
         return aggregation_data
 
+    def chack_name(self, symbol):
+        """HTTP method POST."""
+        match symbol:
+            case 'CFI':
+                return 'CFi'
+            case 'IOTA':
+                return 'MIOTA'
+            case _:
+                return symbol
 
 def main(user_id):
     """"""
@@ -71,15 +72,15 @@ def main(user_id):
 
     symbol_list = []
     for data_from_exchanger in data_from_exchangers:
-        symbol_list += [coin['coin'] for coin in list(data_from_exchanger.values())[0]]
-    # print('9------', symbol_list)
+        symbol_list += [main.chack_name(coin['coin']) for coin in list(data_from_exchanger.values())[0]]
+    # print('9------', sorted(symbol_list))
 
     cmc = Cmc(symbol_list)
     data_from_cmc = cmc.get_data_from_cmc()
-    print('~' * 50)
     # print('6------', data_from_cmc)
 
     aggregation_data = main.get_aggregation_data(data_from_cmc, data_from_exchangers)
-    # print('0------', aggregation_data)
+    # [print(e) for e in aggregation_data]
+
     return aggregation_data
 

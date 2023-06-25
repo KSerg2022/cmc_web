@@ -10,10 +10,14 @@
     {% endif %}
 
     {% if user.is_authenticated %}
+
         <li class='nav-link'>
-            Hello, {% if user.first_name %} {{ user.first_name }}
-        {% else %} {{ user.username }}
-        {% endif %}
+        <a class="dropdown-item" href="{% url "exchanger:exchangers" %}">
+                Hello, {% if user.first_name %} {{ user.first_name }}
+            {% else %} {{ user.username }}
+            {% endif %}
+            </a>
+
         </li>
 
         <li class="nav-item dropdown">

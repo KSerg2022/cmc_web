@@ -21,7 +21,7 @@
         {% for portfolio in user_portfolios_data %}
 
             {% for name, portfolio_data in portfolio.items %}
-                <h3>Users portfolios {{ name }}</h3>
+                <h3>Users portfolios {{ name|upper }}</h3>
 
                 <table class="table table-striped align-middle" id="">
                     <thead class="table-primary">

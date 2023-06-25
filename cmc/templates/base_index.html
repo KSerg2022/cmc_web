@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load exchanger_tags %}
+{% load blockchain_tags %}
 
 {% block bootstrap5_content %}
 
@@ -18,7 +19,8 @@
                 <ul>
                     <li>Total coins on site: {% total_coins %}</li>
                     <li>Total users on site: {% total_users %}</li>
-                    <li>Total portfolio on site: {% total_portfolios %}</li>
+                    <li>Total exchanger portfolio on site: {% total_exchanger_portfolios %}</li>
+                    <li>Total blockchain portfolio on site: {% total_blockchain_portfolios %}</li>
                 </ul>
             </div>
 
@@ -62,8 +64,44 @@
                     {% else %}
                         <p>You did not create exchanger yet.</p>
                     {% endif %}
-                    </div>
+
+                    {% get_blockchain_portfolios user as blockchain_portfolios %}
+
+                    {% if blockchain_portfolios %}
+                        <table class="table table-borderless align-middle" id="">
+                            <thead class="table-primary">
+                            <tr>
+                                <th scope="col">Blockchains</th>
+                                <th scope="col" class="text-center">Info</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for blockchain_portfolio in blockchain_portfolios %}
+                                <tr>
+                                <td>{{ blockchain_portfolio }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-info">
+                                        <a href="#"
+                                           class=" link">Get data</a>
+                                    </span>
+                                </td>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <p class="text-center">
+                         <span class="badge bg-warning bg-lg">
+                            <a href="{% url "exchanger:get_all_data" user.id %}" class=" link">Get data for all portfolios</a>
+                        </span>
+                        </p>
+
+                    {% else %}
+                        <p>You did not create blockchain yet.</p>
+                    {% endif %}
+
                 {% endif %}
+            </div>
 
 
             {% block sidebar %}{% endblock sidebar %}

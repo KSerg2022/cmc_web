@@ -10,11 +10,14 @@ from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 from .utils.main.main_2 import main
 
+from blockchain.models import Blockchain
 
 @login_required
 def exchangers(request):
-    exchangers_list = Exchanger.objects.all().filter(is_active=True)
-    return render(request, 'exchanger/exchangers.html', {'exchangers': exchangers_list})
+    exchangers_list = Exchanger.objects.filter(is_active=True)
+    blockchains_list = Blockchain.objects.filter(is_active=True)
+    return render(request, 'exchanger/exchangers.html', {'exchangers': exchangers_list,
+                                                         'blockchains_list': blockchains_list})
 
 
 @login_required
@@ -103,8 +106,6 @@ def get_data(request, exchanger_id):
     data_total = get_aggregation_data(data_from_cmc=data_cmc,
                                       data_from_exchangers=[data_exchanger])
     total_sum = sum([coin['total'] for coin in list(data_total[0].values())[0]])
-    # id_s = [coin['id'] for coin in list(data_total[0].values())[0]]
-    # print('1------', id_s)
 
     data_, page_range = get_paginator(request, list(data_total[0].values())[0])
     return render(request, 'exchanger/data_portfolio.html', {'exchanger': exchanger,
@@ -118,17 +119,11 @@ def get_data(request, exchanger_id):
 def get_all_data(request, user_id):
     user_portfolios = get_object_or_404(User,
                                         id=user_id).exchanger_created.all()
-    print('1---', user_portfolios)
-
     user_portfolios_data = main(user_id)
-
-    print('2---', user_portfolios)
-
 
     # data_, page_range = get_paginator(request, list(data_total[0].values())[0])
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})
-
 
 
 @login_required

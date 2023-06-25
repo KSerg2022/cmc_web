@@ -13,7 +13,7 @@ register = template.Library()
 @register.simple_tag
 def get_users_portfolios(user):
     user = User.objects.get(id=user.id)
-    user_exchangers = ExPortfolio.objects.all().filter(owner=user.id)
+    user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
     return [user_exchanger.exchanger for user_exchanger in user_exchangers]
 
 
@@ -28,7 +28,7 @@ def total_users():
 
 
 @register.simple_tag
-def total_portfolios():
+def total_exchanger_portfolios():
     return ExPortfolio.objects.all().count()
 
 

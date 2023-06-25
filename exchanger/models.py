@@ -30,6 +30,10 @@ class Exchanger(models.Model):
     logo = models.ImageField(upload_to=f'exchangers/%Y_%m_%d/',
                              blank=True,
                              validators=[validate_image_file_extension])
+    website = models.URLField(max_length=200,
+                              verbose_name='Site',
+                              blank=True,
+                              )
 
     class Meta:
         indexes = [
@@ -59,7 +63,7 @@ class ExPortfolio(models.Model):
                             unique=True,
                             validators=[validate_slug])
     api_key = models.CharField(max_length=255)
-    api_secret = models.CharField(max_length=255)
+    api_secret = models.TextField()
     password = models.CharField(max_length=255,
                                 blank=True)
     comments = models.TextField(blank=True)
