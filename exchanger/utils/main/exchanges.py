@@ -18,52 +18,88 @@ from blockchain.utils.solana import Solana
 from django.contrib.auth.models import User
 
 
+
 class DataFromExchangers:
     """"""
 
     def __init__(self, user_id):
-        user_exchanger_portfolios = get_object_or_404(User,
-                                                      id=user_id).exchanger_created.all()
-        data_for_queries_exchanger = self.get_data_for_queries(user_exchanger_portfolios)
-
-        user_blockchain_portfolios = get_object_or_404(User,
-                                                       id=user_id).blockchain_created.all()
-        data_for_queries_blockchain = self.get_data_for_queries_blockchain(user_blockchain_portfolios)
-
+        self.data_for_queries_exchanger = self.get_data_for_queries_exchanger(user_id)
+        self.data_for_queries_blockchain = self.get_data_for_queries_blockchain(user_id)
         self.currencies = []
-        self.exchangers = [
-            ExLbank(*data_for_queries_exchanger['Lbank']).get_account,
-            ExMexc(*data_for_queries_exchanger['MEXC']).get_account,
-            ExGate(*data_for_queries_exchanger['Gate']).get_account,
-            ExBybit(*data_for_queries_exchanger['ByBit']).get_account,
-            ExOkx(*data_for_queries_exchanger['OKX']).get_account,
-            ExBinance(*data_for_queries_exchanger['Binance']).get_account,
-
-            Bsc(*data_for_queries_blockchain['BSC']).get_account,
-            Ether(*data_for_queries_blockchain['Ethereum']).get_account,
-            Polygon(*data_for_queries_blockchain['Polygon']).get_account,
-            Fantom(*data_for_queries_blockchain['Fantom']).get_account,
-            Solana(*data_for_queries_blockchain['Solana']).get_account,
-        ]
 
     def get_data_from_exchangers(self):
         """"""
-        for exchanger in self.exchangers:
-            self.currencies.append(exchanger())
+        exchanger_list = list(self.data_for_queries_exchanger.keys())
+        if 'Lbank' in exchanger_list:
+            self.currencies.append(
+                ExLbank(*self.data_for_queries_exchanger['Lbank']).get_account()
+            )
+        if 'Mexc' in exchanger_list:
+            self.currencies.append(
+                ExMexc(*self.data_for_queries_exchanger['MEXC']).get_account()
+            )
+        if 'ByBit' in exchanger_list:
+            self.currencies.append(
+                ExBybit(*self.data_for_queries_exchanger['ByBit']).get_account()
+            )
+        if 'Gate' in exchanger_list:
+            self.currencies.append(
+                ExGate(*self.data_for_queries_exchanger['Gate']).get_account()
+            )
+        if 'OKX' in exchanger_list:
+            self.currencies.append(
+                ExOkx(*self.data_for_queries_exchanger['OKX']).get_account()
+            )
+        if 'Binance' in exchanger_list:
+            self.currencies.append(
+                ExBinance(*self.data_for_queries_exchanger['Binance']).get_account()
+            )
+
+        blockchain_list = list(self.data_for_queries_blockchain.keys())
+        if 'BSC' in blockchain_list:
+            self.currencies.append(
+                Bsc(*self.data_for_queries_blockchain['BSC']).get_account()
+            )
+        if 'Ethereum' in blockchain_list:
+            self.currencies.append(
+                Ether(*self.data_for_queries_blockchain['Ethereum']).get_account()
+            )
+        if 'Polygon' in blockchain_list:
+            self.currencies.append(
+                Polygon(*self.data_for_queries_blockchain['Polygon']).get_account()
+            )
+        if 'Fantom' in blockchain_list:
+            self.currencies.append(
+                Fantom(*self.data_for_queries_blockchain['Fantom']).get_account()
+            )
+        if 'Solana' in blockchain_list:
+            self.currencies.append(
+                Solana(*self.data_for_queries_blockchain['Solana']).get_account()
+            )
         return self.currencies
 
-    def get_data_for_queries(self, user_portfolios):
+    @staticmethod
+    def get_data_for_queries_exchanger(user_id):
+        user_exchanger_portfolios = get_object_or_404(User,
+                                                      id=user_id).exchanger_created.all()
         data = {}
-        for q in user_portfolios:
-            data[q.exchanger.name] = (q.api_key,
+        for q in user_exchanger_portfolios:
+            data[q.exchanger.name] = (q.exchanger.host,
+                                      q.exchanger.url,
+                                      q.exchanger.prefix,
+                                      q.api_key,
                                       q.api_secret,
                                       q.password)
         return data
 
-    def get_data_for_queries_blockchain(self, user_portfolios):
+    @staticmethod
+    def get_data_for_queries_blockchain(user_id):
+        user_blockchain_portfolios = get_object_or_404(User,
+                                                       id=user_id).blockchain_created.all()
         data = {}
-        for q in user_portfolios:
-            data[q.blockchain.name] = (q.api_key,
+        for q in user_blockchain_portfolios:
+            data[q.blockchain.name] = (q.blockchain.host,
+                                       q.api_key,
                                        q.wallet,
                                        q.currencies)
         return data
