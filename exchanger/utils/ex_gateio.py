@@ -19,12 +19,12 @@ load_dotenv()
 class ExGate(ExchangerBase):
     """"""
 
-    host = "https://api.gateio.ws"
-    prefix = "/api/v4"
-    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-    query_param = ''
-
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
+        self.host = host
+        self.prefix = prefix
+        self.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        self.query_param = ''
         self.key = api_key  # api_key
         self.secret = api_secret  # api_secret
         self.exchanger = os.path.splitext(os.path.basename(__file__))[0][3:]
@@ -75,9 +75,3 @@ class ExGate(ExchangerBase):
                 'bal': float(symbol['available']) + float(symbol['locked'])
             })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    currencies = ExGate()
-    result = currencies.get_account()
-    print(result)

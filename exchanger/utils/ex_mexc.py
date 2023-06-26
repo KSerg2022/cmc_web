@@ -18,11 +18,12 @@ load_dotenv()
 
 class ExMexc(ExchangerBase):
     """"""
-    host = "https://api.mexc.com"
-    prefix = "/api/v3/"
-    url = 'account'
 
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
+        self.host = host
+        self.prefix = prefix
+        self.url = url
         self.apiKey = api_key
         self.apiSecret = api_secret
         self.headers = {"X-MEXC-APIKEY": self.apiKey, "Content-Type": "application/json"}
@@ -64,10 +65,3 @@ class ExMexc(ExchangerBase):
                 'bal': float(symbol['free']) + float(symbol['locked'])
             })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    currencies = ExMexc()
-    result = currencies.get_account()
-    print(result)
-

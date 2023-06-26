@@ -15,9 +15,9 @@ load_dotenv()
 
 
 class ExBinance(ExchangerBase):
-    host = 'https://api.binance.com'
 
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
         self.api_key = api_key
         self.api_secret = api_secret
 
@@ -76,9 +76,3 @@ class ExBinance(ExchangerBase):
                         'bal': float(symbol['marginBalance'])
                     })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    r = ExBinance()
-    result = r.get_account()
-    print(result)

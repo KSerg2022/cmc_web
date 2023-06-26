@@ -9,9 +9,9 @@ from blockchain.utils.base import Base
 class Bsc(Base):
     """"""
 
-    def __init__(self, api_key, wallet, currencies):
+    def __init__(self, host, api_key, wallet, currencies):
         super().__init__()
-        self.host = 'https://api.bscscan.com/api'
+        self.host = host
         self.api_key = api_key
         self.wallet = wallet
         self.currencies = currencies

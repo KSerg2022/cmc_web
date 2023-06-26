@@ -14,9 +14,10 @@ load_dotenv()
 
 
 class ExOkx(ExchangerBase):
-    host = "https://www.okx.com"
 
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
+        self.host = host
         self.api_key = api_key
         self.api_secret = api_secret
         self.passphrase = passphrase
@@ -74,9 +75,3 @@ class ExOkx(ExchangerBase):
                         'bal': float(symbol['bal'])
                     })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    currencies = ExOkx()
-    data = currencies.get_account()
-    print(data)

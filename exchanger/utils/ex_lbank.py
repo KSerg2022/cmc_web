@@ -14,7 +14,8 @@ load_dotenv()
 class ExLbank(ExchangerBase):
     """"""
 
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
         self.api_key = api_key
         self.private_key = api_secret
         self.api = LBankAPI(self.api_key, self.private_key)

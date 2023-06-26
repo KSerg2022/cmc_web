@@ -18,7 +18,8 @@ load_dotenv()
 class ExBybit(ExchangerBase):
     """"""
 
-    def __init__(self, api_key, api_secret, passphrase):
+    def __init__(self, host=None, url=None, prefix=None,
+                 api_key=None, api_secret=None, passphrase=None):
         self.apiKey = api_key
         self.apiSecret = api_secret
         self.session = HTTP(testnet=False, api_key=self.apiKey, api_secret=self.apiSecret)
