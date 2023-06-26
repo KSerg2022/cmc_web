@@ -19,7 +19,7 @@
         </p>
     </div>
 
-{#    <div class="container col-md-6 text-center">#}
+
     <div class="container-fluid text-center">
         <div class="row">
             <div class="col-sm-6">
@@ -39,7 +39,6 @@
                         </thead>
 
                         <tbody>
-                        {% get_users_portfolios user as users_portfolios %}
 
                         {% for exchanger in exchangers %}
                             <tr>
@@ -51,7 +50,7 @@
                                     <img src="{% thumbnail exchanger.logo 120x120 %}">
                                 </td>
 
-                                {% if exchanger in users_portfolios %}
+                                {% if exchanger in exchanger_portfolios %}
                                     <td>
                                         <button type="button" class="btn btn-outline-success disabled">
                                             <a href="{% url "exchanger:create_portfolio" exchanger.id %}" class="link">
@@ -120,7 +119,6 @@
                         </thead>
 
                         <tbody>
-                        {% get_blockchain_portfolios user as blockchain_portfolios %}
 
                         {% for blockchain in blockchains_list %}
                             <tr>

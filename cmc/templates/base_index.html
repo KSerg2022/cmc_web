@@ -4,6 +4,10 @@
 
 {% block bootstrap5_content %}
 
+    {% get_exchanger_portfolios user as exchanger_portfolios %}
+    {% get_blockchain_portfolios user as blockchain_portfolios %}
+
+
     <div class="height100 main">
 
         <div class="main_content">
@@ -28,10 +32,9 @@
             <div class="container">
                 {% if user.is_authenticated %}
 
-                    {% get_users_portfolios user as users_portfolios %}
                     <h2 class="text-center">{{ user }}.</h2>
 
-                    {% if users_portfolios %}
+                    {% if exchanger_portfolios %}
 
                         <table class="table table-borderless align-middle" id="">
                             <thead class="table-primary">
@@ -42,30 +45,27 @@
                             </thead>
 
                             <tbody>
-                            {% for users_portfolio in users_portfolios %}
+                            {% for exchanger_portfolio in exchanger_portfolios %}
                                 <tr>
-                                <td>{{ users_portfolio }}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-info">
-                                        <a href="{% url "exchanger:get_data" users_portfolio.id %}"
-                                           class=" link">Get data</a>
-                                    </span>
-                                </td>
+                                    <td>{{ exchanger_portfolio }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url "exchanger:get_data" exchanger_portfolio.id %}"
+                                           class="badge bg-info link">Get data</a>
+                                    </td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
 
                         <p class="text-center">
-                         <span class="badge bg-warning bg-lg">
-                            <a href="{% url "exchanger:get_all_data" user.id %}" class=" link">Get data for all portfolios</a>
-                        </span>
+                            <a href="{% url "exchanger:get_all_data" user.id %}" class="badge bg-warning bg-lg link">
+                                Get data for all portfolios</a>
                         </p>
 
                     {% else %}
                         <p>You did not create exchanger yet.</p>
                     {% endif %}
 
-                    {% get_blockchain_portfolios user as blockchain_portfolios %}
 
                     {% if blockchain_portfolios %}
                         <table class="table table-borderless align-middle" id="">
@@ -79,21 +79,21 @@
                             <tbody>
                             {% for blockchain_portfolio in blockchain_portfolios %}
                                 <tr>
-                                <td>{{ blockchain_portfolio }}</td>
-                                <td class="text-center">
+                                    <td>{{ blockchain_portfolio }}</td>
+                                    <td class="text-center">
                                     <span class="badge bg-info">
                                         <a href="#"
                                            class=" link">Get data</a>
                                     </span>
-                                </td>
+                                    </td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
 
                         <p class="text-center">
-                         <span class="badge bg-warning bg-lg">
-                            <a href="{% url "exchanger:get_all_data" user.id %}" class=" link">Get data for all portfolios</a>
-                        </span>
+                            <a href="{% url "exchanger:get_all_data" user.id %}" class="badge bg-warning bg-lg link">
+                                Get data for all portfolios</a>
                         </p>
 
                     {% else %}
@@ -102,7 +102,6 @@
 
                 {% endif %}
             </div>
-
 
             {% block sidebar %}{% endblock sidebar %}
 
