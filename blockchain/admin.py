@@ -1,4 +1,8 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import Textarea, CharField, TextInput
+from django_json_widget.widgets import JSONEditorWidget
+
 
 from .models import Blockchain
 # from .models import Currencies
@@ -18,9 +22,13 @@ class BlockchainAdmin(admin.ModelAdmin):
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'blockchain', 'slug', 'api_key', 'wallet', 'comments', 'currencies')
+    list_display = ('owner', 'blockchain', 'slug', 'api_key', 'wallet', 'comments')
     list_filter = ('blockchain', 'owner')
     search_fields = ('blockchain', 'owner', )
     prepopulated_fields = {'slug': ('owner', 'blockchain')}
     ordering = ('blockchain', 'owner')
-
+    formfield_overrides = {
+        models.JSONField: {'widget': JSONEditorWidget},
+        models.TextField: {'widget': Textarea(attrs={'rows': 4, 'cols': 50})},
+        models.CharField: {'widget': TextInput(attrs={'size': '150'})},
+    }

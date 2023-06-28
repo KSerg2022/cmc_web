@@ -24,6 +24,9 @@ class PortfolioForm(forms.ModelForm):
                                              'placeholder': "Enter a wallet"}),
             'comments': forms.Textarea(attrs={'style': 'height: 5em; width: 40em',
                                               'placeholder': "Enter a comments"}),
-            'currencies': forms.Textarea(attrs={'style': 'height: 10em; width: 40em'})
+            'currencies': forms.Textarea(attrs={'style': 'height: 10em; width: 40em',
+                                                'placeholder': '{\n"SYMBOL1": "adresse 1",\n'
+                                                               '"SYMBOL2": "adresse 2",\n'
+                                                               '"SYMBOL3": "adresse 3"\n}'}
+                                         )
         }
-
