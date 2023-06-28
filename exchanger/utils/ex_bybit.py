@@ -27,16 +27,18 @@ class ExBybit(ExchangerBase):
 
     def get_account_spot(self):
         """"""
-        return self._get_response(self.session.get_spot_asset_info,
-                                  self.exchanger,
-                                  (FailedRequestError, InvalidRequestError, UnauthorizedExceptionError,)
+        return self._get_response(fn=self.session.get_spot_asset_info,
+                                  error_label='spot account',
+                                  exchanger=self.exchanger,
+                                  exception=(FailedRequestError, InvalidRequestError, UnauthorizedExceptionError,)
                                   )
 
     def get_account_margin(self):
         """"""
-        return self._get_response(self.session.get_wallet_balance,
-                                  self.exchanger,
-                                  (FailedRequestError, InvalidRequestError, UnauthorizedExceptionError,),
+        return self._get_response(fn=self.session.get_wallet_balance,
+                                  error_label='margin account',
+                                  exchanger=self.exchanger,
+                                  exception=(FailedRequestError, InvalidRequestError, UnauthorizedExceptionError,),
                                   accountType="CONTRACT",
                                   )
 
@@ -49,8 +51,11 @@ class ExBybit(ExchangerBase):
 
     def _normalize_data(self, account_spot, account_margin):
         """"""
-        if not account_spot and not account_margin:
-            return {self.exchanger: {}}
+        if 'error' in account_spot and 'error' in account_margin:
+            return {self.exchanger: [account_spot, account_margin]}
+
+        # if not account_spot and not account_margin:
+        #     return {self.exchanger: {}}
 
         q = defaultdict(list)
         if account_spot:
@@ -71,9 +76,3 @@ class ExBybit(ExchangerBase):
                 'bal': value[0]
             })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    c = ExBybit()
-    r = currencies = c.get_account()
-    print(r)

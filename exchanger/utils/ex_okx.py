@@ -4,7 +4,7 @@ import okx.Account as Account
 import okx.Funding as Funding
 from okx.exceptions import OkxAPIException, OkxParamsException, OkxRequestException
 
-from .ex_base import ExchangerBase
+from .ex_base import ExchangerBase, ERROR_MSG
 
 from exchanger.models import Exchanger
 
@@ -35,15 +35,27 @@ class ExOkx(ExchangerBase):
 
     def get_funding(self):
         """"""
-        return self._get_response(self.funding.get_balances, self.exchanger, (OkxAPIException,
-                                                                              OkxParamsException,
-                                                                              OkxRequestException))
+        response = self._get_response(fn=self.funding.get_balances,
+                                  error_label='funding',
+                                  exchanger=self.exchanger,
+                                  exception=(OkxAPIException,
+                                             OkxParamsException,
+                                             OkxRequestException))
+        if response['msg']:
+            return {'error': f'"{"funding".upper()}" - ERROR - "{ERROR_MSG}"'}
+        return response
 
     def get_account_trading(self):
         """"""
-        return self._get_response(self.account.get_account_balance, self.exchanger, (OkxAPIException,
-                                                                                     OkxParamsException,
-                                                                                     OkxRequestException))
+        response = self._get_response(fn=self.account.get_account_balance,
+                                      error_label='trading account',
+                                      exchanger=self.exchanger,
+                                      exception=(OkxAPIException,
+                                                 OkxParamsException,
+                                                 OkxRequestException))
+        if response['msg']:
+            return {'error': f'"{"trading account".upper()}" - ERROR - "{ERROR_MSG}"'}
+        return response
 
     def get_account(self):
         """"""
@@ -55,8 +67,8 @@ class ExOkx(ExchangerBase):
 
     def _normalize_data(self, currencies_trading, currencies_funding):
         """"""
-        if not currencies_trading and not currencies_funding:
-            return {self.exchanger: {}}
+        if 'error' in currencies_trading and 'error' in currencies_funding:
+            return {self.exchanger: [currencies_trading, currencies_funding]}
 
         currencies = []
         for symbol in currencies_trading['data'][0]['details'] + currencies_funding['data']:

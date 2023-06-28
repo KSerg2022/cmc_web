@@ -39,11 +39,12 @@ class ExMexc(ExchangerBase):
 
     def get_account(self):
         """"""
-        currencies_account = self._get_response(self._get_request,
-                                                self.exchanger,
-                                                (RequestException, )
+        currencies_account = self._get_response(fn=self._get_request,
+                                                error_label='account',
+                                                exchanger=self.exchanger,
+                                                exception=(RequestException, )
                                                 )
-        currencies = self._normalize_data(currencies_account.json())
+        currencies = self._normalize_data(currencies_account)
         return currencies
 
     def _get_request(self):
@@ -53,13 +54,13 @@ class ExMexc(ExchangerBase):
                                 headers=self.headers,
                                 params=sign_params)
 
-    def _normalize_data(self, currencies_account):
+    def _normalize_data(self, currencies_account: dict[list]):
         """"""
-        if not currencies_account:
-            return {self.exchanger: currencies_account}
+        if 'error' in currencies_account:
+            return {self.exchanger: [currencies_account]}
 
         currencies = []
-        for symbol in currencies_account['balances']:
+        for symbol in currencies_account.json()['balances']:
             currencies.append({
                 'coin': symbol['asset'].upper(),
                 'bal': float(symbol['free']) + float(symbol['locked'])

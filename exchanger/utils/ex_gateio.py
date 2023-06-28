@@ -42,19 +42,21 @@ class ExGate(ExchangerBase):
     def get_total_balance(self):
         """in USDT"""
         url = '/wallet/total_balance'
-        return self._get_response(self._get_request,
-                                  self.exchanger,
-                                  (RequestException,),
+        return self._get_response(fn=self._get_request,
+                                  error_label='total balance',
+                                  exchanger=self.exchanger,
+                                  exception=(RequestException,),
                                   url=url)
 
     def get_account(self):
         """"""
         url = '/spot/accounts'
-        currencies_account = self._get_response(self._get_request,
-                                                self.exchanger,
-                                                (RequestException,),
+        currencies_account = self._get_response(fn=self._get_request,
+                                                error_label='spot account',
+                                                exchanger=self.exchanger,
+                                                exception=(RequestException,),
                                                 url=url)
-        currencies = self._normalize_data(currencies_account.json())
+        currencies = self._normalize_data(currencies_account)
         return currencies
 
     def _get_request(self, url):
@@ -63,13 +65,13 @@ class ExGate(ExchangerBase):
         self.headers.update(sign_headers)
         return requests.request('GET', self.host + self.prefix + url, headers=self.headers)
 
-    def _normalize_data(self, currencies_account):
+    def _normalize_data(self, currencies_account: dict[list]):
         """"""
-        if not currencies_account:
-            return {self.exchanger: currencies_account}
+        if 'error' in currencies_account:
+            return {self.exchanger: [currencies_account]}
 
         currencies = []
-        for symbol in currencies_account:
+        for symbol in currencies_account.json():
             currencies.append({
                 'coin': symbol['currency'].upper(),
                 'bal': float(symbol['available']) + float(symbol['locked'])

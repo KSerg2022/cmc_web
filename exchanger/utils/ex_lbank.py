@@ -23,16 +23,17 @@ class ExLbank(ExchangerBase):
 
     def get_account(self):
         """"""
-        account = self._get_response(self.api.user_assets,
-                                     self.exchanger,
-                                     (LBankError, ))
+        account = self._get_response(fn=self.api.user_assets,
+                                     error_label='account',
+                                     exchanger=self.exchanger,
+                                     exception=(LBankError, ))
         currencies = self._normalize_data(account)
         return currencies
 
     def _normalize_data(self, currencies_account):
         """"""
-        if not currencies_account:
-            return {self.exchanger: currencies_account}
+        if 'error' in currencies_account:
+            return {self.exchanger: [currencies_account]}
 
         currencies = []
         for symbol, value in currencies_account['info']['toBtc'].items():
@@ -42,9 +43,3 @@ class ExLbank(ExchangerBase):
                     'bal': value
                 })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
-
-
-if __name__ == '__main__':
-    currencies = ExLbank()
-    r = currencies.get_account()
-    print(r)

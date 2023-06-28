@@ -34,8 +34,7 @@ def total_exchanger_portfolios():
 
 @register.simple_tag
 def get_sum_portfolio(portfolio):
-    return round(sum([coin['total'] for coin in portfolio]), 3)
-
+    return round(sum([coin['total'] for coin in portfolio if 'total' in coin]), 3)
 
 # @register.inclusion_tag('blog/latest_posts.html')
 # def show_latest_posts(count=5):

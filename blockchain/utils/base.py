@@ -11,6 +11,9 @@ load_dotenv()
 RATE_DECIMALS_9 = ['MCRT', ]
 
 
+ERROR_MSG = 'Check your "api key", "wallet address".'
+
+
 class Base:
     """"""
     COIN = 'coin'
@@ -32,8 +35,8 @@ class Base:
             self.params['contractaddress'] = contractaddress
 
             response = self._get_request(self.host, self.params, self.headers)
-            if response['message'] == 'NOTOK':
-                print(f"Error - {response['result']}, host={self.host}")
+            if 'error' in response:
+                # print(f"Error - {response['error']}, host={self.host}")
                 return {self.blockchain: [response]}
 
             if currency in RATE_DECIMALS_9:
@@ -42,21 +45,23 @@ class Base:
                 currencies.append({self.COIN: currency, self.BAL: float(response['result']) / (10 ** 18)})
         return {self.blockchain: sorted(currencies, key=lambda x: x['coin'])}
 
-    @staticmethod
-    def _get_request(url: str, params: dict[str, str], headers=None) -> dict | None:
+    def _get_request(self, url: str, params: dict[str, str], headers=None) -> dict | None:
         """"""
         try:
-            response = requests.request(method='GET', url=url, params=params, headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                return data
-            else:
-                e = f"Ошибка получения данных. Код ответа: {response.status_code}"
-                print(e)
-                return {'message': 'NOTOK', "result": e}
+            response = requests.request(method='GET',
+                                        url=url,
+                                        params=params,
+                                        headers=headers).json()
+            try:
+                if response.get('message', '') == 'NOTOK' or 'error' in response:
+                    return {'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG}"'}
+            except AttributeError:
+                return response
+
         except RequestException as e:
-            print(f"Ошибка подключения: {str(e)}")
-            return {'message': 'NOTOK', "result": str(e)}
+            # print(f"Ошибка подключения: {str(e)}")
+            return {'error': f'"{self.blockchain.upper()}" - ERROR - "{e}"'}
+        return response
 
     def get_account_balance(self) -> dict | None:
         """"""

@@ -34,7 +34,7 @@ class DataFromExchangers:
             self.currencies.append(
                 ExLbank(*self.data_for_queries_exchanger['Lbank']).get_account()
             )
-        if 'Mexc' in exchanger_list:
+        if 'MEXC' in exchanger_list:
             self.currencies.append(
                 ExMexc(*self.data_for_queries_exchanger['MEXC']).get_account()
             )

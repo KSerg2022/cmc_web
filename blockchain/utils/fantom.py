@@ -10,7 +10,6 @@ class Fantom(Base):
 
     def __init__(self, host, api_key, wallet, currencies):
         super().__init__()
-        print(host, api_key, wallet, currencies)
         self.host = host
         self.api_key = api_key
         self.wallet = wallet

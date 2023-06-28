@@ -25,21 +25,27 @@ class ExBinance(ExchangerBase):
         self.exchanger = os.path.splitext(os.path.basename(__file__))[0][3:]
 
     def get_futures_coin_account(self):
-        futures_coin_account = self._get_response(self.coin_m.futures_coin_account,
-                                                  self.exchanger,
-                                                  (BinanceAPIException, ),
+        futures_coin_account = self._get_response(fn=self.coin_m.futures_coin_account,
+                                                  error_label='futures account',
+                                                  exchanger=self.exchanger,
+                                                  exception=(BinanceAPIException,),
                                                   )
-        if not futures_coin_account:
+        if 'error' in futures_coin_account:
             return futures_coin_account
+        # if not futures_coin_account:
+        #     return futures_coin_account
         return [x for x in futures_coin_account['assets'] if float(x['walletBalance']) != 0]
 
     def get_spot_account(self) -> list[dict]:
-        spot_account = self._get_response(self.coin_m.get_account,
-                                          self.exchanger,
-                                          (BinanceAPIException,)
+        spot_account = self._get_response(fn=self.coin_m.get_account,
+                                          error_label="spot account",
+                                          exchanger=self.exchanger,
+                                          exception=(BinanceAPIException,)
                                           )
-        if not spot_account:
+        if 'error' in spot_account:
             return spot_account
+        # if not spot_account:
+        #     return spot_account
         return [x for x in spot_account['balances'] if float(x['free']) != 0 or float(x['locked']) != 0]
 
     def get_account(self):
@@ -52,8 +58,11 @@ class ExBinance(ExchangerBase):
 
     def _normalize_data(self, spot_account, futures_coin_account):
         """"""
-        if not spot_account and not futures_coin_account:
-            return {self.exchanger: {}}
+        if 'error' in spot_account and 'error' in futures_coin_account:
+            return {self.exchanger: [spot_account, futures_coin_account]}
+
+        # if not spot_account and not futures_coin_account:
+        #     return {self.exchanger: {}}
 
         currencies = []
         for symbol in spot_account + futures_coin_account:
