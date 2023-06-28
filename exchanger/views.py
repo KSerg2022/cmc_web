@@ -9,8 +9,10 @@ from .handlers import get_paginator
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 from .utils.main.main_2 import main
+from exchanger.utils.handlers.xlsx_file import XlsxFile
 
 from blockchain.models import Blockchain
+
 
 @login_required
 def exchangers(request):
@@ -102,7 +104,7 @@ def get_data(request, exchanger_id):
     data_exchanger = okx.get_account()
     symbol_list = [coin['coin'] for coin in list(data_exchanger.values())[0]]
 
-    data_cmc = Cmc(symbol_list).get_data()
+    data_cmc = Cmc(symbol_list).get_data_from_cmc()
     data_total = get_aggregation_data(data_from_cmc=data_cmc,
                                       data_from_exchangers=[data_exchanger])
     total_sum = sum([coin['total'] for coin in list(data_total[0].values())[0]])
@@ -117,11 +119,8 @@ def get_data(request, exchanger_id):
 
 @login_required
 def get_all_data(request, user_id):
-    user_portfolios = get_object_or_404(User,
-                                        id=user_id).exchanger_created.all()
     user_portfolios_data = main(user_id)
-
-    # data_, page_range = get_paginator(request, list(data_total[0].values())[0])
+    XlsxFile(request.user).create_xlsx(user_portfolios_data)
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})
 

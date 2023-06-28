@@ -6,6 +6,7 @@
 
     {% get_exchanger_portfolios user as exchanger_portfolios %}
     {% get_blockchain_portfolios user as blockchain_portfolios %}
+    {% get_path_to_users_xlsx_file user as path_to_users_xlsx_file %}
 
 
     <div class="height100 main">
@@ -57,10 +58,6 @@
                             </tbody>
                         </table>
 
-                        <p class="text-center">
-                            <a href="{% url "exchanger:get_all_data" user.id %}" class="badge bg-warning bg-lg link">
-                                Get data for all portfolios</a>
-                        </p>
 
                     {% else %}
                         <p>You did not create exchanger yet.</p>
@@ -94,6 +91,11 @@
                         <p class="text-center">
                             <a href="{% url "exchanger:get_all_data" user.id %}" class="badge bg-warning bg-lg link">
                                 Get data for all portfolios</a>
+                        </p>
+
+                        <p class="text-center">
+                            <a href="{{ path_to_users_xlsx_file }}" class="badge bg-secondary bg-lg link"
+                            download>Download 'xlsx' file</a>
                         </p>
 
                     {% else %}

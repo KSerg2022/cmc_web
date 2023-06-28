@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.utils.safestring import mark_safe
 # import markdown
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from exchanger.models import Exchanger, ExPortfolio
 from cmc.models import Cryptocurrency
@@ -36,28 +37,12 @@ def total_exchanger_portfolios():
 def get_sum_portfolio(portfolio):
     return round(sum([coin['total'] for coin in portfolio if 'total' in coin]), 3)
 
-# @register.inclusion_tag('blog/latest_posts.html')
-# def show_latest_posts(count=5):
-#     latest_posts = Post.objects.filter(status='published').order_by('-publish')[:count]
-#     if not latest_posts:
-#         return {'latest_posts': ''}
-#     return {'latest_posts': latest_posts}
 
-#
-# @register.simple_tag
-# def get_most_commented_posts(count=5):
-#     return Post.objects.filter(status='published').annotate(
-#         total_comments=Count('comments')
-#     ).order_by('-total_comments')[:count]
+@register.simple_tag
+def get_path_to_users_xlsx_file(user):
+    xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{user.id}_{user.username.lower()}/'
+    filename = f'{user.id}_{user.username.lower()}.xlsx'
+    path_to_file = xlsx_dir + filename
+    return path_to_file
 
 
-
-
-# @register.simple_tag
-# def total_user_posts(user=None):
-#     return Post.objects.filter(author=user).count()
-#
-#
-# @register.simple_tag
-# def total_user_posts_with_status(user=None, status=None):
-#     return Post.objects.filter(status=status).filter(author=user).count()
