@@ -44,7 +44,7 @@ class ExMexc(ExchangerBase):
                                                 exchanger=self.exchanger,
                                                 exception=(RequestException, )
                                                 )
-        currencies = self._normalize_data(currencies_account)
+        currencies = self._normalize_data(currencies_account.json())
         return currencies
 
     def _get_request(self):
@@ -60,7 +60,7 @@ class ExMexc(ExchangerBase):
             return {self.exchanger: [currencies_account]}
 
         currencies = []
-        for symbol in currencies_account.json()['balances']:
+        for symbol in currencies_account['balances']:
             currencies.append({
                 'coin': symbol['asset'].upper(),
                 'bal': float(symbol['free']) + float(symbol['locked'])

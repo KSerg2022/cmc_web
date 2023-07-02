@@ -41,7 +41,7 @@ class ExOkx(ExchangerBase):
                                   exception=(OkxAPIException,
                                              OkxParamsException,
                                              OkxRequestException))
-        if response['msg']:
+        if response.get('msg', ''):
             return {'error': f'"{"funding".upper()}" - ERROR - "{ERROR_MSG}"'}
         return response
 
@@ -53,7 +53,7 @@ class ExOkx(ExchangerBase):
                                       exception=(OkxAPIException,
                                                  OkxParamsException,
                                                  OkxRequestException))
-        if response['msg']:
+        if response.get('msg', ''):
             return {'error': f'"{"trading account".upper()}" - ERROR - "{ERROR_MSG}"'}
         return response
 

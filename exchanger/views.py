@@ -98,7 +98,8 @@ def get_data(request, exchanger_id):
     portfolio = get_object_or_404(ExPortfolio,
                                   owner=request.user,
                                   exchanger=exchanger_id)
-    okx = ExOkx(api_key=portfolio.api_key,
+    okx = ExOkx(host=portfolio.exchanger.host,
+                api_key=portfolio.api_key,
                 api_secret=portfolio.api_secret,
                 passphrase=portfolio.password)
     data_exchanger = okx.get_account()
