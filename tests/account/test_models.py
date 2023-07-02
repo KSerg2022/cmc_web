@@ -36,7 +36,7 @@ class UserModelTest(TestCase):
             user.save()
 
     def test_user_fields(self):
-        fields = ['profile', 'logentry', 'exchanger_created', 'id', 'password', 'last_login', 'is_superuser',
+        fields = ['profile', 'logentry', 'exchanger_created', 'blockchain_created', 'id', 'password', 'last_login', 'is_superuser',
                   'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',
                   'date_joined', 'groups', 'user_permissions']
         user = User.objects.create()

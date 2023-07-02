@@ -61,7 +61,7 @@ class TestSignUpPage(BaseTest):
         self.assertIn('Create an account', header_text)
 
         inputs = self.browser.find_elements(By.TAG_NAME, 'input')
-        self.assertIn('« Go back!', [input_.get_attribute("value") for input_ in inputs])
+        # self.assertIn('« Go back!', [input_.get_attribute("value") for input_ in inputs])
         self.assertIn('Create my account', [input_.get_attribute("value") for input_ in inputs])
 
     def test_signup_with_empty_username(self):

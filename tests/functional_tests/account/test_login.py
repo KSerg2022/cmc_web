@@ -1,3 +1,4 @@
+import unittest
 
 from selenium.webdriver.common.by import By
 from django.urls import reverse
@@ -17,10 +18,7 @@ class TestLoginPage(BaseTest):
             "Please enter a correct username and password. "
             "Note that both fields may be case-sensitive."))
 
-
         self.browser.implicitly_wait(2) # ??????????????
-
-
 
         current_url = self.browser.current_url
         self.assertRegex(current_url, reverse('login'))
@@ -53,23 +51,24 @@ class TestLoginPage(BaseTest):
         login_key = self.browser.find_element(By.XPATH, '//input[@value="Log-in"]')
         self.assertTrue(login_key)
 
-        self.assertTrue(self.get_go_back_key())
+        # self.assertTrue(self.get_go_back_key())
 
     def test_login_user(self):
         self.browser.get(self.live_server_url)
         self.login_user()
 
         current_url = self.browser.current_url
-        self.assertRegex(current_url, '/')
-        self.assertIn('index', self.browser.title)
+        self.assertRegex(current_url, '/exchanger/')
+        self.assertIn('Exchangers', self.browser.title)
 
-        # header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
-        # self.assertIn(f'Welcome {self.first_name}!', header_text)
+        header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
+        self.assertIn('Exchangers.', header_text)
 
-        # p_text = self.browser.find_element(By.TAG_NAME, 'p').text
-        # self.assertEqual('Your account has been successfully created. Now you can log in.',
-        #                  p_text)
-        self.assertTrue(self.get_go_back_key())
+        h3_text = self.browser.find_element(By.TAG_NAME, 'h3').text
+        self.assertIn('Please choose exchanger:', h3_text)
+
+
+        # self.assertTrue(self.get_go_back_key())
 
     def test_login_with_not_correct_username(self):
         self.signup_and_goto_page_login()

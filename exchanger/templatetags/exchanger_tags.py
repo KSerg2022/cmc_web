@@ -1,9 +1,11 @@
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.utils.safestring import mark_safe
 # import markdown
 from django.contrib.auth.models import User
 from django.conf import settings
+
 
 from exchanger.models import Exchanger, ExPortfolio
 from cmc.models import Cryptocurrency
@@ -13,8 +15,12 @@ register = template.Library()
 
 @register.simple_tag
 def get_exchanger_portfolios(user):
-    user = User.objects.get(id=user.id)
+    try:
+        user = User.objects.get(id=user.id)
+    except ObjectDoesNotExist:
+        return 0
     user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
+
     return [user_exchanger.exchanger for user_exchanger in user_exchangers]
 
 

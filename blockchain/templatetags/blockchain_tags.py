@@ -1,4 +1,5 @@
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
 from django.utils.safestring import mark_safe
 # import markdown
@@ -12,7 +13,10 @@ register = template.Library()
 
 @register.simple_tag
 def get_blockchain_portfolios(user):
-    user = User.objects.get(id=user.id)
+    try:
+        user = User.objects.get(id=user.id)
+    except ObjectDoesNotExist:
+        return 0
     user_blockchains = Portfolio.objects.filter(owner=user.id).prefetch_related('blockchain')
     return [user_blockchain.blockchain for user_blockchain in user_blockchains]
 

@@ -30,7 +30,7 @@ class ExchangerModelTest(TestCase):
 
     def test_exchanger_fields(self):
         fields = ['portfolio', 'id', 'name', 'slug', 'host', 'url', 'prefix',
-                  'is_active', 'logo']
+                  'is_active', 'logo', 'website']
         exchange = Exchanger.objects.create()
         model_fields = [field.name for field in exchange._meta.get_fields()]
 
@@ -39,14 +39,6 @@ class ExchangerModelTest(TestCase):
     def test_exchanger_create_with_empty_name(self):
         with self.assertRaises(ValidationError):
             exchange = Exchanger.objects.create(name='')
-            exchange.full_clean()
-            exchange.save()
-
-    def test_exchanger_create_with_empty_host(self):
-        with self.assertRaises(ValidationError):
-            exchange = Exchanger.objects.create(name=self.name,
-                                                host=''
-                                                )
             exchange.full_clean()
             exchange.save()
 

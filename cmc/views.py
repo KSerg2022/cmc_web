@@ -16,7 +16,8 @@ def index(request):
     return render(request,
                   'cmc/cmc/index.html',
                   {'cryptocurrencies': cryptocurrencies,
-                   'page_range': page_range})
+                   'page_range': page_range}
+                  )
 
 
 def detail(request, slug):

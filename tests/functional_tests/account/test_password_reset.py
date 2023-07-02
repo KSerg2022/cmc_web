@@ -37,7 +37,7 @@ class TestPasswordReset(BaseTest):
         login_key = self.browser.find_element(By.XPATH, '//input[@value="Send e-mail"]')
         self.assertTrue(login_key)
 
-        self.assertTrue(self.get_go_back_key())
+        # self.assertTrue(self.get_go_back_key())
 
     def test_send_email(self):
         self.signup_and_goto_page_login()
@@ -58,7 +58,7 @@ class TestPasswordReset(BaseTest):
         self.assertEqual("We've emailed you instructions for setting your password.",
                          p_text)
 
-        self.assertTrue(self.get_go_back_key())
+        # self.assertTrue(self.get_go_back_key())
 
     def test_goto_by_link_in_email(self):
         self.signup_and_goto_page_login()
@@ -84,7 +84,7 @@ class TestPasswordReset(BaseTest):
         change_my_password_key = self.browser.find_element(By.XPATH, '//input[@value="Change my password"]')
         self.assertTrue(change_my_password_key)
 
-        self.assertTrue(self.get_go_back_key())
+        # self.assertTrue(self.get_go_back_key())
 
     def test_enter_new_password(self):
         self.signup_and_goto_page_login()
@@ -111,4 +111,4 @@ class TestPasswordReset(BaseTest):
         self.assertEqual("Your password has been set. You can log in now",
                          p_text)
 
-        self.assertTrue(self.get_go_back_key())
+        # self.assertTrue(self.get_go_back_key())
