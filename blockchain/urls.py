@@ -13,7 +13,7 @@ urlpatterns = [
          name='change_blockchain_portfolio'),
     path('delete_portfolio/<int:blockchain_id>/', views.delete_blockchain_portfolio,
          name='delete_blockchain_portfolio'),
-    # path('data/<int:exchanger_id>/', views.get_data, name='get_data'),
+    path('data/<int:blockchain_id>/', views.get_blockchain_data, name='get_blockchain_data'),
     # path('all-data/<int:user_id>/', views.get_all_data, name='get_all_data'),
 
 ]

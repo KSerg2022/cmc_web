@@ -50,7 +50,7 @@
                                 <tr>
                                     <td>{{ exchanger_portfolio }}</td>
                                     <td class="text-center">
-                                        <a href="{% url "exchanger:get_data" exchanger_portfolio.id %}"
+                                        <a href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}"
                                            class="badge bg-info link">Get data</a>
                                     </td>
                                 </tr>
@@ -79,7 +79,7 @@
                                     <td>{{ blockchain_portfolio }}</td>
                                     <td class="text-center">
                                     <span class="badge bg-info">
-                                        <a href="#"
+                                        <a href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}"
                                            class=" link">Get data</a>
                                     </span>
                                     </td>

@@ -3,12 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
-from cmc.handlers.aggregation import get_aggregation_data
-from cmc.handlers.cmc import Cmc
-from .handlers import get_paginator
+
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
-from .utils.main.main_2 import main
+from .utils.main.get_data import get_data
+from .utils.main.get_all_data import get_all_data as all_dada
 from exchanger.utils.handlers.xlsx_file import XlsxFile
 
 from blockchain.models import Blockchain
@@ -88,39 +87,28 @@ def delete_portfolio(request, exchanger_id):
                                                                'form': form})
 
 
-from exchanger.utils.ex_okx import ExOkx
-
-
 @login_required
-def get_data(request, exchanger_id):
-    exchanger = get_object_or_404(Exchanger,
-                                  id=exchanger_id)
+def get_exchanger_data(request, exchanger_id):
     portfolio = get_object_or_404(ExPortfolio,
                                   owner=request.user,
                                   exchanger=exchanger_id)
-    okx = ExOkx(host=portfolio.exchanger.host,
-                api_key=portfolio.api_key,
-                api_secret=portfolio.api_secret,
-                passphrase=portfolio.password)
-    data_exchanger = okx.get_account()
-    symbol_list = [coin['coin'] for coin in list(data_exchanger.values())[0]]
+    response_exchanger, total_sum = get_data(portfolio)
 
-    data_cmc = Cmc(symbol_list).get_data_from_cmc()
-    data_total = get_aggregation_data(data_from_cmc=data_cmc,
-                                      data_from_exchangers=[data_exchanger])
-    total_sum = sum([coin['total'] for coin in list(data_total[0].values())[0]])
+    if 'error' in response_exchanger[0]:
+        return render(request, 'exchanger/data_portfolio.html', {'portfolio': portfolio,
+                                                                 'data': response_exchanger,
+                                                                 'total_sum': 0,
+                                                                 })
 
-    data_, page_range = get_paginator(request, list(data_total[0].values())[0])
-    return render(request, 'exchanger/data_portfolio.html', {'exchanger': exchanger,
-                                                             'data': data_,
+    return render(request, 'exchanger/data_portfolio.html', {'portfolio': portfolio,
+                                                             'data': response_exchanger,
                                                              'total_sum': total_sum,
-                                                             'page_range': page_range
                                                              })
 
 
 @login_required
 def get_all_data(request, user_id):
-    user_portfolios_data = main(user_id)
+    user_portfolios_data = all_dada(user_id)
     XlsxFile(request.user).create_xlsx(user_portfolios_data)
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})

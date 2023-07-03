@@ -3,10 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
-from exchanger.utils.main.main_2 import main
-from .forms import PortfolioForm
 
+from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
+from .utils.handlers.get_data import get_data
 
 
 @login_required
@@ -80,15 +80,23 @@ def delete_blockchain_portfolio(request, blockchain_id):
                                                                 'form': form})
 
 
-# @login_required
-# def get_all_data(request, user_id):
-#     user_blockchain_portfolios = get_object_or_404(User,
-#                                                    id=user_id).blockchain_created.all()
-#     user_blockchain_portfolios = main(user_id)
-#
-#     # data_, page_range = get_paginator(request, list(data_total[0].values())[0])
-#     return render(request, 'exchanger/data_all_portfolios.html',
-#                   {'user_portfolios_data': user_blockchain_portfolios})
+@login_required
+def get_blockchain_data(request, blockchain_id):
+    portfolio = get_object_or_404(Portfolio,
+                                  owner=request.user,
+                                  blockchain=blockchain_id)
+    response_blockchain, total_sum = get_data(portfolio)
+
+    if 'error' in response_blockchain[0]:
+        return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,
+                                                                 'data': response_blockchain,
+                                                                 'total_sum': 0,
+                                                                 })
+
+    return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,
+                                                             'data': response_blockchain,
+                                                             'total_sum': total_sum,
+                                                             })
 
 
 @login_required
