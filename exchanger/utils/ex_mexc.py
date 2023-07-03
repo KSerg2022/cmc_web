@@ -61,6 +61,8 @@ class ExMexc(ExchangerBase):
 
         currencies = []
         for symbol in currencies_account['balances']:
+            if symbol['asset'].upper() == 'RD':
+                continue
             currencies.append({
                 'coin': symbol['asset'].upper(),
                 'bal': float(symbol['free']) + float(symbol['locked'])
