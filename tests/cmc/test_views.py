@@ -4,7 +4,7 @@ import unittest
 from django.test import TestCase
 from django.urls import resolve, reverse
 from django.contrib.auth.models import User
-from cmc.utils.load_data_to_db import dump_to_db
+from cmc.fixtures.handlers.load_currencies_to_db import dump_to_db_currencies
 
 from cmc.views import index, detail
 from cmc.models import Cryptocurrency
@@ -33,7 +33,7 @@ class DetailTest(TestCase):
         self.symbol = 'symbol_test'
         self.name = 'name_test'
         self.slug = 'name_test'
-        dump_to_db(5)
+        dump_to_db_currencies(5)
         self.crypto = Cryptocurrency.objects.all()[0]
 
         # self.website = 'test@test.com',

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.auth.models import User
 
 from exchanger.models import Exchanger, ExPortfolio
-from cmc.utils.load_data_to_db import dump_to_db
+from cmc.fixtures.handlers.load_currencies_to_db import dump_to_db_currencies
 from cmc.models import Cryptocurrency
 
 
@@ -73,22 +73,22 @@ class ExchangerModelTest(TestCase):
 
     def test_exchanger_create_with_invalid_format_photo(self):
         with self.assertRaises(ValidationError):
-            cryptocurrency = Exchanger.objects.create(name=self.name,
+            exchange = Exchanger.objects.create(name=self.name,
                                                       logo='tests/account/data_for_test/text.txt')
-            cryptocurrency.full_clean()
-            cryptocurrency.save()
+            exchange.full_clean()
+            exchange.save()
 
     def test_exchanger_ordering(self):
         exchanger1 = Exchanger.objects.create(name=self.name)
         exchanger2 = Exchanger.objects.create(name=self.name + '1')
-        cryptocurrencies = Exchanger.objects.all()
+        exchanges = Exchanger.objects.all()
 
         self.assertEqual([f'{self.name.capitalize()}', f'{self.name.capitalize() + "1"}'],
-                         [str(q) for q in cryptocurrencies],
-                         cryptocurrencies)
+                         [str(q) for q in exchanges],
+                         exchanges)
         self.assertNotEqual([f'{self.name.capitalize() + "1"}', f'{self.name.capitalize()}'],
-                            [str(q) for q in cryptocurrencies],
-                            cryptocurrencies)
+                            [str(q) for q in exchanges],
+                            exchanges)
 
     def test_exchanger_get_absolute_url(self):
         exchanger = Exchanger.objects.create(name=self.name)
@@ -174,7 +174,7 @@ class ExPortfolioTest(TestCase):
                                                    )
 
     def test_ex_portfolio_add_currencies(self):
-        dump_to_db(5)
+        dump_to_db_currencies(5)
         currencies = Cryptocurrency.objects.all()
 
         owner_1 = User.objects.create(username='User_1', password='user_1')
