@@ -1,3 +1,4 @@
+from django.conf import settings
 
 from cmc.handlers.json_file import JsonFile
 
@@ -6,7 +7,7 @@ from cmc.handlers.cmc_api import Cmc
 
 
 def dump_to_db_currencies(qty):
-    filename = Cmc().filename
+    filename = settings.BASE_DIR /'blockchain'/'fixtures'/'cryptocurrency.json'
     currencies = JsonFile().load_data_from_file(filename)
     for currency in currencies[:qty]:
         Cryptocurrency.objects.update_or_create(symbol=currency['fields']['symbol'],

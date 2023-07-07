@@ -31,7 +31,7 @@
   "fields": {
     "name": "Fantom",
     "slug": "fantom",
-    "host": "https://api.ftmscan.com/api'",
+    "host": "https://api.ftmscan.com/api",
     "is_active": true,
     "logo": "blockchains/2023_06_23/CryptoMode-Fantom-Protocol-fMint-DeFi.png",
     "website": "https://fantom.foundation/",
@@ -55,12 +55,13 @@
   "model": "blockchain.blockchain",
   "pk": 5,
   "fields": {
-    "name": "Solscan",
-    "slug": "solscan",
+    "name": "Solana",
+    "slug": "solana",
     "host": "https://public-api.solscan.io/account/tokens",
     "is_active": true,
     "logo": "blockchains/2023_06_23/full-solana-logo.png",
     "website": "https://solana.com/ru",
     "scan_site": "https://solscan.io/"
   }
-}]
+}
+]
