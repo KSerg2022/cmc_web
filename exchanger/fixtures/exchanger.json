@@ -9,7 +9,8 @@
     "url": "",
     "prefix": "",
     "is_active": true,
-    "logo": "exchangers/2023_06_20/okx_black_N0zks6i.png"
+    "logo": "exchangers/2023_06_20/okx_black_N0zks6i.png",
+    "website": "https://www.okx.com/"
   }
 },
 {
@@ -22,7 +23,8 @@
     "url": "",
     "prefix": "/api/v4",
     "is_active": true,
-    "logo": "exchangers/2023_06_20/H-LOGO_1.png"
+    "logo": "exchangers/2023_06_20/H-LOGO_1.png",
+    "website": "https://gate.io/"
   }
 },
 {
@@ -35,7 +37,8 @@
     "url": "",
     "prefix": "",
     "is_active": true,
-    "logo": "exchangers/2023_06_22/Binance-Logo.wine.png"
+    "logo": "exchangers/2023_06_22/Binance-Logo.wine.png",
+    "website": "https://www.binance.com/"
   }
 },
 {
@@ -48,7 +51,8 @@
     "url": "",
     "prefix": "",
     "is_active": true,
-    "logo": "exchangers/2023_06_22/Bybit-Logo.png"
+    "logo": "exchangers/2023_06_22/Bybit-Logo.png",
+    "website": "http://www.bybit.com/"
   }
 },
 {
@@ -61,7 +65,8 @@
     "url": "",
     "prefix": "",
     "is_active": true,
-    "logo": "exchangers/2023_06_22/lbank.png"
+    "logo": "exchangers/2023_06_22/lbank.png",
+    "website": "https://www.lbank.com/"
   }
 },
 {
@@ -74,190 +79,8 @@
     "url": "account",
     "prefix": "/api/v3/",
     "is_active": true,
-    "logo": "exchangers/2023_06_22/MEXC-Blue.png"
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 1,
-  "fields": {
-    "owner": 1,
-    "exchanger": 1,
-    "slug": "adminokx",
-    "api_key": "sghfagfa",
-    "api_secret": "afgagfadfg",
-    "password": "",
-    "comments": "",
-    "currencies": [
-      6308,
-      5316,
-      2837
-    ]
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 4,
-  "fields": {
-    "owner": 1,
-    "exchanger": 2,
-    "slug": "admin-gate",
-    "api_key": "kl",
-    "api_secret": "l",
-    "password": "",
-    "comments": "",
-    "currencies": [
-      6286,
-      6287,
-      6288,
-      6285,
-      6289,
-      6290,
-      6291,
-      6292,
-      6293,
-      6294,
-      6295,
-      6296,
-      6299,
-      6300,
-      6301,
-      6302,
-      6303,
-      6304,
-      6305,
-      6306,
-      6307,
-      6308,
-      5316,
-      2837
-    ]
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 37,
-  "fields": {
-    "owner": 8,
-    "exchanger": 1,
-    "slug": "test-okx",
-    "api_key": "sghfagfa",
-    "api_secret": "afgagfadfg",
-    "password": "",
-    "comments": "dhdh",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 39,
-  "fields": {
-    "owner": 8,
-    "exchanger": 2,
-    "slug": "test-gate",
-    "api_key": "dsfdsf",
-    "api_secret": "q",
-    "password": "",
-    "comments": "xdhjx",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 43,
-  "fields": {
-    "owner": 2,
-    "exchanger": 1,
-    "slug": "ivan-okx",
-    "api_key": "b6a08169-1c5a-429f-a010-a061cf631960",
-    "api_secret": "6364D572C604A15D6E49B7B78AE9F0A9",
-    "password": "1qaSW2#eD!",
-    "comments": "Срок действия до - ?",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 44,
-  "fields": {
-    "owner": 2,
-    "exchanger": 2,
-    "slug": "ivan-gate",
-    "api_key": "3e88811103aa40b9a1a320d19ff3aafa",
-    "api_secret": "cc174c37bed7d7c9a89ef8a168595ab65ba7a7442443d8e4f1825a0927ac3895",
-    "password": "",
-    "comments": "Срок действия до - ?",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 45,
-  "fields": {
-    "owner": 2,
-    "exchanger": 3,
-    "slug": "ivan-binance",
-    "api_key": "fFexzFomJBexC3uezJ0BA9NoT5v4Q82TqrUOiWXWgtALQQM0onCZUFnYFaHOzd17",
-    "api_secret": "ugYMr2w0aDJtk2ofQbyLDGQWFDFp16XFOW6TS2w3CPlzK0ubMHZ5eb0NUkqpJeny",
-    "password": "",
-    "comments": "Нужно обновлять IP  адрес в разрешениях",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 46,
-  "fields": {
-    "owner": 2,
-    "exchanger": 5,
-    "slug": "ivan-lbank",
-    "api_key": "73db6032-c123-4c8e-9d65-f9943d365476",
-    "api_secret": "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAIF2BgGqnFlW9Vv8Q+KMzdZwsQ8pzcy5FW7cpaL7g3T4/zSBpoFa4Y1ggrReow00qdvJVaBL6Fke/I1BLo9EoyF0LsiuYxUAol1oVuZzQeG+GytZ9qbkApF6ZVQBSDCpq+6y/Y9y743LpqAspommcLd+0c6szhEddqfQuqFm/njxAgMBAAECgYAfJ2K8pezoBugWkbdYXl/uWcI",
-    "password": "",
-    "comments": "",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 47,
-  "fields": {
-    "owner": 2,
-    "exchanger": 6,
-    "slug": "ivan-mexc",
-    "api_key": "mx0vgleKVENvhbcTAn",
-    "api_secret": "5318848d19e7440caa17c50ef7a5a5b9",
-    "password": "",
-    "comments": "",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 48,
-  "fields": {
-    "owner": 2,
-    "exchanger": 4,
-    "slug": "ivan-bybit",
-    "api_key": "M3WB4LDrzHWkzqtxoR",
-    "api_secret": "YeAheU20oGol4FfzVhr2lQV9JZ8YS36GXOLQ",
-    "password": "",
-    "comments": "22.06.2023",
-    "currencies": []
-  }
-},
-{
-  "model": "exchanger.exportfolio",
-  "pk": 49,
-  "fields": {
-    "owner": 6,
-    "exchanger": 4,
-    "slug": "bob-bybit",
-    "api_key": "sghfagfa",
-    "api_secret": "afgagfadfg",
-    "password": "",
-    "comments": "",
-    "currencies": []
+    "logo": "exchangers/2023_06_22/MEXC-Blue.png",
+    "website": "https://www.mexc.com/"
   }
 }
 ]
