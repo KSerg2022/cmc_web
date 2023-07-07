@@ -5,11 +5,10 @@ from django_json_widget.widgets import JSONEditorWidget
 
 from .models import (Blockchain,
                      Portfolio,
-    # Currencies,
                      )
 
-EMPTY_FIELD_ERROR = "You can't have an empty field - "
-VALID_ERROR = 'Enter a valid - '
+# EMPTY_FIELD_ERROR = "You can't have an empty field - "
+# VALID_ERROR = 'Enter a valid - '
 
 
 class PortfolioForm(forms.ModelForm):
@@ -29,4 +28,8 @@ class PortfolioForm(forms.ModelForm):
                                                                '"SYMBOL2": "adresse 2",\n'
                                                                '"SYMBOL3": "adresse 3"\n}'}
                                          )
+        }
+
+        error_messages = {
+            'currencies': {'invalid': 'Enter a valid JSON.'},
         }

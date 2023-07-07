@@ -19,7 +19,7 @@ class ExPortfolioForm(forms.ModelForm):
             'api_secret': forms.TextInput(attrs={'style': 'height: 2em; width: 40em',
                                                  'placeholder': "Enter a api secret"}),
             'password': forms.TextInput(attrs={'style': 'height: 2em; width: 40em',
-                                               'placeholder': "Enter a password"}),
+                                               'placeholder': "Now only for 'OKX'. Enter a password"}),
             'comments': forms.Textarea(attrs={'style': 'height: 5em; width: 40em',
                                               'placeholder': "Enter a comments"}),
 
