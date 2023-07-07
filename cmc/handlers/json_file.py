@@ -26,9 +26,9 @@ class JsonFile:
 
     def load_data_from_file(self, filename) -> dict:
         """Writing to file human-readable data."""
-        path_to_file = self.data_dir / f'{filename}.json'
-        self.check_file_exists(self.data_dir, path_to_file)
-        with open(path_to_file, 'r') as file_json:
+        # path_to_file = self.data_dir / f'{filename}.json'
+        self.check_file_exists(self.data_dir, filename)
+        with open(filename, 'r') as file_json:
             loaded_data = json.load(file_json)
         return loaded_data
 
