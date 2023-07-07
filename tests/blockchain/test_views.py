@@ -373,3 +373,19 @@ class GetBlockchainData(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
+
+    def test_dget_blockchain_data_with_not_correct_api(self):
+        self.client.force_login(self.user)
+        blockchain = Blockchain.objects.last()
+        portfolio_wrong_apy = Portfolio.objects.create(api_key='wrong_apy',
+                                                       wallet=self.wallet,
+                                                       comments='',
+                                                       currencies=self.currencies,
+                                                       blockchain=blockchain,
+                                                       owner=self.user)
+
+        url = reverse('blockchain:get_blockchain_data', args=f'{blockchain.id}')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'blockchain/data_portfolio.html')

@@ -151,7 +151,7 @@ class ChangePortfolio(TestCase):
         found = resolve('/exchanger/change_portfolio/1/')
         self.assertEqual(found.func, change_portfolio)
 
-    def test_change_portfolio_if_user_is_not_authenticated(self):
+    def test_exchanger_portfolio_if_user_is_not_authenticated(self):
         url = reverse('exchanger:change_portfolio', args='1')
         response = self.client.get(url)
         url_redirect = reverse('login') + '?next=' + url
@@ -160,18 +160,18 @@ class ChangePortfolio(TestCase):
                              status_code=302, target_status_code=200,
                              fetch_redirect_response=False)
 
-    def test_change_portfolio_templates(self):
+    def test_exchanger_portfolio_templates(self):
         response = self._get_response_for_page_GET()
 
         self.assertTemplateUsed(response, 'exchanger/add_portfolio.html')
 
-    def test_change_portfolio_GET(self):
+    def test_exchanger_portfolio_GET(self):
         response = self._get_response_for_page_GET()
 
         self.assertEqual(response.status_code, 200, response)
         self.assertTemplateUsed(response, 'exchanger/add_portfolio.html')
 
-    def test_change_portfolio_POST(self):
+    def test_exchanger_portfolio_POST(self):
         self.assertEqual(self.portfolio.api_key, self.api_key)
         self.assertEqual(self.portfolio.api_secret, self.api_secret)
 
@@ -196,7 +196,7 @@ class ChangePortfolio(TestCase):
         self.assertEqual(portfolio.api_secret, 'api_secret new', portfolio)
         self.assertEqual(portfolio.password, 'password new', portfolio)
 
-    def test_change_portfolio_with_empty_api_POST(self):
+    def test_exchanger_portfolio_with_empty_api_POST(self):
         self.client.force_login(self.user)
         url = reverse('exchanger:change_portfolio', args='1')
         response = self.client.post(url,
@@ -210,7 +210,7 @@ class ChangePortfolio(TestCase):
         self.assertTemplateUsed(response, 'exchanger/add_portfolio.html')
         self.assertContains(response, escape('Error changed your portfolio'))
 
-    def test_change_portfolio_with_empty_api_secret_POST(self):
+    def test_exchanger_portfolio_with_empty_api_secret_POST(self):
         self.client.force_login(self.user)
         url = reverse('exchanger:change_portfolio', args='1')
         response = self.client.post(url,
@@ -248,11 +248,11 @@ class DeletePortfolio(TestCase):
         url = reverse('exchanger:delete_portfolio', args='1')
         return self.client.get(url)
 
-    def test_url_to_page_delete_blockchain_portfolio(self):
+    def test_url_to_page_delete_exchanger_portfolio(self):
         found = resolve(f'/exchanger/delete_portfolio/{1}/')
         self.assertEqual(found.func, delete_portfolio)
 
-    def test_delete_blockchain_portfolio_if_user_is_not_authenticated(self):
+    def test_delete_exchanger_portfolio_if_user_is_not_authenticated(self):
         url = reverse('exchanger:delete_portfolio', args='1')
         response = self.client.get(url)
         url_redirect = reverse('login') + '?next=' + url
@@ -261,18 +261,18 @@ class DeletePortfolio(TestCase):
                              status_code=302, target_status_code=200,
                              fetch_redirect_response=False)
 
-    def test_delete_blockchain_portfolio_templates(self):
+    def test_delete_exchanger_portfolio_templates(self):
         response = self._get_response_for_page_GET()
 
         self.assertTemplateUsed(response, 'exchanger/delete_portfolio.html')
 
-    def test_delete_blockchain_portfolio_GET(self):
+    def test_delete_exchanger_portfolio_GET(self):
         response = self._get_response_for_page_GET()
 
         self.assertEqual(response.status_code, 200, response)
         self.assertTemplateUsed(response, 'exchanger/delete_portfolio.html')
 
-    def test_delete_blockchain_portfolio_GET_with_yes(self):
+    def test_delete_exchanger_portfolio_GET_with_yes(self):
         self.assertTrue(ExPortfolio.objects.first())
 
         self.client.force_login(self.user)
@@ -289,7 +289,7 @@ class DeletePortfolio(TestCase):
         portfolio = ExPortfolio.objects.first()
         self.assertIsNone(portfolio)
 
-    def test_delete_blockchain_portfolio_with_not_correct_id_portfolio(self):
+    def test_delete_exchanger_portfolio_with_not_correct_id_portfolio(self):
         self.assertTrue(ExPortfolio.objects.first())
 
         self.client.force_login(self.user)
@@ -323,11 +323,11 @@ class GetExchangerData(TestCase):
         url = reverse('exchanger:get_exchanger_data', args='1')
         return self.client.get(url)
 
-    def test_url_to_page_get_blockchain_data(self):
+    def test_url_to_page_get_exchanger_data(self):
         found = resolve(f'/exchanger/data/{1}/')
         self.assertEqual(found.func, get_exchanger_data)
 
-    def test_get_blockchain_data_if_user_is_not_authenticated(self):
+    def test_get_exchanger_data_if_user_is_not_authenticated(self):
         url = reverse('exchanger:get_exchanger_data', args='1')
         response = self.client.get(url)
         url_redirect = reverse('login') + '?next=' + url
@@ -336,18 +336,18 @@ class GetExchangerData(TestCase):
                              status_code=302, target_status_code=200,
                              fetch_redirect_response=False)
 
-    def test_get_blockchain_data_templates(self):
+    def test_get_exchanger_data_templates(self):
         response = self._get_response_for_page_GET()
 
         self.assertTemplateUsed(response, 'exchanger/data_portfolio.html')
 
-    def test_get_blockchain_data_GET(self):
+    def test_get_exchanger_data_GET(self):
         response = self._get_response_for_page_GET()
 
         self.assertEqual(response.status_code, 200, response)
         self.assertTemplateUsed(response, 'exchanger/data_portfolio.html')
 
-    def test_dget_blockchain_data_with_not_correct_id_portfolio(self):
+    def test_dget_exchanger_data_with_not_correct_id_portfolio(self):
         self.assertTrue(ExPortfolio.objects.first())
 
         self.client.force_login(self.user)
@@ -355,3 +355,18 @@ class GetExchangerData(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
+
+    def test_get_exchanger_data_with_not_correct_api(self):
+        self.client.force_login(self.user)
+        portfolio_wrong_apy = ExPortfolio.objects.create(api_key='wrong_apy',
+                                                         api_secret=self.api_secret,
+                                                         password='',
+                                                         comments='',
+                                                         exchanger=Exchanger.objects.get(id=3),
+                                                         owner=self.user)
+
+        url = reverse('exchanger:get_exchanger_data', args=('3', ))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'exchanger/data_portfolio.html')

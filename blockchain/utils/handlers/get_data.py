@@ -3,15 +3,9 @@ from blockchain.utils.ether import Ether
 from blockchain.utils.fantom import Fantom
 from blockchain.utils.polygon import Polygon
 from blockchain.utils.solana import Solana
-# from cmc.handlers.aggregation import get_aggregation_data
 from exchanger.utils.main.get_all_data import get_aggregation_data
 from cmc.handlers.cmc import Cmc
-from exchanger.utils.ex_binance import ExBinance
-from exchanger.utils.ex_bybit import ExBybit
-from exchanger.utils.ex_gateio import ExGate
-from exchanger.utils.ex_lbank import ExLbank
-from exchanger.utils.ex_mexc import ExMexc
-from exchanger.utils.ex_okx import ExOkx
+
 from exchanger.utils.main.get_all_data import check_name
 
 

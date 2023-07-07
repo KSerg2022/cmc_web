@@ -63,24 +63,24 @@ class Base:
             return {'error': f'"{self.blockchain.upper()}" - ERROR - "{e}"'}
         return response
 
-    def get_account_balance(self) -> dict | None:
-        """"""
-        params = {'module': 'account',
-                  'action': 'balance',
-                  'address': self.wallet,
-                  'apikey': self.api_key,
-                  }
-        result = self._get_request(self.host, params)
-        return result
+    # def get_account_balance(self) -> dict | None:
+    #     """"""
+    #     params = {'module': 'account',
+    #               'action': 'balance',
+    #               'address': self.wallet,
+    #               'apikey': self.api_key,
+    #               }
+    #     result = self._get_request(self.host, params)
+    #     return result
 
-    def get_address_BEP20_token_holding(self):
-        """API PRO need"""
-        params = {'module': 'account',
-                  'action': 'addresstokenbalance',
-                  'address': self.wallet,
-                  'page': 1,
-                  'offset': 100,
-                  'apikey': self.api_key,
-                  }
-        result = self._get_request(self.host, params)
-        return result
+    # def get_address_BEP20_token_holding(self):
+    #     """API PRO need"""
+    #     params = {'module': 'account',
+    #               'action': 'addresstokenbalance',
+    #               'address': self.wallet,
+    #               'page': 1,
+    #               'offset': 100,
+    #               'apikey': self.api_key,
+    #               }
+    #     result = self._get_request(self.host, params)
+    #     return result
