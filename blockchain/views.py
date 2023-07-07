@@ -45,7 +45,7 @@ def change_blockchain_portfolio(request, blockchain_id):
     if request.method == 'POST':
         form_portfolio = PortfolioForm(data=request.POST)
         if form_portfolio.is_valid():
-            print(form_portfolio.cleaned_data.values())
+            # print(form_portfolio.cleaned_data.values())
             portfolio.api_key = form_portfolio.cleaned_data.get('api_key')
             portfolio.wallet = form_portfolio.cleaned_data.get('wallet')
             portfolio.comments = form_portfolio.cleaned_data.get('comments')
@@ -89,14 +89,14 @@ def get_blockchain_data(request, blockchain_id):
 
     if 'error' in response_blockchain[0]:
         return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,
-                                                                 'data': response_blockchain,
-                                                                 'total_sum': 0,
-                                                                 })
+                                                                  'data': response_blockchain,
+                                                                  'total_sum': 0,
+                                                                  })
 
     return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,
-                                                             'data': response_blockchain,
-                                                             'total_sum': total_sum,
-                                                             })
+                                                              'data': response_blockchain,
+                                                              'total_sum': total_sum,
+                                                              })
 
 
 @login_required

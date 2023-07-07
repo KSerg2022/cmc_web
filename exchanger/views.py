@@ -23,7 +23,9 @@ def exchangers(request):
 
 @login_required
 def create_portfolio(request, exchanger_id):
-    exchanger = Exchanger.objects.get(id=exchanger_id)
+    # exchanger = Exchanger.objects.get(id=exchanger_id)
+    exchanger = get_object_or_404(Exchanger,
+                                  id=exchanger_id)
     form = ExPortfolioForm()
     if request.method == 'POST':
         form = ExPortfolioForm(data=request.POST)
@@ -45,11 +47,11 @@ def create_portfolio(request, exchanger_id):
 
 @login_required
 def change_portfolio(request, exchanger_id):
-    exchanger = Exchanger.objects.get(id=exchanger_id)
+    exchanger = get_object_or_404(Exchanger,
+                                  id=exchanger_id)
     portfolio = get_object_or_404(ExPortfolio,
                                   owner=request.user,
                                   exchanger=exchanger_id)
-
     form = ExPortfolioForm(instance=portfolio)
     if request.method == 'POST':
         form = ExPortfolioForm(data=request.POST)
