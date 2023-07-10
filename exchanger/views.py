@@ -99,7 +99,19 @@ def get_exchanger_data(request, exchanger_id):
     portfolio = get_object_or_404(ExPortfolio,
                                   owner=request.user,
                                   exchanger=exchanger_id)
-    response_exchanger, total_sum = get_data(portfolio)
+
+    cache_user_exchanger = cache.get(f'user_{portfolio.owner.username.capitalize()}_exchanger_{portfolio.exchanger}')
+    cache_user_total_sum = cache.get(f'user_{portfolio.owner.username.capitalize()}_total_sum_{portfolio.exchanger}')
+
+    if cache_user_exchanger and cache_user_total_sum:
+        response_exchanger = cache_user_exchanger
+        total_sum = cache_user_total_sum
+    else:
+        response_exchanger, total_sum = get_data(portfolio)
+        cache.set(f'user_{portfolio.owner.username.capitalize()}_exchanger_{portfolio.exchanger}',
+                  response_exchanger, 60*3)
+        cache.set(f'user_{portfolio.owner.username.capitalize()}_total_sum_{portfolio.exchanger}',
+                  total_sum, 60*3)
 
     if 'error' in response_exchanger[0]:
         return render(request, 'exchanger/data_portfolio.html', {'portfolio': portfolio,
@@ -115,7 +127,13 @@ def get_exchanger_data(request, exchanger_id):
 
 @login_required
 def get_all_data(request, user_id):
-    user_portfolios_data = all_dada(user_id)
+    cache_user_portfolios_data = cache.get(f'user_{user_id}_portfolios_data')
+    if cache_user_portfolios_data:
+        user_portfolios_data = cache_user_portfolios_data
+    else:
+        user_portfolios_data = all_dada(user_id)
+        cache.set(f'user_{user_id}_portfolios_data', user_portfolios_data, 60*10)
+
     XlsxFile(request.user).create_xlsx(user_portfolios_data)
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})

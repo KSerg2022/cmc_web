@@ -148,9 +148,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
-
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # STATIC_DIR = os.path.join(BASE_DIR, 'static')
 # STATIC_URL = '/static/'
@@ -208,3 +207,15 @@ if 'test' in sys.argv:
 #     'root': {'level': 'INFO'},
 # }
 
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        # "LOCATION": "redis://  cache:6379",
+        # "LOCATION": "redis://  redis:6379",
+        # "OPTIONS": {
+        #     "db": "1",
+        # },
+    }
+}
