@@ -12,6 +12,7 @@ urlpatterns = [
     path('delete_portfolio/<int:exchanger_id>/', views.delete_portfolio, name='delete_portfolio'),
     path('data/<int:exchanger_id>/', views.get_exchanger_data, name='get_exchanger_data'),
     path('all-data/<int:user_id>/', views.get_all_data, name='get_all_data'),
+    path('all_data_pdf/<int:user_id>/', views.get_all_data_pdf, name='get_all_data_pdf'),
     path('', views.exchangers, name='exchangers'),
 
 ]

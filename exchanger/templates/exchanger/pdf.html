@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+{% load exchanger_tags %}
+{% load thumbnail %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF-Portfolio</title>
+</head>
+<body>
+
+
+<div class="text-center">
+    <h1>Users portfolios data in PDF.</h1>
+</div>
+
+<div class="container text-center">
+    {% for portfolio in user_portfolios_data %}
+
+        {% for name, portfolio_data in portfolio.items %}
+            <h3>Users portfolios {{ name|upper }}</h3>
+
+            <table class="table table-bordered align-middle" id="">
+                <thead class="table-primary">
+                <tr class="table-primary">
+                    <th scope="col">#</th>
+                    <th scope="col" class="text-center">Coin</th>
+                    <th scope="col" class="text-center">Balance</th>
+                    <th scope="col" class="text-center">Data</th>
+                    <th scope="col" class="text-center">CMC id</th>
+                    <th scope="col" class="text-center">Name</th>
+                    <th scope="col" class="text-center">Price</th>
+                    <th scope="col" class="text-center table-info">Total:
+                        <span class="text-center h4">{% get_sum_portfolio portfolio_data %}</span>
+                    </th>
+                </tr>
+                </thead>
+
+                {% for data in portfolio_data %}
+                    <tbody>
+                    <tr>
+                        {% if data.error %}
+                            <td colspan="8">{{ data.error }}</td>
+                        {% else %}
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ data.coin }}</td>
+                            <td>{{ data.bal }}</td>
+                            <td>{{ data.data }}</td>
+                            <td>{{ data.id }}</td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.price }}</td>
+                            <td>{{ data.total }}</td>
+                        {% endif %}
+                    </tr>
+                    </tbody>
+                {% endfor %}
+            </table>
+
+        {% endfor %}
+
+    {% endfor %}
+</div>
+
+
+</body>
+</html>

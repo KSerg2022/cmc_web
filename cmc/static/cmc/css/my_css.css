@@ -87,7 +87,11 @@ footer {
     color: #595959;
     text-decoration: none;
 }
-.link:hover {
+.link-wight {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+.link:hover, .link-wight:hover {
     color: #FB6D3A;
     text-decoration: underline;
 }

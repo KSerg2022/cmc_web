@@ -1,8 +1,13 @@
+import pdfkit
+from django.conf import settings
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
-
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.core.cache import cache
 
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
@@ -119,3 +124,39 @@ def get_all_data(request, user_id):
 @login_required
 def detail(request, slug):
     return render(request, 'exchanger/detail.html')
+
+
+@login_required
+def get_all_data_pdf(request, user_id):
+    """
+    https://www.geeksforgeeks.org/python-convert-html-pdf/
+    https://pythoncircle.com/post/470/generating-and-returning-pdf-as-response-in-django/
+    """
+    user = get_object_or_404(User, id=user_id)
+
+    cache_user_portfolios_data = cache.get(f'user_{user_id}_portfolios_data')
+    if cache_user_portfolios_data:
+        user_portfolios_data = cache_user_portfolios_data
+    else:
+        user_portfolios_data = all_dada(user_id)
+        cache.set(f'user_{user_id}_portfolios_data', user_portfolios_data, 60*10)
+
+    pdf = get_pdf(user_portfolios_data)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=PDF_portfolio_User_{user.username.capitalize()}.pdf'
+    return response
+
+
+def get_pdf(user_portfolios_data):
+    html = render_to_string('exchanger/pdf.html', {'user_portfolios_data': user_portfolios_data})
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    pdf_settings = {
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    pdf = pdfkit.from_string(input=html,
+                             css=settings.STATIC_ROOT / 'cmc/css/pdf.css',
+                             configuration=config,
+                             options=pdf_settings)
+    return pdf
