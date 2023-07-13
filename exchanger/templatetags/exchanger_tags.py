@@ -41,7 +41,7 @@ def total_exchanger_portfolios():
 
 @register.simple_tag
 def get_sum_portfolio(portfolio):
-    return round(sum([coin['total'] for coin in portfolio if 'total' in coin]), 3)
+    return round(sum([coin['total'] for coin in portfolio if 'total' in coin]), 5)
 
 
 @register.simple_tag

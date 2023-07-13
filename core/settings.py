@@ -84,7 +84,7 @@ TEMPLATES = [
             'libraries': {
                 'exchanger_tags': 'exchanger.templatetags.exchanger_tags',
                 'blockchain_tags': 'blockchain.templatetags.blockchain_tags',
-
+                'cmc_tags': 'cmc.templatetags.cmc_tags',
             }
         },
     },
