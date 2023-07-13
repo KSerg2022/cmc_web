@@ -51,9 +51,11 @@
                                     <td>{{ exchanger_portfolio }}</td>
                                     <td class="text-center">
                                         <a href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}"
-                                           class="badge bg-info link">Get data</a>
-                                        <a href="{% url "exchanger:get_all_data_pdf" user.id %}"
+                                           class="badge bg-info link">Data</a>
+                                        <a href="{% url "exchanger:get_exchanger_data_pdf" exchanger_portfolio.id %}"
                                            class="badge  bg-danger link-wight" target="_blank">PDF</a>
+                                        <a href="#"
+                                           class="badge  bg-success link-wight" target="_blank">XLSX</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -82,10 +84,12 @@
                                     <td class="text-center">
                                     <span class="badge bg-info">
                                         <a href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}"
-                                           class=" link">Get data</a>
+                                           class=" link">Data</a>
                                     </span>
-                                        <a href="{% url "exchanger:get_all_data_pdf" user.id %}"
-                                           class="btn  btn-danger  btn-sm link-wight" target="_blank">PDF</a>
+                                        <a href="{% url "blockchain:get_blockchain_data_pdf" blockchain_portfolio.id %}"
+                                           class="badge  bg-danger link-wight" target="_blank">PDF</a>
+                                        <a href="#"
+                                           class="badge  bg-success link-wight " target="_blank">XLSX</a>
                                     </td>
                                 </tr>
                             {% endfor %}
