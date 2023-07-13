@@ -1,7 +1,12 @@
+import pdfkit
+from django.conf import settings
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 
 from .cache import check_caches_blockchain_data
 from .forms import PortfolioForm
@@ -103,3 +108,39 @@ def get_blockchain_data(request, blockchain_id):
 @login_required
 def detail(request, slug):
     return render(request, 'blockchain/detail.html')
+
+
+@login_required
+def get_blockchain_data_pdf(request, blockchain_id):
+    """
+    https://www.geeksforgeeks.org/python-convert-html-pdf/
+    https://pythoncircle.com/post/470/generating-and-returning-pdf-as-response-in-django/
+    """
+    portfolio = get_object_or_404(Portfolio,
+                                  owner=request.user,
+                                  blockchain=blockchain_id)
+    response_blockchain, total_sum = check_caches_blockchain_data(portfolio)
+
+    pdf = get_blockchain_pdf(portfolio, response_blockchain, total_sum)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=PDF_{portfolio.blockchain.name}' \
+                                      f'_{portfolio.owner.username.capitalize()}.pdf'
+    return response
+
+
+def get_blockchain_pdf(portfolio, user_portfolio_data, total_sum):
+    html = render_to_string('blockchain/pdf_blockchain.html',
+                            {'portfolio': portfolio,
+                             'user_portfolio_data': user_portfolio_data,
+                             'total_sum': total_sum})
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    pdf_settings = {
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    pdf = pdfkit.from_string(input=html,
+                             css=settings.STATIC_ROOT / 'cmc/css/pdf.css',
+                             configuration=config,
+                             options=pdf_settings)
+    return pdf

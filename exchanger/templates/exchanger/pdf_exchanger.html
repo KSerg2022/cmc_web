@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+{% load exchanger_tags %}
+{% load thumbnail %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF-Portfolio</title>
+</head>
+<body>
+
+
+<div class="container">
+    <h1>Users portfolio data in PDF.</h1>
+
+
+    <h3>Users portfolio {{ portfolio.exchanger.name|upper }}:</h3>
+
+    <table id="">
+        <thead>
+        <tr class="center">
+            <th scope="col">#</th>
+            <th scope="col" class="center">Coin</th>
+            <th scope="col" class="center">Balance</th>
+            <th scope="col" class="center">Data</th>
+            <th scope="col" class="center">CMC id</th>
+            <th scope="col" class="center">Name</th>
+            <th scope="col" class="center">Price</th>
+            <th scope="col" class="center">Total</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for data in user_portfolio_data %}
+            <tr>
+                {% if data.error %}
+                    <td colspan="8">{{ data.error }}</td>
+                {% else %}
+                    <td class="left">{{ forloop.counter }}</td>
+                    <td class="left">{{ data.coin }}</td>
+                    <td class="right">{{ data.bal|floatformat:5 }}</td>
+{#                    <td class="center">{{ data.data|slice:":10" }}</td>#}
+                    <td class="center">{{ data.data }}</td>
+                    <td class="center">{{ data.id }}</td>
+                    <td class="left">{{ data.name }}</td>
+                    <td class="right">{{ data.price|floatformat:5 }}</td>
+                    <td class="right">{{ data.total|floatformat:5 }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        <tr class="total">
+            <th colspan="7" class="right">Total:</th>
+            <td class="center">{{ total_sum|floatformat:5 }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+</body>
+</html>

@@ -15,5 +15,5 @@ urlpatterns = [
          name='delete_blockchain_portfolio'),
     path('data/<int:blockchain_id>/', views.get_blockchain_data, name='get_blockchain_data'),
     # path('all-data/<int:user_id>/', views.get_all_data, name='get_all_data'),
-
+    path('blockchain_data_pdf/<int:blockchain_id>/', views.get_blockchain_data_pdf, name='get_blockchain_data_pdf'),
 ]

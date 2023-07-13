@@ -29,7 +29,6 @@ def exchangers(request):
 
 @login_required
 def create_portfolio(request, exchanger_id):
-    # exchanger = Exchanger.objects.get(id=exchanger_id)
     exchanger = get_object_or_404(Exchanger,
                                   id=exchanger_id)
     form = ExPortfolioForm()
@@ -115,6 +114,41 @@ def get_exchanger_data(request, exchanger_id):
                                                              'total_sum': total_sum,
                                                              })
 
+@login_required
+def get_exchanger_data_pdf(request, exchanger_id):
+    """
+    https://www.geeksforgeeks.org/python-convert-html-pdf/
+    https://pythoncircle.com/post/470/generating-and-returning-pdf-as-response-in-django/
+    """
+    portfolio = get_object_or_404(ExPortfolio,
+                                  owner=request.user,
+                                  exchanger=exchanger_id)
+    response_exchanger, total_sum = check_caches_exchanger_data(portfolio)
+
+    pdf = get_exchanger_pdf(portfolio, response_exchanger, total_sum)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=PDF_{portfolio.exchanger.name}' \
+                                      f'_{portfolio.owner.username.capitalize()}.pdf'
+    return response
+
+
+def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
+    html = render_to_string('exchanger/pdf_exchanger.html',
+                            {'portfolio': portfolio,
+                             'user_portfolio_data': user_portfolio_data,
+                             'total_sum': total_sum})
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    pdf_settings = {
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    pdf = pdfkit.from_string(input=html,
+                             css=settings.STATIC_ROOT / 'cmc/css/pdf.css',
+                             configuration=config,
+                             options=pdf_settings)
+    return pdf
+
 
 @login_required
 def get_all_data(request, user_id):
@@ -137,13 +171,7 @@ def get_all_data_pdf(request, user_id):
     https://pythoncircle.com/post/470/generating-and-returning-pdf-as-response-in-django/
     """
     user = get_object_or_404(User, id=user_id)
-
-    cache_user_portfolios_data = cache.get(f'user_{user_id}_portfolios_data')
-    if cache_user_portfolios_data:
-        user_portfolios_data = cache_user_portfolios_data
-    else:
-        user_portfolios_data = all_dada(user_id)
-        cache.set(f'user_{user_id}_portfolios_data', user_portfolios_data, 60*10)
+    user_portfolios_data = check_cache_user_portfolios_data(user_id)
 
     pdf = get_pdf(user_portfolios_data)
     response = HttpResponse(pdf, content_type='application/pdf')

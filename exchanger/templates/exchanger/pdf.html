@@ -11,50 +11,52 @@
 <body>
 
 
-<div class="text-center">
-    <h1>Users portfolios data in PDF.</h1>
-</div>
 
-<div class="container text-center">
+<div class="container">
+    <h1>Users portfolios data in PDF.</h1>
+
     {% for portfolio in user_portfolios_data %}
 
         {% for name, portfolio_data in portfolio.items %}
-            <h3>Users portfolios {{ name|upper }}</h3>
+            <h3>Users portfolios {{ name|upper }}:</h3>
 
-            <table class="table table-bordered align-middle" id="">
-                <thead class="table-primary">
-                <tr class="table-primary">
-                    <th scope="col">#</th>
-                    <th scope="col" class="text-center">Coin</th>
-                    <th scope="col" class="text-center">Balance</th>
-                    <th scope="col" class="text-center">Data</th>
-                    <th scope="col" class="text-center">CMC id</th>
-                    <th scope="col" class="text-center">Name</th>
-                    <th scope="col" class="text-center">Price</th>
-                    <th scope="col" class="text-center table-info">Total:
-                        <span class="text-center h4">{% get_sum_portfolio portfolio_data %}</span>
-                    </th>
-                </tr>
+            <table id="">
+                <thead>
+                    <tr class="center">
+                        <th scope="col">#</th>
+                        <th scope="col" class="center">Coin</th>
+                        <th scope="col" class="center">Balance</th>
+                        <th scope="col" class="center">Data</th>
+                        <th scope="col" class="center">CMC id</th>
+                        <th scope="col" class="center">Name</th>
+                        <th scope="col" class="center">Price</th>
+                        <th scope="col" class="center">Total</th>
+                    </tr>
                 </thead>
 
-                {% for data in portfolio_data %}
                     <tbody>
-                    <tr>
-                        {% if data.error %}
-                            <td colspan="8">{{ data.error }}</td>
-                        {% else %}
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ data.coin }}</td>
-                            <td>{{ data.bal }}</td>
-                            <td>{{ data.data }}</td>
-                            <td>{{ data.id }}</td>
-                            <td>{{ data.name }}</td>
-                            <td>{{ data.price }}</td>
-                            <td>{{ data.total }}</td>
-                        {% endif %}
+                    {% for data in portfolio_data %}
+                        <tr>
+                            {% if data.error %}
+                                <td colspan="8">{{ data.error }}</td>
+                            {% else %}
+                                <td class="left">{{ forloop.counter }}</td>
+                                <td class="left">{{ data.coin }}</td>
+                                <td class="right">{{ data.bal|floatformat:5 }}</td>
+                                {#                            <td>{{ data.data|slice:":10" }}</td>#}
+                                <td class="center">{{ data.data }}</td>
+                                <td class="right">{{ data.id }}</td>
+                                <td class="left">{{ data.name }}</td>
+                                <td class="right">{{ data.price|floatformat:5 }}</td>
+                                <td class="right">{{ data.total|floatformat:5 }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    <tr class="total">
+                        <th colspan="7" class="right">Total:</th>
+                        <td class="center">{% get_sum_portfolio portfolio_data %}</td>
                     </tr>
                     </tbody>
-                {% endfor %}
             </table>
 
         {% endfor %}
