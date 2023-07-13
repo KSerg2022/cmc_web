@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
-
+from .cache import check_caches_blockchain_data
 from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
 from .utils.handlers.get_data import get_data
@@ -85,7 +85,8 @@ def get_blockchain_data(request, blockchain_id):
     portfolio = get_object_or_404(Portfolio,
                                   owner=request.user,
                                   blockchain=blockchain_id)
-    response_blockchain, total_sum = get_data(portfolio)
+
+    response_blockchain, total_sum = check_caches_blockchain_data(portfolio)
 
     if 'error' in response_blockchain[0]:
         return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,
