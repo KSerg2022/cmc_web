@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 
-from .cache import check_caches_blockchain_data
+from exchanger.cache import delete_cache_user_portfolios_data
+from .cache import check_caches_blockchain_data, delete_caches_blockchain_data
 from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
 from .utils.handlers.get_data import get_data
@@ -27,6 +28,9 @@ def create_blockchain_portfolio(request, blockchain_id):
             portfolio.owner = request.user
             portfolio.blockchain = blockchain
             portfolio.save()
+
+            delete_caches_blockchain_data(portfolio)
+            delete_cache_user_portfolios_data(portfolio.owner.id)
 
             messages.success(request, 'Portfolio created successfully')
             return redirect('exchanger:exchangers')
@@ -57,6 +61,9 @@ def change_blockchain_portfolio(request, blockchain_id):
             portfolio.currencies = form_portfolio.cleaned_data.get('currencies')
             portfolio.save()
 
+            delete_caches_blockchain_data(portfolio)
+            delete_cache_user_portfolios_data(portfolio.owner.id)
+
             messages.success(request, 'Portfolio changed successfully')
             return redirect('exchanger:exchangers')
         else:
@@ -79,6 +86,10 @@ def delete_blockchain_portfolio(request, blockchain_id):
     if request.GET.get('yes') == 'yes':
         portfolio.delete()
         messages.success(request, f'Portfolio {portfolio.blockchain} deleted successfully')
+
+        delete_caches_blockchain_data(portfolio)
+        delete_cache_user_portfolios_data(portfolio.owner.id)
+
         return redirect('exchanger:exchangers')
 
     return render(request, 'blockchain/delete_portfolio.html', {'blockchain': blockchain,
