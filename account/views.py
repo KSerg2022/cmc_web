@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.cache import cache
 
 # from .models import Contact
 from .forms import (LoginForm,
@@ -30,6 +31,8 @@ def register(request):
 
             # Создать профиль пользователя
             Profile.objects.create(user=new_user)
+
+            cache.delete('total_users')
             return render(request,
                           'account/template/register_done.html',
                           {'new_user': new_user})
