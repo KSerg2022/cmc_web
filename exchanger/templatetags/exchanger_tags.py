@@ -5,38 +5,65 @@ from django.utils.safestring import mark_safe
 # import markdown
 from django.contrib.auth.models import User
 from django.conf import settings
-
+from django.core.cache import cache
 
 from exchanger.models import Exchanger, ExPortfolio
 from cmc.models import Cryptocurrency
 
 register = template.Library()
 
+TIME_CACHES_DATA = 60*10
+TIME_CACHES_COINS = 60*5
+TIME_CACHES_USERS = 60
+
 
 @register.simple_tag
 def get_exchanger_portfolios(user):
-    try:
-        user = User.objects.get(id=user.id)
-    except ObjectDoesNotExist:
-        return 0
-    user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
-
-    return [user_exchanger.exchanger for user_exchanger in user_exchangers]
+    cache_user_exchangers = cache.get(f'user_{user.id}_exchangers')
+    if cache_user_exchangers:
+        exchangers = cache_user_exchangers
+    else:
+        try:
+            user = User.objects.get(id=user.id)
+        except ObjectDoesNotExist:
+            return 0
+        user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
+        exchangers = [user_exchanger.exchanger for user_exchanger in user_exchangers]
+        cache.set(f'user_{user.id}_exchangers', exchangers, TIME_CACHES_DATA)
+    return exchangers
 
 
 @register.simple_tag
 def total_coins():
-    return Cryptocurrency.objects.all().count()
+    cache_total_coins = cache.get('total_coins')
+    if cache_total_coins:
+        coins = cache_total_coins
+    else:
+        coins = Cryptocurrency.objects.all().count()
+        cache.set('total_coins', coins, TIME_CACHES_COINS)
+    return coins
 
 
 @register.simple_tag
 def total_users():
-    return User.objects.all().count()
+    cache_total_users = cache.get('total_users')
+    if cache_total_users:
+        qty_users = cache_total_users
+    else:
+        qty_users = User.objects.all().count()
+        cache.set('total_users', qty_users, TIME_CACHES_USERS)
+    return qty_users
 
 
 @register.simple_tag
 def total_exchanger_portfolios():
-    return ExPortfolio.objects.all().count()
+    cache_total_exchanger_portfolios = cache.get('total_exchanger_portfolios')
+    if cache_total_exchanger_portfolios:
+        qty_exchanger_portfolios = cache_total_exchanger_portfolios
+    else:
+        qty_exchanger_portfolios = ExPortfolio.objects.all().count()
+        cache.set('total_exchanger_portfolios', qty_exchanger_portfolios, TIME_CACHES_DATA)
+    return qty_exchanger_portfolios
 
 
 @register.simple_tag
