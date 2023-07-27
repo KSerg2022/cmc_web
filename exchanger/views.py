@@ -7,13 +7,14 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.core.cache import cache
 
-from .cache import check_cache_user_portfolios_data, check_caches_exchanger_data
+from .cache import (check_cache_user_portfolios_data,
+                    check_caches_exchanger_data,
+                    delete_caches_exchanger_data,
+                    delete_cache_user_portfolios_data)
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
-from .utils.main.get_data import get_data
-from .utils.main.get_all_data import get_all_data as all_dada
+
 from exchanger.utils.handlers.xlsx_file import XlsxFile
 
 from blockchain.models import Blockchain
@@ -39,6 +40,9 @@ def create_portfolio(request, exchanger_id):
             portfolio.owner = request.user
             portfolio.exchanger = exchanger
             portfolio.save()
+
+            delete_caches_exchanger_data(portfolio)
+            delete_cache_user_portfolios_data(portfolio.owner.id)
 
             messages.success(request, 'Portfolio created successfully')
             return redirect('exchanger:exchangers')
@@ -67,6 +71,9 @@ def change_portfolio(request, exchanger_id):
             portfolio.comments = form.cleaned_data.get('comments')
             portfolio.save()
 
+            delete_caches_exchanger_data(portfolio)
+            delete_cache_user_portfolios_data(portfolio.owner.id)
+
             messages.success(request, 'Portfolio changed successfully')
             return redirect('exchanger:exchangers')
         else:
@@ -88,6 +95,10 @@ def delete_portfolio(request, exchanger_id):
     if request.GET.get('yes') == 'yes':
         portfolio.delete()
         messages.success(request, f'Portfolio {portfolio.exchanger} deleted successfully')
+
+        delete_caches_exchanger_data(portfolio)
+        delete_cache_user_portfolios_data(portfolio.owner.id)
+
         return redirect('exchanger:exchangers')
 
     return render(request, 'exchanger/delete_portfolio.html', {'exchanger': exchanger,
@@ -100,8 +111,6 @@ def get_exchanger_data(request, exchanger_id):
                                   owner=request.user,
                                   exchanger=exchanger_id)
     response_exchanger, total_sum = check_caches_exchanger_data(portfolio)
-    print(response_exchanger)
-    print(total_sum)
 
     if 'error' in response_exchanger[0]:
         return render(request, 'exchanger/data_portfolio.html', {'portfolio': portfolio,
@@ -113,6 +122,7 @@ def get_exchanger_data(request, exchanger_id):
                                                              'data': response_exchanger,
                                                              'total_sum': total_sum,
                                                              })
+
 
 @login_required
 def get_exchanger_data_pdf(request, exchanger_id):

@@ -3,9 +3,8 @@ from django.core.cache import cache
 from .utils.main.get_all_data import get_all_data
 from .utils.main.get_data import get_data
 
-
-TIME_CACHE_USER_PORTFOLIO_DATA = 60*100
-TIME_CACHES_EXCHANGER_DATA = 60*100
+TIME_CACHE_USER_PORTFOLIO_DATA = 60 * 100
+TIME_CACHES_EXCHANGER_DATA = 60 * 100
 
 
 def check_cache_user_portfolios_data(user_id):
@@ -23,7 +22,8 @@ def check_cache_user_portfolios_data(user_id):
 
 def check_caches_exchanger_data(portfolio):
     cache_user_exchanger = cache.get(f'user_{portfolio.owner.id}_exchanger_{portfolio.exchanger}')
-    cache_user_cache_user_exchanger_total_sum = cache.get(f'user_{portfolio.owner.id}_exchanger_total_sum_{portfolio.exchanger}')
+    cache_user_cache_user_exchanger_total_sum = cache.get(
+        f'user_{portfolio.owner.id}_exchanger_total_sum_{portfolio.exchanger}')
 
     if cache_user_exchanger and cache_user_cache_user_exchanger_total_sum:
         response_exchanger = cache_user_exchanger
@@ -37,3 +37,17 @@ def check_caches_exchanger_data(portfolio):
                   total_sum,
                   TIME_CACHES_EXCHANGER_DATA)
     return response_exchanger, total_sum
+
+
+def delete_caches_exchanger_data(portfolio):
+    cache.delete(f'user_{portfolio.owner.id}_exchanger_{portfolio.exchanger}')
+    cache.delete(f'user_{portfolio.owner.id}_exchanger_total_sum_{portfolio.exchanger}')
+    cache.delete(f'user_{portfolio.owner.id}_exchangers')
+    cache.delete('total_exchanger_portfolios')
+
+    return
+
+
+def delete_cache_user_portfolios_data(user_id):
+    cache.delete(f'user_{user_id}_portfolios_data')
+    return
