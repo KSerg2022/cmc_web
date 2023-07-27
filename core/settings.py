@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'easy_thumbnails',
     'django_json_widget',
+    'cachalot',  # global caches
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
