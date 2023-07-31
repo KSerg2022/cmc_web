@@ -211,12 +211,11 @@ if 'test' in sys.argv:
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        # "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
-        # "LOCATION": "redis://  cache:6379",
-        # "LOCATION": "redis://  redis:6379",
-        # "OPTIONS": {
-        #     "db": "1",
-        # },
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
