@@ -211,14 +211,17 @@ if 'test' in sys.argv:
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        # "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
+        # "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
 
 # Celery
-# CELERY_BROKER_URL = 'redis://redis:6379/0'
-# CELERY_BROKER_URL = 'redis://cache:6379/0'
-CELERY_BROKER_URL = 'redis://cache_redis:6379/0'
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'

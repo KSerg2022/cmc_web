@@ -1,6 +1,28 @@
 version: '3.1'
 
 services:
+  cmc:
+    build:
+      context: .
+    image: cmc:latest
+
+  web_cmc:
+    image: cmc:latest
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/cmc
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+#    command:
+#      - python manage.py runserver 0.0.0.0:8000
+    depends_on:
+       - postgres
 
   postgres:
     container_name: postgres
@@ -9,58 +31,63 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PORT=5432
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     restart: always
 
-  redis:
+  cache:
     image: redis:latest
-    hostname: redis
+    hostname: cache_redis
     restart: always
     ports:
       - "6379:6379" # убрать когда будет все докирезировано
-
+    volumes:
+      - ./data/cache:/data
 
   worker:
-    build:
-      context: .
-    image: cmc_celery:latest
+#    build:
+#      context: .
+    image: cmc:latest
     hostname: worker
     entrypoint: celery
-    command: -A celery_app.app worker --loglevel=info
+    command:
+#      - A celery_app.app worker --loglevel-info
+      celery -A --app=celery_app.app worker --loglevel=info
+#      ['celery', '-A', 'celery_app.app', 'worker', '-l', 'info']
     volumes:
       - .:/cmc
     labels:
-      - redis
+      - cache
     depends_on:
-      - redis
+      - cache
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
 
-
   flower:
-    build:
-      context: .
-    image: cmc_flower:latest
+#    build:
+#      context: .
+    image: cmc:latest
     hostname: flower
     entrypoint: celery
-    command: -A celery_app.app flower
+    command:
+#      - A celery_app.app flower
+      flower --app=worker.celery
     volumes:
       - .:/cmc
     labels:
-      - redis
+      - cache
       - worker
     depends_on:
-      - redis
+      - cache
       - worker
     ports:
       - "5555:5555"
+
 
 
 volumes:
