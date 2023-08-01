@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'easy_thumbnails',
     'django_json_widget',
-    'cachalot',  # global caches
+    'cachalot',  # global caches. https://djangopackages.org/grids/g/caching/
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
@@ -214,8 +214,14 @@ CACHES = {
         # "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
+        # "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
+
+
+# Celery
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
