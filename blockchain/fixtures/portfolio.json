@@ -1,0 +1,107 @@
+[
+{
+  "model": "blockchain.portfolio",
+  "pk": 5,
+  "fields": {
+    "owner": 2,
+    "blockchain": 1,
+    "slug": "ivan-bsc",
+    "api_key": "HKUAZ9MW5V81C5V7VIVGJT7FU88XTT7IJG",
+    "wallet": "0xAB69275E0270a82F456aBBdf73573Cc41FF2BeFd",
+    "comments": "",
+    "currencies": {
+      "DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
+      "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+      "GMI": "0x93D8d25E3C9A847a5Da79F79ecaC89461FEcA846",
+      "ONT": "0xFd7B3A77848f1C2D67E05E54d78d174a0C850335",
+      "BUSD": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+      "CAKE": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+      "KZEN": "0x455B75A6DCF86e700B020765DFbcbE7D4A3b73f5",
+      "MATE": "0x696c2D3c711d5727c3686672F411583faeDAA29F",
+      "MCRT": "0x4b8285aB433D8f69CB48d5Ad62b415ed1a221e4f",
+      "PPAD": "0x93Bb13E90678cCd8BBab07D1dAEF15086746dc9B",
+      "USDT": "0x55d398326f99059fF775485246999027B3197955",
+      "LPOOL": "0xCfB24d3C3767364391340a2E6d99c64F1CBd7A3D"
+    }
+  }
+},
+{
+  "model": "blockchain.portfolio",
+  "pk": 6,
+  "fields": {
+    "owner": 2,
+    "blockchain": 2,
+    "slug": "ivan-ethereum",
+    "api_key": "SF9G6N5D8E5A32MADKUHC44SUYI15CNYJD",
+    "wallet": "0xAB69275E0270a82F456aBBdf73573Cc41FF2BeFd",
+    "comments": "",
+    "currencies": {
+      "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8"
+    }
+  }
+},
+{
+  "model": "blockchain.portfolio",
+  "pk": 7,
+  "fields": {
+    "owner": 2,
+    "blockchain": 3,
+    "slug": "ivan-fantom",
+    "api_key": "5I9537K92E621BTK6A7PCPC31K9XQGRB83",
+    "wallet": "0xAB69275E0270a82F456aBBdf73573Cc41FF2BeFd",
+    "comments": "",
+    "currencies": {
+      "FS": "0xC758295Cd1A564cdb020a78a681a838CF8e0627D",
+      "BRO": "0x230576a0455d7Ae33c6dEfE64182C0BB68bAFAF3",
+      "FTM": "0x4e15361fd6b4bb609fa63c81a2be19d873717870",
+      "WIS": "0xF24be6c063Bee7c7844dD90a21fdf7d783d41a94",
+      "MCRT": "0xE705aF5f63fcaBDCDF5016aA838EAaac35D12890",
+      "SAVG": "0xa097c96ACc9587D140AD8aEaAC13D9db2C6CC07f",
+      "ESCROW": "0xE613a914bbb433855378183c3aB13003285da40A"
+    }
+  }
+},
+{
+  "model": "blockchain.portfolio",
+  "pk": 8,
+  "fields": {
+    "owner": 2,
+    "blockchain": 4,
+    "slug": "ivan-polygon",
+    "api_key": "47FEBI9Z73IYQRJSEBRCSBIM3QCZBWXRYH",
+    "wallet": "0xAB69275E0270a82F456aBBdf73573Cc41FF2BeFd",
+    "comments": "",
+    "currencies": {
+      "MATIC": "0x0000000000000000000000000000000000001010"
+    }
+  }
+},
+{
+  "model": "blockchain.portfolio",
+  "pk": 9,
+  "fields": {
+    "owner": 2,
+    "blockchain": 5,
+    "slug": "ivan-solana",
+    "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2ODQ0MjQ4ODQyMDIsImVtYWlsIjoia29zaGV2b3lzQGdtYWlsLmNvbSIsImFjdGlvbiI6InRva2VuLWFwaSIsImlhdCI6MTY4NDQyNDg4NH0.3CEdFLG4IkwWqrY2dwNp8fQ-ZUJv4rv6ELD8NPh2_h4",
+    "wallet": "8YFgi5DwDGkGb4p2XTX2UCLH9yWZcrn39Nx41urDSvj3",
+    "comments": "",
+    "currencies": {
+      "BGS": "At7RLMbA6ZUjj7riyvFq2j5NHQ19aJabCju2VxLDAqso",
+      "GAR": "CKaKtYvz6dKPyMvYq9Rh3UBrnNqYZAyd7iF4hJtjUvks",
+      "GWT": "GWTipxSJVPmmW2wCjBdkbnEJbCRCyrhL2x9zuHRPPTj1",
+      "SOL": "",
+      "WAG": "5tN42n9vMi6ubp67Uy4NnmM5DMZYN8aS8GeB3bEDHr6E",
+      "YOM": "yomFPUqz1wJwYSfD5tZJUtS3bNb8xs8mx9XzBv8RL39",
+      "BONK": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      "RAZR": "RAZRymwM9F2nP9ZAsojyKRoneydftoqztsx3MnRS9MC",
+      "SOLC": "Bx1fDtvTN6NvE4kjdPHQXtmGSg582bZx9fGy4DQNMmAT",
+      "SOLR": "7j7H7sgsnNDeCngAPjpaCN4aaaru4HS7NAFYSEUyzJ3k",
+      "TRBL": "3CKQgrcvwhvFqVXXxLTb1u262nh26SJ3uutkSCTtbZxH",
+      "USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "USDT": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      "TICKET": "AymKzSDznoLT7Vhsb4wSRnCj1gjcG3zkgYFY8fxsHHer"
+    }
+  }
+}
+]
