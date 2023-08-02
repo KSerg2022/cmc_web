@@ -9,8 +9,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
 app = Celery('core')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.conf.broker_url = settings.CELERY_BROKER_URL
-app.conf.result_backend = settings.CELERY_RESULT_BACKEND
+# app.conf.broker_url = settings.CELERY_BROKER_URL
+# app.conf.result_backend = settings.CELERY_RESULT_BACKEND
 app.autodiscover_tasks()
 
 

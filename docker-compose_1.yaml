@@ -1,13 +1,9 @@
 version: '3.1'
 
 services:
-  cmc:
+  web_cmc:
     build:
       context: .
-    image: cmc:latest
-
-  web_cmc:
-    image: cmc:latest
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
@@ -23,6 +19,7 @@ services:
 #      - python manage.py runserver 0.0.0.0:8000
     depends_on:
        - postgres
+       - redis
 
   postgres:
     container_name: postgres
@@ -31,37 +28,26 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    restart: always
+    restart: unless-stopped
 
-  cache:
+  redis:
     image: redis:latest
     hostname: cache_redis
-    restart: always
-    ports:
-      - "6379:6379" # убрать когда будет все докирезировано
-    volumes:
-      - ./data/cache:/data
+    restart: unless-stopped
+
 
   worker:
-#    build:
-#      context: .
-    image: cmc:latest
+    build:
+      context: .
     hostname: worker
     entrypoint: celery
-    command:
-#      - A celery_app.app worker --loglevel-info
-      celery -A --app=celery_app.app worker --loglevel=info
-#      ['celery', '-A', 'celery_app.app', 'worker', '-l', 'info']
+    command: -A celery_app.app worker --loglevel=info
     volumes:
       - .:/cmc
     labels:
-      - cache
+      - redis
     depends_on:
-      - cache
+      - redis
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
@@ -69,27 +55,18 @@ services:
       - DB_NAME=${POSTGRES_DB}
 
   flower:
-#    build:
-#      context: .
-    image: cmc:latest
+    build:
+      context: .
     hostname: flower
     entrypoint: celery
-    command:
-#      - A celery_app.app flower
-      flower --app=worker.celery
+    command: -A celery_app.app flower
     volumes:
       - .:/cmc
     labels:
-      - cache
+      - redis
       - worker
     depends_on:
-      - cache
+      - redis
       - worker
     ports:
       - "5555:5555"
-
-
-
-volumes:
-  postgres_data:
-    driver: local

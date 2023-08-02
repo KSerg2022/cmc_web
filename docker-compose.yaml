@@ -22,7 +22,6 @@ services:
     ports:
       - "6379:6379" # убрать когда будет все докирезировано
 
-
   worker:
     build:
       context: .
