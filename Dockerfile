@@ -3,6 +3,8 @@ FROM python:3.10
 
 RUN apt-get update && apt-get -y upgrade
 
+RUN apt-get install -y wkhtmltopdf && apt-get install -y xvfb
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 

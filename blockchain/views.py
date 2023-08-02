@@ -144,7 +144,8 @@ def get_blockchain_pdf(portfolio, user_portfolio_data, total_sum):
                             {'portfolio': portfolio,
                              'user_portfolio_data': user_portfolio_data,
                              'total_sum': total_sum})
-    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",

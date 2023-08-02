@@ -147,7 +147,8 @@ def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
                             {'portfolio': portfolio,
                              'user_portfolio_data': user_portfolio_data,
                              'total_sum': total_sum})
-    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",
@@ -191,7 +192,8 @@ def get_all_data_pdf(request, user_id):
 
 def get_pdf(user_portfolios_data):
     html = render_to_string('exchanger/pdf.html', {'user_portfolios_data': user_portfolios_data})
-    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",
