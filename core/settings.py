@@ -109,7 +109,8 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRyES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
+        # 'HOST': 'localhost',
+        'HOST': 'postgres',
         'PORT': 5432,
     }
 }
@@ -213,9 +214,9 @@ CACHES = {
     "default": {
         # "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        # "LOCATION": "redis://127.0.0.1:6379/1",
         # "LOCATION": "redis://localhost:6379/1",
-        # "LOCATION": "redis://redis:6379/1",
+        "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }

@@ -15,8 +15,6 @@ services:
       - .:/cmc
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
-#    command:
-#      - python manage.py runserver 0.0.0.0:8000
     depends_on:
        - postgres
        - redis
@@ -54,6 +52,25 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
 
+  worker2:
+    build:
+      context: .
+    hostname: worker2
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - .:/cmc
+    labels:
+      - redis
+    depends_on:
+      - redis
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+
+
   flower:
     build:
       context: .
@@ -70,3 +87,7 @@ services:
       - worker
     ports:
       - "5555:5555"
+
+volumes:
+  postgres_data:
+    driver: local
