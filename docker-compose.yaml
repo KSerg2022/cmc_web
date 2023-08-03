@@ -25,18 +25,19 @@ services:
   worker:
     build:
       context: .
-    image: cmc_celery:latest
+    image: cmc_celery_dev:latest
     hostname: worker
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
     volumes:
       - .:/cmc
-    labels:
+    links:
       - redis
     depends_on:
       - redis
+      - postgres
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=localhost
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
@@ -45,19 +46,16 @@ services:
   flower:
     build:
       context: .
-    image: cmc_flower:latest
+    image: cmc_flower_dev:latest
     hostname: flower
     entrypoint: celery
     command: -A celery_app.app flower
-#    command: --broker=redis://redis:6379/0 flower && -A celery_app.app flower
     volumes:
       - .:/cmc
-    labels:
+    links:
       - redis
-      - worker
     depends_on:
       - redis
-      - worker
     ports:
       - "5555:5555"
 
