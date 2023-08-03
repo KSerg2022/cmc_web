@@ -167,7 +167,11 @@ def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
 def get_all_data(request, user_id):
     user_portfolios_data = check_cache_user_portfolios_data(user_id)
 
-    XlsxFile(request.user).create_xlsx(user_portfolios_data)
+    # XlsxFile(request.user).create_xlsx(user_portfolios_data)
+
+    from exchanger.tasks import save_xlsx_file
+    save_xlsx_file.delay(request.user.id, user_portfolios_data)
+
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})
 
