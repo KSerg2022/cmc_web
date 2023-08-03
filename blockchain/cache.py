@@ -1,8 +1,7 @@
 from django.core.cache import cache
 
+from local_settings import TIME_CACHES_BLOCKCHAIN_DATA
 from .utils.handlers.get_data import get_data
-
-TIME_CACHES_BLOCKCHAIN_DATA = 60 * 100
 
 
 def check_caches_blockchain_data(portfolio):

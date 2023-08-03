@@ -1,10 +1,8 @@
 from django.core.cache import cache
 
+from local_settings import TIME_CACHE_USER_PORTFOLIO_DATA, TIME_CACHES_EXCHANGER_DATA
 from .utils.main.get_all_data import get_all_data
 from .utils.main.get_data import get_data
-
-TIME_CACHE_USER_PORTFOLIO_DATA = 60 * 100
-TIME_CACHES_EXCHANGER_DATA = 60 * 100
 
 
 def check_cache_user_portfolios_data(user_id):
