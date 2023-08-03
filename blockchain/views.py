@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 
 from exchanger.cache import delete_cache_user_portfolios_data
+from exchanger.views import get_path_to_wkhtmltopdf
 from .cache import check_caches_blockchain_data, delete_caches_blockchain_data
 from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
@@ -144,8 +145,7 @@ def get_blockchain_pdf(portfolio, user_portfolio_data, total_sum):
                             {'portfolio': portfolio,
                              'user_portfolio_data': user_portfolio_data,
                              'total_sum': total_sum})
-    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
+    path_wkhtmltopdf = get_path_to_wkhtmltopdf()
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",

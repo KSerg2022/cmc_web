@@ -1,3 +1,5 @@
+import os
+
 import pdfkit
 from django.conf import settings
 
@@ -8,6 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
+from local_settings import path_wkhtmltopdf_win, path_wkhtmltopdf_lin
 from .cache import (check_cache_user_portfolios_data,
                     check_caches_exchanger_data,
                     delete_caches_exchanger_data,
@@ -147,8 +150,7 @@ def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
                             {'portfolio': portfolio,
                              'user_portfolio_data': user_portfolio_data,
                              'total_sum': total_sum})
-    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
+    path_wkhtmltopdf = get_path_to_wkhtmltopdf()
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",
@@ -192,8 +194,7 @@ def get_all_data_pdf(request, user_id):
 
 def get_pdf(user_portfolios_data):
     html = render_to_string('exchanger/pdf.html', {'user_portfolios_data': user_portfolios_data})
-    # path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    path_wkhtmltopdf = r'/bin/wkhtmltopdf'  # in docker container
+    path_wkhtmltopdf = get_path_to_wkhtmltopdf()
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     pdf_settings = {
         'encoding': "UTF-8",
@@ -204,3 +205,11 @@ def get_pdf(user_portfolios_data):
                              configuration=config,
                              options=pdf_settings)
     return pdf
+
+
+def get_path_to_wkhtmltopdf():
+    path_wkhtmltopdf = path_wkhtmltopdf_win
+    if os.path.isfile(path_wkhtmltopdf):
+        return path_wkhtmltopdf
+    return path_wkhtmltopdf_lin
+
