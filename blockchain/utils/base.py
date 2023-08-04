@@ -12,6 +12,7 @@ RATE_DECIMALS_9 = ['MCRT', ]
 
 
 ERROR_MSG = 'Check your "api key", "wallet address".'
+ERROR_MSG_NOT_EMPTY = 'List of currencies cannot be empty!'
 
 
 class Base:
@@ -31,6 +32,8 @@ class Base:
     def get_account(self) -> dict[str, dict]:
         """"""
         currencies = []
+        if not self.currencies:
+            return {self.blockchain: [{'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG_NOT_EMPTY}"'}]}
         for currency, contractaddress in self.currencies.items():
             self.params['contractaddress'] = contractaddress
 
