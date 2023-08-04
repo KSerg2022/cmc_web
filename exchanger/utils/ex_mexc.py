@@ -44,7 +44,10 @@ class ExMexc(ExchangerBase):
                                                 exchanger=self.exchanger,
                                                 exception=(RequestException, )
                                                 )
-        currencies = self._normalize_data(currencies_account.json())
+        try:
+            currencies = self._normalize_data(currencies_account.json())
+        except AttributeError:
+            currencies = self._normalize_data(currencies_account)
         return currencies
 
     def _get_request(self):
