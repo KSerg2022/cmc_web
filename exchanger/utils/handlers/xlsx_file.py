@@ -7,9 +7,10 @@ from django.conf import settings
 
 class XlsxFile:
 
-    def __init__(self, user):
+    def __init__(self, user, portfolio_name):
         self.dir = settings.MEDIA_ROOT / 'xlsx_files' / f'{user.id}_{user.username.lower()}'
-        self.filename = f'{user.id}_{user.username.lower()}.xlsx'
+        self.portfolio_name = portfolio_name
+        self.filename = f'{user.id}_{user.username.lower()}_{self.portfolio_name}.xlsx'
         self.path_to_file = self.dir / self.filename
 
     def create_xlsx(self, data: list[dict]):

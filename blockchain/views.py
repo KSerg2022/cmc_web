@@ -13,6 +13,7 @@ from exchanger.views import get_path_to_wkhtmltopdf
 from .cache import check_caches_blockchain_data, delete_caches_blockchain_data
 from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
+from exchanger.tasks import save_portfolio_to_xlsx_file
 from .utils.handlers.get_data import get_data
 
 
@@ -104,6 +105,11 @@ def get_blockchain_data(request, blockchain_id):
                                   blockchain=blockchain_id)
 
     response_blockchain, total_sum = check_caches_blockchain_data(portfolio)
+
+    portfolio_name = portfolio.blockchain.name
+    save_portfolio_to_xlsx_file.delay(request.user.id,
+                                      [{portfolio_name: response_blockchain}],
+                                      portfolio_name)
 
     if 'error' in response_blockchain[0]:
         return render(request, 'blockchain/data_portfolio.html', {'portfolio': portfolio,

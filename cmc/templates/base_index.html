@@ -6,7 +6,8 @@
 
     {% get_exchanger_portfolios user as exchanger_portfolios %}
     {% get_blockchain_portfolios user as blockchain_portfolios %}
-    {% get_path_to_users_xlsx_file user as path_to_users_xlsx_file %}
+    {% get_path_to_users_xlsx_file_all user as path_to_users_xlsx_file_all %}
+
 
 
     <div class="height100 main">
@@ -54,8 +55,11 @@
                                            class="badge bg-info link">Data</a>
                                         <a href="{% url "exchanger:get_exchanger_data_pdf" exchanger_portfolio.id %}"
                                            class="badge  bg-danger link-wight" target="_blank">PDF</a>
-                                        <a href="#"
-                                           class="badge  bg-success link-wight" target="_blank">XLSX</a>
+
+                                        <a href="{% get_path_to_users_xlsx_file_one user exchanger_portfolio %}" class="badge  bg-success link-wight"
+                                           download>XLSX</a>
+{#                                        <a href="#"#}
+{#                                           class="badge  bg-success link-wight" target="_blank">XLSX</a>#}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -88,8 +92,10 @@
                                     </span>
                                         <a href="{% url "blockchain:get_blockchain_data_pdf" blockchain_portfolio.id %}"
                                            class="badge  bg-danger link-wight" target="_blank">PDF</a>
-                                        <a href="#"
-                                           class="badge  bg-success link-wight " target="_blank">XLSX</a>
+                                        <a href="{% get_path_to_users_xlsx_file_one user blockchain_portfolio %}" class="badge  bg-success link-wight"
+                                           download>XLSX</a>
+{#                                        <a href="#"#}
+{#                                           class="badge  bg-success link-wight " target="_blank">XLSX</a>#}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -102,7 +108,7 @@
                         </p>
 
                         <p class="text-center">
-                            <a href="{{ path_to_users_xlsx_file }}" class="btn btn-success btn-sm link"
+                            <a href="{{ path_to_users_xlsx_file_all }}" class="btn btn-success btn-sm link"
                             download>XLSX</a>
                             <a href="{% url "exchanger:get_all_data_pdf" user.id %}"
                                class="btn  btn-danger  btn-sm link-wight" target="_blank">PDF</a>

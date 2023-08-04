@@ -18,7 +18,7 @@ from .cache import (check_cache_user_portfolios_data,
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 
-from exchanger.utils.handlers.xlsx_file import XlsxFile
+from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file
 
 from blockchain.models import Blockchain
 
@@ -115,6 +115,11 @@ def get_exchanger_data(request, exchanger_id):
                                   exchanger=exchanger_id)
     response_exchanger, total_sum = check_caches_exchanger_data(portfolio)
 
+    portfolio_name = portfolio.exchanger.name
+    save_portfolio_to_xlsx_file.delay(request.user.id,
+                                      [{portfolio_name: response_exchanger}],
+                                      portfolio_name)
+
     if 'error' in response_exchanger[0]:
         return render(request, 'exchanger/data_portfolio.html', {'portfolio': portfolio,
                                                                  'data': response_exchanger,
@@ -167,10 +172,7 @@ def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
 def get_all_data(request, user_id):
     user_portfolios_data = check_cache_user_portfolios_data(user_id)
 
-    # XlsxFile(request.user).create_xlsx(user_portfolios_data)
-
-    from exchanger.tasks import save_xlsx_file
-    save_xlsx_file.delay(request.user.id, user_portfolios_data)
+    save_all_to_xlsx_file.delay(request.user.id, user_portfolios_data, 'ALL')
 
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})
