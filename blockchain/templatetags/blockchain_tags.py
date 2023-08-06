@@ -8,10 +8,9 @@ from django.core.cache import cache
 
 from blockchain.models import Blockchain, Portfolio
 from cmc.models import Cryptocurrency
+from local_settings import TIME_CACHES_DATA
 
 register = template.Library()
-
-TIME_CACHES_DATA = 60*10
 
 
 @register.simple_tag

@@ -8,12 +8,10 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 
-
 from cmc.models import Cryptocurrency
+from local_settings import TIME_CACHE_ALL_COINS
 
 register = template.Library()
-
-TIME_CACHE_ALL_COINS = 60*60*24
 
 
 @register.simple_tag

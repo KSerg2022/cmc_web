@@ -9,12 +9,9 @@ from django.core.cache import cache
 
 from exchanger.models import Exchanger, ExPortfolio
 from cmc.models import Cryptocurrency
+from local_settings import TIME_CACHES_DATA, TIME_CACHES_COINS, TIME_CACHES_USERS
 
 register = template.Library()
-
-TIME_CACHES_DATA = 60*10
-TIME_CACHES_COINS = 60*5
-TIME_CACHES_USERS = 60
 
 
 @register.simple_tag
