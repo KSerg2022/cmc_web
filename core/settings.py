@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'django_json_widget',
     'cachalot',  # global caches. https://djangopackages.org/grids/g/caching/
+    'django_celery_beat',
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
@@ -138,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Berlin'
 
 USE_I18N = True
 DATE_FORMAT = "d-m-Y"
@@ -151,11 +152,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
-
-
-# STATIC_DIR = os.path.join(BASE_DIR, 'static')
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [STATIC_DIR, ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -189,7 +185,7 @@ MESSAGE_TAGS = {
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
-    # INTERNAL_IPS = ('127.0.0.1',)
+# INTERNAL_IPS = ('127.0.0.1',)
 
 # LOGGING = {
 #     'version': 1,
@@ -214,8 +210,6 @@ CACHES = {
     "default": {
         # "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "BACKEND": "django_redis.cache.RedisCache",
-        # "LOCATION": "redis://127.0.0.1:6379/1",
-        # "LOCATION": "redis://localhost:6379/1",
         "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -227,6 +221,21 @@ CACHES = {
 # Celery
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_TASK_TIME_LIMIT = 60 * 5
+CELERY_TIMEZONE = 'Europe/Berlin'
+CELERY_TASK_TRACK_STARTED = True
 
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Celery-beat
+from celery.schedules import crontab
+import cmc.tasks
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task1": {
+        "task": "cmc.tasks.sample_task",
+        "schedule": crontab(minute="*/1"),
+    },
+    "cmc_currencies": {
+        "task": "cmc.tasks.cmc_currencies",
+        "schedule": crontab(minute="0", hour="2"),  # every day at 2 hour
+    },
+}

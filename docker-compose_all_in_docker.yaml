@@ -85,6 +85,24 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
 
+  celery-beat:
+    image: cmc:v1
+    restart: unless-stopped
+    hostname: worker2
+    entrypoint: celery
+    command: -A celery_app.app beat --loglevel=info
+    volumes:
+      - .:/cmc
+    links:
+      - redis
+    depends_on:
+      - redis
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+
 
   flower:
     image: cmc:v1
