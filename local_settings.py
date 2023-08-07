@@ -14,5 +14,6 @@ TIME_CACHES_DATA = 60*10
 TIME_CACHES_COINS = 60*5
 TIME_CACHES_USERS = 60
 
-
+# tasks
+FILE_AGE_IN_MINUTES = 60 * 15  # for task core.tasks.del_old_files_in_media_xlsx_files
 

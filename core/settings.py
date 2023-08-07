@@ -235,14 +235,19 @@ CELERY_TASK_TRACK_STARTED = True
 # Celery-beat
 from celery.schedules import crontab
 import cmc.tasks
+import core.tasks
 
 CELERY_BEAT_SCHEDULE = {
     "sample_task1": {
         "task": "cmc.tasks.sample_task",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/1"),  # debug_task
     },
     "cmc_currencies": {
         "task": "cmc.tasks.cmc_currencies",
         "schedule": crontab(minute="0", hour="2"),  # every day at 2 hour
+    },
+    "delete_old_files_xlsx": {
+        "task": "core.tasks.del_old_files_in_media_xlsx_files",
+        "schedule": crontab(minute="*/15"),  # delete old files in media xlsx_files which older 120 minutes
     },
 }
