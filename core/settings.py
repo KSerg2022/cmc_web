@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_json_widget',
     'cachalot',  # global caches. https://djangopackages.org/grids/g/caching/
     'django_celery_beat',
+    'django_celery_results',
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
@@ -208,19 +209,25 @@ if 'test' in sys.argv:
 
 CACHES = {
     "default": {
-        # "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "BACKEND": "django_redis.cache.RedisCache",
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        # "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://redis:6379/1",
+    },
+    "cachalot": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
-
+# CACHALOT
+CACHALOT_CACHE = 'cachalot'
 
 # Celery
 CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'
 CELERY_TASK_TIME_LIMIT = 60 * 5
 CELERY_TIMEZONE = 'Europe/Berlin'
 CELERY_TASK_TRACK_STARTED = True
