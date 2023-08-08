@@ -71,14 +71,14 @@ footer {
     background-color: #FFFFFF;
     /*box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.1);*/
     padding: 10px 10px;
-    width: 85%;
+    width: 84%;
     height: 100%;
 
 }
 
 .sidebar {
     background-color: #9cdcfe;
-    width: 15%;
+    width: 16%;
     padding-top: 10px;
     height: 100%;
 }
