@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from cmc.views import index
-from exchanger.views import send_email
+from exchanger.views import send_email, send_PDF_by_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,6 +33,8 @@ urlpatterns = [
 
     path('send_email/<str:portfolio>/', send_email, name='send_email'),
     path('send_email/<path:path_to_file>/', send_email, name='send_email'),
+    path('send_PDF_by_email/<int:user_id>/', send_PDF_by_email, name='send_PDF_by_email'),
+    path('send_PDF_by_email/<int:user_id>/<str:portfolio>/', send_PDF_by_email, name='send_PDF_by_email'),
 
     path('', index, name='index'),
 ]

@@ -18,7 +18,7 @@ from .cache import (check_cache_user_portfolios_data,
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 
-from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file, sending_email
+from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file, sending_email, sending_PDF_by_email
 
 from blockchain.models import Blockchain
 
@@ -230,4 +230,20 @@ def send_email(request, path_to_file=None, portfolio=None):
         path_to_file = xlsx_dir + filename
         sending_email.delay(request.user.id, path_to_file)
     messages.success(request, f'Portfolios were send to your email.')
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def send_PDF_by_email(request, user_id=None, portfolio=None):
+    xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
+    path_to_file = None
+    if portfolio:
+        filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
+        path_to_file = xlsx_dir + filename
+    elif user_id:
+        filename = f'{request.user.id}_{request.user.username.lower()}_ALL.pdf'
+        path_to_file = xlsx_dir + filename
+
+    sending_PDF_by_email.delay(user_id=user_id, path_to_file=path_to_file, portfolio=portfolio)
+    messages.success(request, f'Portfolios {portfolio} were send to your email.')
     return redirect(request.META.get('HTTP_REFERER'))

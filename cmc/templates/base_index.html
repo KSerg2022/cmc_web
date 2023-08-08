@@ -94,7 +94,8 @@
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
-                                                <li><a class="dropdown-item link" href="#">Email</a></li>
+                                                <li><a class="dropdown-item link"
+                                                       href="{% url "send_PDF_by_email" user_id=user.id portfolio=exchanger_portfolio %}">Email</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -173,7 +174,8 @@
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
-                                                <li><a class="dropdown-item link" href="#">Email</a></li>
+                                                <li><a class="dropdown-item link"
+                                                       href="{% url "send_PDF_by_email" user_id=user.id portfolio=blockchain_portfolio %}">Email</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -222,7 +224,8 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item link" href="#">Email</a></li>
+                                    <li><a class="dropdown-item link"
+                                           href="{% url "send_PDF_by_email" user_id=user.id %}">Email</a></li>
                                 </ul>
                             </div>
                         </div>
