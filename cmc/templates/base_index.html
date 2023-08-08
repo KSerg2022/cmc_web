@@ -78,7 +78,8 @@
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
-                                                <li><a class="dropdown-item link" href="#">Email</a></li>
+                                                <li><a class="dropdown-item link"
+                                                       href="{% url "send_email" portfolio=exchanger_portfolio %}">Email</a></li>
                                             </ul>
                                         </div>
 
@@ -151,12 +152,13 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a href="{% get_path_to_users_xlsx_file_one user blockchain_portfolio %}"
-                                                       class="dropdown-item link"
-                                                       download>Save</a></li>
+                                                       class="dropdown-item link" download>Save</a></li>
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
-                                                <li><a class="dropdown-item link" href="#">Email</a></li>
+                                                <li><a class="dropdown-item link"
+                                                       href="{% url "send_email" portfolio=blockchain_portfolio %}">Email
+                                                       </a></li>
                                             </ul>
                                         </div>
 
@@ -206,7 +208,7 @@
                                         <hr class="dropdown-divider">
                                     </li>
                                     <li><a class="dropdown-item link"
-                                           href="{% url "send_email" path_to_users_xlsx_file_all %}">Email</a></li>
+                                           href="{% url "send_email" path_to_file=path_to_users_xlsx_file_all %}">Email</a></li>
                                 </ul>
                             </div>
                             <div class="btn-group">

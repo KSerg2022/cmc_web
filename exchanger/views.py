@@ -221,7 +221,13 @@ def get_path_to_wkhtmltopdf():
 
 
 @login_required
-def send_email(request, path_to_file):
-    sending_email.delay(request.user.id, path_to_file)
+def send_email(request, path_to_file=None, portfolio=None):
+    if path_to_file:
+        sending_email.delay(request.user.id, path_to_file)
+    if portfolio:
+        xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
+        filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.xlsx'
+        path_to_file = xlsx_dir + filename
+        sending_email.delay(request.user.id, path_to_file)
     messages.success(request, f'Portfolios were send to your email.')
     return redirect(request.META.get('HTTP_REFERER'))

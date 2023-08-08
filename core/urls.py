@@ -31,6 +31,7 @@ urlpatterns = [
 
     path('cmc/', include('cmc.urls', namespace='cmc')),
 
+    path('send_email/<str:portfolio>/', send_email, name='send_email'),
     path('send_email/<path:path_to_file>/', send_email, name='send_email'),
 
     path('', index, name='index'),
