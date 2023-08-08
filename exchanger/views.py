@@ -18,7 +18,7 @@ from .cache import (check_cache_user_portfolios_data,
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 
-from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file
+from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file, sending_email
 
 from blockchain.models import Blockchain
 
@@ -219,3 +219,9 @@ def get_path_to_wkhtmltopdf():
         return path_wkhtmltopdf
     return path_wkhtmltopdf_lin
 
+
+@login_required
+def send_email(request, path_to_file):
+    sending_email.delay(request.user.id, path_to_file)
+    messages.success(request, f'Portfolios were send to your email.')
+    return redirect(request.META.get('HTTP_REFERER'))

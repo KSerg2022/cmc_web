@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from cmc.views import index
+from exchanger.views import send_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +30,9 @@ urlpatterns = [
     path('blockchain/', include('blockchain.urls', namespace='blockchain')),
 
     path('cmc/', include('cmc.urls', namespace='cmc')),
+
+    path('send_email/<path:path_to_file>/', send_email, name='send_email'),
+
     path('', index, name='index'),
 ]
 
