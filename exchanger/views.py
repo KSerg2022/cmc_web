@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from local_settings import path_wkhtmltopdf_win, path_wkhtmltopdf_lin
+from local_settings import path_wkhtmltopdf_win, path_wkhtmltopdf_lin, ALL_PORTFOLIOS
 from .cache import (check_cache_user_portfolios_data,
                     check_caches_exchanger_data,
                     delete_caches_exchanger_data,
@@ -18,7 +18,8 @@ from .cache import (check_cache_user_portfolios_data,
 from .models import Exchanger, ExPortfolio
 from .forms import ExPortfolioForm
 
-from exchanger.tasks import save_portfolio_to_xlsx_file, save_all_to_xlsx_file, sending_email, sending_PDF_by_email
+from exchanger.tasks import (save_portfolio_to_xlsx_file, save_all_to_xlsx_file, 
+                             sending_XLSX_by_email, sending_PDF_by_email)
 
 from blockchain.models import Blockchain
 
@@ -172,7 +173,7 @@ def get_exchanger_pdf(portfolio, user_portfolio_data, total_sum):
 def get_all_data(request, user_id):
     user_portfolios_data = check_cache_user_portfolios_data(user_id)
 
-    save_all_to_xlsx_file.delay(request.user.id, user_portfolios_data, 'ALL')
+    save_all_to_xlsx_file.delay(request.user.id, user_portfolios_data, portfolio_name=ALL_PORTFOLIOS)
 
     return render(request, 'exchanger/data_all_portfolios.html',
                   {'user_portfolios_data': user_portfolios_data})
@@ -221,27 +222,24 @@ def get_path_to_wkhtmltopdf():
 
 
 @login_required
-def send_email(request, path_to_file=None, portfolio=None):
-    if path_to_file:
-        sending_email.delay(request.user.id, path_to_file)
+def send_XLSX_by_email(request, path_to_file=None, portfolio=ALL_PORTFOLIOS):
     if portfolio:
         xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
         filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.xlsx'
         path_to_file = xlsx_dir + filename
-        sending_email.delay(request.user.id, path_to_file)
-    messages.success(request, f'Portfolios were send to your email.')
+
+    sending_XLSX_by_email.delay(request.user.id, path_to_file, portfolio)
+    messages.success(request, f'Portfolios {portfolio} were send to your email.')
     return redirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
-def send_PDF_by_email(request, user_id=None, portfolio=None):
+def send_PDF_by_email(request, user_id=None, portfolio=ALL_PORTFOLIOS):
     xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
-    path_to_file = None
+    filename = f'{request.user.id}_{request.user.username.lower()}_{ALL_PORTFOLIOS}.pdf'
+    path_to_file = xlsx_dir + filename
     if portfolio:
         filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
-        path_to_file = xlsx_dir + filename
-    elif user_id:
-        filename = f'{request.user.id}_{request.user.username.lower()}_ALL.pdf'
         path_to_file = xlsx_dir + filename
 
     sending_PDF_by_email.delay(user_id=user_id, path_to_file=path_to_file, portfolio=portfolio)

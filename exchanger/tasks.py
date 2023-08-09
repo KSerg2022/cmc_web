@@ -10,8 +10,10 @@ from core.settings import BASE_DIR
 from celery import shared_task
 
 from exchanger.utils.handlers.xlsx_file import XlsxFile
+from local_settings import ALL_PORTFOLIOS
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -31,24 +33,51 @@ def save_portfolio_to_xlsx_file(user_id, user_portfolios_data, portfolio_name):
     XlsxFile(user, portfolio_name).create_xlsx(user_portfolios_data)
 
 
-@shared_task()
-def sending_email(user_id, path_to_file):
-    if not path_to_file:
-        return {"error": "File not created yet", "status": 400}
+def get_portfolio_data(user, portfolio):
+    from exchanger.cache import check_caches_exchanger_data
+    from blockchain.cache import check_caches_blockchain_data
+    from django.core.exceptions import ObjectDoesNotExist
+    from .models import ExPortfolio
+    from blockchain.models import Portfolio
 
+    try:
+        portfolio = ExPortfolio.objects.get(owner=user,
+                                            exchanger__slug=portfolio.lower())
+        user_portfolios_data, total_sum = check_caches_exchanger_data(portfolio)
+    except (ValueError, ObjectDoesNotExist):
+        portfolio = Portfolio.objects.get(owner=user,
+                                          blockchain__slug=portfolio.lower())
+        user_portfolios_data, total_sum = check_caches_blockchain_data(portfolio)
+    return user_portfolios_data, total_sum
+
+
+@shared_task()
+def sending_XLSX_by_email(user_id, path_to_file, portfolio):
     from django.contrib.auth.models import User
     user = get_object_or_404(User,
                              id=user_id)
     if not (email := user.email):
         return {"error": "You have not added an email to your registration details", "status": 400}
 
-    subject = f'All portfolios data for user - {user.username}'
+    subject = f'Portfolio {portfolio} data for user in xlsx-file - {user.username}'
     message = f'Dear {user.username},\n\n' \
               f'This letter contains information about your Portfolios. XLSX.'
     msg = EmailMessage(subject,
                        message,
                        os.environ.get('EMAIL'),
                        [email])
+
+    from exchanger.cache import check_cache_user_portfolios_data
+
+    if portfolio != ALL_PORTFOLIOS:
+        user_portfolios_data, total_sum = get_portfolio_data(user, portfolio)
+        save_portfolio_to_xlsx_file(user_id,
+                                    [{portfolio: user_portfolios_data}],
+                                    portfolio)
+    else:
+        user_portfolios_data = check_cache_user_portfolios_data(user_id)
+        save_all_to_xlsx_file(user_id, user_portfolios_data, portfolio_name=ALL_PORTFOLIOS)
+
     msg.attach_file(str(BASE_DIR) + path_to_file, mimetype='text/*')
     try:
         msg.send()
@@ -58,36 +87,25 @@ def sending_email(user_id, path_to_file):
 
 
 @shared_task()
-def sending_PDF_by_email(user_id, path_to_file=None, portfolio=None):
+def sending_PDF_by_email(user_id, path_to_file, portfolio):
     from django.contrib.auth.models import User
-    from exchanger.cache import check_cache_user_portfolios_data, check_caches_exchanger_data
-    from blockchain.cache import check_caches_blockchain_data
+    from exchanger.cache import check_cache_user_portfolios_data
     from exchanger.views import get_pdf, get_exchanger_pdf
-    from django.core.exceptions import ObjectDoesNotExist
-    from .models import ExPortfolio
-    from blockchain.models import Portfolio
 
     user = get_object_or_404(User, id=user_id)
     if not (email := user.email):
         return {"error": "You have not added an email to your registration details", "status": 400}
 
-    subject = f'Portfolio {portfolio} data for user - {user.username}'
+    subject = f'Portfolio {portfolio} data for user in pdf-file - {user.username}'
     message = f'Dear {user.username},\n\n' \
               f'This letter contains information about your Portfolios. PDF.'
     msg = EmailMessage(subject,
                        message,
                        os.environ.get('EMAIL'),
                        [email])
-    if portfolio:
-        try:
-            portfolio = ExPortfolio.objects.get(owner=user,
-                                                exchanger__slug=portfolio.lower())
-            response, total_sum = check_caches_exchanger_data(portfolio)
-        except (ValueError, ObjectDoesNotExist):
-            portfolio = Portfolio.objects.get(owner=user,
-                                              blockchain__slug=portfolio.lower())
-            response, total_sum = check_caches_blockchain_data(portfolio)
-        pdf = get_exchanger_pdf(portfolio, response, total_sum)
+    if portfolio != ALL_PORTFOLIOS:
+        user_portfolios_data, total_sum = get_portfolio_data(user, portfolio)
+        pdf = get_exchanger_pdf(portfolio, user_portfolios_data, total_sum)
 
     else:
         user_portfolios_data = check_cache_user_portfolios_data(user_id)
