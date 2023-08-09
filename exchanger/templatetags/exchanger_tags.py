@@ -71,7 +71,7 @@ def get_sum_portfolio(portfolio):
 @register.simple_tag
 def get_path_to_users_xlsx_file_all(user):
     xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{user.id}_{user.username.lower()}/'
-    filename = f'{user.id}_{user.username.lower()}_ALL.xlsx'
+    filename = f'{user.id}_{user.username.lower()}_{ALL_PORTFOLIOS}.xlsx'
     path_to_file = xlsx_dir + filename
     return path_to_file
 
