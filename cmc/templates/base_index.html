@@ -168,12 +168,6 @@
                                 Get data for all portfolios</a>
                         </p>
 
-                        <p class="text-center">
-                            <a href="{{ path_to_users_xlsx_file_all }}" class="btn btn-success btn-sm link"
-                               download>XLSX</a>
-                            <a href="{% url "exchanger:get_all_data_pdf" user.id %}"
-                               class="btn  btn-danger  btn-sm link-wight" target="_blank">PDF</a>
-                        </p>
 
                         <div class="container d-flex align-items-center justify-content-center">
                             <div class="btn-group">
@@ -185,7 +179,7 @@
                                     <li><a href="{{ path_to_users_xlsx_file_all }}" class="dropdown-item link"
                                            download>Save</a></li>
                                     <li>
-                                        <hr class="dropdown-divider">
+                                    <hr class="dropdown-divider">
                                     </li>
                                     <li><a class="dropdown-item link"
                                            href="{% url "send_XLSX_by_email" path_to_file=path_to_users_xlsx_file_all %}">Email</a>
