@@ -21,6 +21,8 @@ class Blockchain(models.Model):
     host = models.URLField(verbose_name='https://',
                            blank=True,
                            validators=[URLValidator])
+    api_key = models.CharField(max_length=255,
+                               verbose_name='api key')
     is_active = models.BooleanField(default=True)
     logo = models.ImageField(upload_to=f'blockchains/%Y_%m_%d/',
                              blank=True,
@@ -61,7 +63,6 @@ class Portfolio(models.Model):
     slug = models.SlugField(max_length=50,
                             unique=True,
                             validators=[validate_slug])
-    api_key = models.CharField(max_length=255)
     wallet = models.CharField(max_length=255)
     comments = models.TextField(blank=True)
     currencies = models.JSONField(blank=True,

@@ -15,27 +15,27 @@ def select_blockchain(portfolio):
     match name:
         case 'BSC':
             return Bsc(host=portfolio.blockchain.host,
-                       api_key=portfolio.api_key,
+                       api_key=portfolio.blockchain.api_key,
                        wallet=portfolio.wallet,
                        currencies=portfolio.currencies).get_account()
         case 'ETHEREUM':
             return Ether(host=portfolio.blockchain.host,
-                         api_key=portfolio.api_key,
+                         api_key=portfolio.blockchain.api_key,
                          wallet=portfolio.wallet,
                          currencies=portfolio.currencies).get_account()
         case 'POLYGON':
             return Polygon(host=portfolio.blockchain.host,
-                           api_key=portfolio.api_key,
+                           api_key=portfolio.blockchain.api_key,
                            wallet=portfolio.wallet,
                            currencies=portfolio.currencies).get_account()
         case 'FANTOM':
             return Fantom(host=portfolio.blockchain.host,
-                          api_key=portfolio.api_key,
+                          api_key=portfolio.blockchain.api_key,
                           wallet=portfolio.wallet,
                           currencies=portfolio.currencies).get_account()
         case 'SOLANA':
             return Solana(host=portfolio.blockchain.host,
-                          api_key=portfolio.api_key,
+                          api_key=portfolio.blockchain.api_key,
                           wallet=portfolio.wallet,
                           currencies=portfolio.currencies).get_account()
 

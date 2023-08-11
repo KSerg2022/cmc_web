@@ -99,7 +99,8 @@ class DataFromExchangers:
         data = {}
         for q in user_blockchain_portfolios:
             data[q.blockchain.name] = (q.blockchain.host,
-                                       q.api_key,
+                                       # q.api_key,
+                                       q.blockchain.api_key,
                                        q.wallet,
                                        q.currencies)
         return data

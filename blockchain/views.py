@@ -14,7 +14,6 @@ from .cache import check_caches_blockchain_data, delete_caches_blockchain_data
 from .forms import PortfolioForm
 from .models import Portfolio, Blockchain
 from exchanger.tasks import save_portfolio_to_xlsx_file
-from .utils.handlers.get_data import get_data
 
 
 @login_required
@@ -24,7 +23,6 @@ def create_blockchain_portfolio(request, blockchain_id):
     form_portfolio = PortfolioForm()
     if request.method == 'POST':
         form_portfolio = PortfolioForm(data=request.POST)
-
         if form_portfolio.is_valid():
             portfolio = form_portfolio.save(commit=False)
             portfolio.owner = request.user
@@ -56,8 +54,6 @@ def change_blockchain_portfolio(request, blockchain_id):
     if request.method == 'POST':
         form_portfolio = PortfolioForm(data=request.POST)
         if form_portfolio.is_valid():
-            # print(form_portfolio.cleaned_data.values())
-            portfolio.api_key = form_portfolio.cleaned_data.get('api_key')
             portfolio.wallet = form_portfolio.cleaned_data.get('wallet')
             portfolio.comments = form_portfolio.cleaned_data.get('comments')
             portfolio.currencies = form_portfolio.cleaned_data.get('currencies')

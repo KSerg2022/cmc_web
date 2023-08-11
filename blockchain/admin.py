@@ -13,7 +13,7 @@ from cmc.models import Cryptocurrency
 
 @admin.register(Blockchain)
 class BlockchainAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug', 'host', 'is_active', 'logo', 'website', 'scan_site')
+    list_display = ('id', 'name', 'slug', 'host', 'api_key', 'is_active', 'logo', 'website', 'scan_site')
     list_filter = ('name', 'is_active')
     search_fields = ('name', )
     prepopulated_fields = {'slug': ('name',)}
@@ -22,7 +22,7 @@ class BlockchainAdmin(admin.ModelAdmin):
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'blockchain', 'slug', 'api_key', 'wallet', 'comments')
+    list_display = ('owner', 'blockchain', 'slug', 'wallet', 'comments')
     list_filter = ('blockchain', 'owner')
     search_fields = ('blockchain', 'owner', )
     prepopulated_fields = {'slug': ('owner', 'blockchain')}

@@ -172,3 +172,6 @@ help
 media/
 **/migrations/**
 **/logo_axchangers/**
+/exchanger/fixtures/portfolio.json
+/exchanger/fixtures/blockchain.json
+/exchanger/fixtures/portfolio.json
