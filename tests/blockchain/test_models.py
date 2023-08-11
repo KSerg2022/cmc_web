@@ -1,4 +1,3 @@
-
 from django.test import TestCase
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
@@ -13,6 +12,7 @@ class BlockchainModelTest(TestCase):
         self.name = 'Blockchain test'
         self.slug = 'blockchain-test'
         self.host = 'https://api.bscscan.com/api'
+        self.api_key = 'api_key'
         self.logo = 'tests/account/data_for_test/black.jpg'
 
     def test_blockchain_default_symbol(self):
@@ -21,11 +21,11 @@ class BlockchainModelTest(TestCase):
 
     def test_blockchain_print(self):
         blockchain = Blockchain.objects.create(name=self.name,
-                                             slug=self.slug)
+                                               slug=self.slug)
         self.assertEqual(f'{self.name.capitalize()}', str(blockchain), blockchain)
 
     def test_blockchain_fields(self):
-        fields = ['portfolio_blockchain', 'id', 'name', 'slug', 'host',
+        fields = ['portfolio_blockchain', 'id', 'name', 'slug', 'host', 'api_key',
                   'is_active', 'logo', 'website', 'scan_site']
         blockchain = Blockchain.objects.create()
         model_fields = [field.name for field in blockchain._meta.get_fields()]
@@ -41,15 +41,23 @@ class BlockchainModelTest(TestCase):
     def test_blockchain_create_with_wrong_host(self):
         with self.assertRaises(ValidationError):
             blockchain = Blockchain.objects.create(name=self.name,
-                                                 host='/url/url'
-                                                 )
+                                                   host='/url/url'
+                                                   )
+            blockchain.full_clean()
+            blockchain.save()
+
+    def test_blockchain_create_with_empty_api_key(self):
+        with self.assertRaises(ValidationError):
+            blockchain = Blockchain.objects.create(name=self.name,
+                                                   api_key=''
+                                                   )
             blockchain.full_clean()
             blockchain.save()
 
     def test_blockchain_create_with_all_data(self):
         blockchain = Blockchain.objects.create(name=self.name,
-                                             host=self.host,
-                                             logo=self.logo)
+                                               host=self.host,
+                                               logo=self.logo)
         self.assertEqual(blockchain.name, self.name)
         self.assertEqual(blockchain.slug, self.slug)
         self.assertEqual(blockchain.host, self.host)
@@ -66,7 +74,7 @@ class BlockchainModelTest(TestCase):
     def test_blockchain_create_with_invalid_format_photo(self):
         with self.assertRaises(ValidationError):
             blockchain = Blockchain.objects.create(name=self.name,
-                                                       logo='tests/account/data_for_test/text.txt')
+                                                   logo='tests/account/data_for_test/text.txt')
             blockchain.full_clean()
             blockchain.save()
 
@@ -95,10 +103,11 @@ class PortfolioTest(TestCase):
     def setUp(self) -> None:
         self.name = 'Blockchain test'
         self.host = 'https://api.bscscan.com/api'
-        self.blockchain = Blockchain.objects.create(name=self.name,
-                                                    host=self.host)
-
         self.api_key = 'api_key'
+        self.blockchain = Blockchain.objects.create(name=self.name,
+                                                    host=self.host,
+                                                    api_key=self.api_key)
+
         self.wallet = 'wallet'
         self.owner = User.objects.create(username='User1',
                                          password='password1')
@@ -112,7 +121,6 @@ class PortfolioTest(TestCase):
     def create_portfolio(self, currencies=None):
         return Portfolio.objects.create(owner=self.owner,
                                         blockchain=self.blockchain,
-                                        api_key=self.api_key,
                                         wallet=self.wallet,
                                         currencies=currencies)
 
@@ -127,7 +135,7 @@ class PortfolioTest(TestCase):
                          str(portfolio), portfolio)
 
     def test_portfolio_fields(self):
-        fields = ['id', 'owner', 'blockchain', 'slug', 'api_key', 'wallet',
+        fields = ['id', 'owner', 'blockchain', 'slug', 'wallet',
                   'comments', 'currencies']
         portfolio = self.create_portfolio()
         model_fields = [field.name for field in portfolio._meta.get_fields()]
@@ -137,25 +145,13 @@ class PortfolioTest(TestCase):
     def test_portfolio_create_without_blockchain(self):
         with self.assertRaises(ObjectDoesNotExist):
             portfolio = Portfolio.objects.create(owner=self.owner,
-                                                 api_key=self.api_key,
                                                  wallet=self.wallet
                                                  )
 
-    def test_portfolio_create_with_empty_api_key(self):
+    def test_portfolio_create_with_empty_wallet(self):
         with self.assertRaises(ValidationError):
             portfolio = Portfolio.objects.create(owner=self.owner,
                                                  blockchain=self.blockchain,
-                                                 api_key='',
-                                                 wallet=self.wallet,
-                                                 )
-            portfolio.full_clean()
-            portfolio.save()
-
-    def test_portfolio_create_with_empty_api_secret(self):
-        with self.assertRaises(ValidationError):
-            portfolio = Portfolio.objects.create(owner=self.owner,
-                                                 blockchain=self.blockchain,
-                                                 api_key=self.api_key,
                                                  wallet=''
                                                  )
             portfolio.full_clean()
@@ -164,7 +160,6 @@ class PortfolioTest(TestCase):
     def test_portfolio_create_without_owner(self):
         with self.assertRaises(ObjectDoesNotExist):
             portfolio = Portfolio.objects.create(blockchain=self.blockchain,
-                                                 api_key=self.api_key,
                                                  wallet=self.wallet
                                                  )
 

@@ -12,7 +12,6 @@ from blockchain.fixtures.handlers.load_blockchains_to_db import dump_to_db_block
 from blockchain.views import (create_blockchain_portfolio,
                               change_blockchain_portfolio, delete_blockchain_portfolio, get_blockchain_data)
 from blockchain.models import Blockchain, Portfolio
-from django.utils import timezone
 
 
 class CreateBlockchainPortfolio(TestCase):
@@ -57,8 +56,7 @@ class CreateBlockchainPortfolio(TestCase):
         self.client.force_login(self.user)
         url = reverse('blockchain:create_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key',
-                                          'wallet': 'wallet',
+                                    data={'wallet': 'wallet',
                                           'comments': '',
                                           'currencies': ''}
                                     )
@@ -71,31 +69,13 @@ class CreateBlockchainPortfolio(TestCase):
                             status_code=200, html=False)
 
         portfolio = Portfolio.objects.first()
-        self.assertEqual(portfolio.api_key, 'api_key', portfolio)
-
-    def test_create_blockchain_portfolio_with_empty_api_POST(self):
-        self.client.force_login(self.user)
-        url = reverse('blockchain:create_blockchain_portfolio', args='1')
-        response = self.client.post(url,
-                                    data={'api_key': '',
-                                          'wallet': 'wallet',
-                                          'comments': '',
-                                          'currencies': ''}
-                                    )
-
-        self.assertEqual(response.status_code, 200, response)
-        self.assertTemplateUsed(response, 'blockchain/add_portfolio.html')
-        self.assertContains(response, escape('Error created your portfolio'))
-
-        portfolio = Portfolio.objects.first()
-        self.assertIsNone(portfolio)
+        self.assertEqual(portfolio.wallet, 'wallet', portfolio)
 
     def test_create_blockchain_portfolio_with_empty_wallet_POST(self):
         self.client.force_login(self.user)
         url = reverse('blockchain:create_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key',
-                                          'wallet': '',
+                                    data={'wallet': '',
                                           'comments': '',
                                           'currencies': ''}
                                     )
@@ -111,8 +91,7 @@ class CreateBlockchainPortfolio(TestCase):
         self.client.force_login(self.user)
         url = reverse('blockchain:create_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key',
-                                          'wallet': '',
+                                    data={'wallet': '',
                                           'comments': '',
                                           'currencies': 'zasfaaf'}
                                     )
@@ -137,8 +116,7 @@ class ChangeBlockchainPortfolio(TestCase):
         self.api_key = 'api_key'
         self.wallet = 'wallet'
         self.currencies = '{"coin": "contract"}'
-        self.portfolio = Portfolio.objects.create(api_key=self.api_key,
-                                                  wallet=self.wallet,
+        self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
                                                   blockchain=Blockchain.objects.first(),
@@ -174,14 +152,14 @@ class ChangeBlockchainPortfolio(TestCase):
         self.assertTemplateUsed(response, 'blockchain/add_portfolio.html')
 
     def test_change_blockchain_portfolio_POST(self):
-        self.assertEqual(self.portfolio.api_key, self.api_key)
         self.assertEqual(self.portfolio.wallet, self.wallet)
         self.assertEqual(self.portfolio.currencies, self.currencies)
 
         self.client.force_login(self.user)
         url = reverse('blockchain:change_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key new',
+                                    data={
+                                        # 'api_key': 'api_key new',
                                           'wallet': 'wallet new',
                                           'comments': '',
                                           'currencies': '{"coin": "contract new"}'}
@@ -195,30 +173,14 @@ class ChangeBlockchainPortfolio(TestCase):
                             status_code=200, html=False)
 
         portfolio = Portfolio.objects.first()
-        self.assertEqual(portfolio.api_key, 'api_key new', portfolio)
         self.assertEqual(portfolio.wallet, 'wallet new', portfolio)
         self.assertEqual(portfolio.currencies, {"coin": "contract new"}, portfolio)
-
-    def test_change_blockchain_portfolio_with_empty_api_POST(self):
-        self.client.force_login(self.user)
-        url = reverse('blockchain:change_blockchain_portfolio', args='1')
-        response = self.client.post(url,
-                                    data={'api_key': '',
-                                          'wallet': 'wallet',
-                                          'comments': '',
-                                          'currencies': ''}
-                                    )
-
-        self.assertEqual(response.status_code, 200, response)
-        self.assertTemplateUsed(response, 'blockchain/add_portfolio.html')
-        self.assertContains(response, escape('Error changed your portfolio'))
 
     def test_change_blockchain_portfolio_with_empty_wallet_POST(self):
         self.client.force_login(self.user)
         url = reverse('blockchain:change_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key',
-                                          'wallet': '',
+                                    data={'wallet': '',
                                           'comments': '',
                                           'currencies': ''}
                                     )
@@ -231,8 +193,7 @@ class ChangeBlockchainPortfolio(TestCase):
         self.client.force_login(self.user)
         url = reverse('blockchain:change_blockchain_portfolio', args='1')
         response = self.client.post(url,
-                                    data={'api_key': 'api_key',
-                                          'wallet': '',
+                                    data={'wallet': '',
                                           'comments': '',
                                           'currencies': 'zasfaaf'}
                                     )
@@ -254,8 +215,7 @@ class DeleteBlockchainPortfolio(TestCase):
         self.api_key = 'api_key'
         self.wallet = 'wallet'
         self.currencies = '{"coin": "contract"}'
-        self.portfolio = Portfolio.objects.create(api_key=self.api_key,
-                                                  wallet=self.wallet,
+        self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
                                                   blockchain=Blockchain.objects.first(),
@@ -329,8 +289,7 @@ class GetBlockchainData(TestCase):
         self.wallet = os.environ.get('WALLET_ADDRESS')
         self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
                            "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8"}
-        self.portfolio = Portfolio.objects.create(api_key=self.api_key,
-                                                  wallet=self.wallet,
+        self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
                                                   blockchain=Blockchain.objects.first(),
@@ -365,7 +324,7 @@ class GetBlockchainData(TestCase):
         self.assertEqual(response.status_code, 200, response)
         self.assertTemplateUsed(response, 'blockchain/data_portfolio.html')
 
-    def test_dget_blockchain_data_with_not_correct_id_portfolio(self):
+    def test_get_blockchain_data_with_not_correct_id_portfolio(self):
         self.assertTrue(Portfolio.objects.first())
 
         self.client.force_login(self.user)
@@ -374,11 +333,10 @@ class GetBlockchainData(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_dget_blockchain_data_with_not_correct_api(self):
+    def test_get_blockchain_data_with_not_correct_api(self):
         self.client.force_login(self.user)
         blockchain = Blockchain.objects.last()
-        portfolio_wrong_apy = Portfolio.objects.create(api_key='wrong_apy',
-                                                       wallet=self.wallet,
+        portfolio_wrong_apy = Portfolio.objects.create(wallet=self.wallet,
                                                        comments='',
                                                        currencies=self.currencies,
                                                        blockchain=blockchain,
