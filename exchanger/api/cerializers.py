@@ -2,11 +2,16 @@
 from rest_framework import serializers
 
 
-from exchanger.models import Exchanger
+from exchanger.models import Exchanger, ExPortfolio
 
 
-class ExchangerSerializer(serializers.HyperlinkedModelSerializer):
+class ExchangerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exchanger
-        # fields = ['url', 'username', 'email', 'is_staff']
+        fields = '__all__'
+
+
+class ExPortfolioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExPortfolio
         fields = '__all__'
