@@ -12,5 +12,8 @@ class Profile(models.Model):
                               validators=[validate_image_file_extension]
                               )
 
+    class Meta:
+        ordering = ['user']
+
     def __str__(self):
         return f'Profile of {self.user.username}'
