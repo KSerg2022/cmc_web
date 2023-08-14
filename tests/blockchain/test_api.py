@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from blockchain.api.cerializers import BlockchainSerializer, BlockchainPortfolioSerializer
+from blockchain.api.serializers import BlockchainSerializer, BlockchainPortfolioSerializer
 from blockchain.api.views import BlockchainViewSet
 from blockchain.models import Blockchain, Portfolio
 

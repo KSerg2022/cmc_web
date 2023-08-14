@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from exchanger.models import Exchanger, ExPortfolio
-from exchanger.api.cerializers import ExchangerSerializer, ExPortfolioSerializer
+from exchanger.api.serializers import ExchangerSerializer, ExPortfolioSerializer
 
 
 class ExchangerViewSet(viewsets.ModelViewSet):

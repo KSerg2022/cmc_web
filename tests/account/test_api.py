@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from account.api.cerializers import UserSerializer, ProfileSerializer
+from account.api.serializers import UserSerializer, ProfileSerializer
 from account.api.views import UserViewSet
 from account.models import Profile
 

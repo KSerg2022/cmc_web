@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from blockchain.models import Blockchain, Portfolio
-from blockchain.api.cerializers import BlockchainSerializer, BlockchainPortfolioSerializer
+from blockchain.api.serializers import BlockchainSerializer, BlockchainPortfolioSerializer
 
 
 class BlockchainViewSet(viewsets.ModelViewSet):
