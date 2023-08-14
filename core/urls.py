@@ -39,6 +39,11 @@ urlpatterns = [
     path('', index, name='index'),
 ]
 
+from account.api.urls import urlpatterns as users_urlpatterns
+from blockchain.api.urls import urlpatterns as blockchain_urlpatterns
+from exchanger.api.urls import urlpatterns as exchanger_urlpatterns
+
+urlpatterns += [*users_urlpatterns, *blockchain_urlpatterns, *exchanger_urlpatterns]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
