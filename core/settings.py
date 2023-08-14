@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'cachalot',  # global caches. https://djangopackages.org/grids/g/caching/
     'django_celery_beat',
     'django_celery_results',
+    'rest_framework',
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
@@ -255,4 +256,16 @@ CELERY_BEAT_SCHEDULE = {
         "task": "core.tasks.del_old_files_in_media_xlsx_files",
         "schedule": crontab(minute="*/15"),  # delete old files in media xlsx_files which older 120 minutes
     },
+}
+
+# Django REST framework
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+
 }
