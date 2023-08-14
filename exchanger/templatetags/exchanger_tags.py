@@ -1,15 +1,14 @@
 from django import template
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
-from django.utils.safestring import mark_safe
+
 # import markdown
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.cache import cache
 
-from exchanger.models import Exchanger, ExPortfolio
+from exchanger.models import ExPortfolio
 from cmc.models import Cryptocurrency
-from local_settings import TIME_CACHES_DATA, TIME_CACHES_COINS, TIME_CACHES_USERS
+from local_settings import TIME_CACHES_DATA, TIME_CACHES_COINS, TIME_CACHES_USERS, ALL_PORTFOLIOS
 
 register = template.Library()
 
@@ -74,6 +73,18 @@ def get_path_to_users_xlsx_file_all(user):
     filename = f'{user.id}_{user.username.lower()}_{ALL_PORTFOLIOS}.xlsx'
     path_to_file = xlsx_dir + filename
     return path_to_file
+
+
+# вызывается каждый раз при загрузке страници - не правильно. При первом запуске, когда без кеша, долго грущится
+# @register.simple_tag
+# def get_path_to_users_xlsx_file_all(user, portfolio_name=ALL_PORTFOLIOS):
+#     xlsx_file = XlsxFile(user, portfolio_name)
+#     if os.path.isfile(xlsx_file.path_to_file):
+#         return xlsx_file.path_to_file
+#
+#     user_portfolios_data = check_cache_user_portfolios_data(user.id)
+#     save_all_to_xlsx_file.delay(user.id, user_portfolios_data, portfolio_name)
+#     return xlsx_file.path_to_file
 
 
 @register.simple_tag

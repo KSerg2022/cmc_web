@@ -98,13 +98,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -166,12 +159,12 @@ LOGIN_REDIRECT_URL = '/exchanger/'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = os.environ.get('EMAIL')
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -190,6 +183,7 @@ MESSAGE_TAGS = {
 # settings for testing
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+
 
 # INTERNAL_IPS = ('127.0.0.1',)
 
@@ -237,15 +231,21 @@ CELERY_TASK_TIME_LIMIT = 60 * 5
 CELERY_TIMEZONE = 'Europe/Berlin'
 CELERY_TASK_TRACK_STARTED = True
 
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
 # Celery-beat
 from celery.schedules import crontab
 import cmc.tasks
 import core.tasks
+import exchanger.tasks
 
 CELERY_BEAT_SCHEDULE = {
     "sample_task1": {
         "task": "cmc.tasks.sample_task",
-        "schedule": crontab(minute="*/1"),  # debug_task
+        "schedule": crontab(minute="*/10"),  # debug_task
     },
     "cmc_currencies": {
         "task": "cmc.tasks.cmc_currencies",
