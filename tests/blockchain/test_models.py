@@ -15,6 +15,9 @@ class BlockchainModelTest(TestCase):
         self.api_key = 'api_key'
         self.logo = 'tests/account/data_for_test/black.jpg'
 
+    def tearDown(self) -> None:
+        Blockchain.objects.all().delete()
+
     def test_blockchain_default_symbol(self):
         blockchain = Blockchain()
         self.assertEqual(blockchain.name, '')
@@ -116,7 +119,9 @@ class PortfolioTest(TestCase):
                            "GMI": "0x93D8d25E3C9A847a5Da79F79ecaC89461FEcA846"}
 
     def tearDown(self) -> None:
-        pass
+        Portfolio.objects.all().delete()
+        Blockchain.objects.all().delete()
+        User.objects.all().delete()
 
     def create_portfolio(self, currencies=None):
         return Portfolio.objects.create(owner=self.owner,

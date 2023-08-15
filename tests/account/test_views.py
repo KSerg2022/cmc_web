@@ -87,8 +87,8 @@ class EditTest(TestCase):
         self.profile = Profile.objects.create(user=self.user)
 
     def tearDown(self) -> None:
-        del self.user
-        del self.profile
+        Profile.objects.all().delete()
+        User.objects.all().delete()
 
     def test_edit_GET(self):
         self.client.force_login(self.user)

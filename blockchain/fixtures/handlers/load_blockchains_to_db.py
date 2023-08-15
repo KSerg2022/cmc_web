@@ -13,6 +13,8 @@ def dump_to_db_blockchain():
         Blockchain.objects.update_or_create(name=blockchain['fields']['name'],
                                             slug=blockchain['fields']['slug'],
                                             host=blockchain['fields']['host'],
+                                            api_key=blockchain['fields']['api_key'],
+                                            is_active=blockchain['fields']['is_active'],
                                             logo=blockchain['fields']['logo'],
                                             website=blockchain['fields']['website'],
                                             scan_site=blockchain['fields']['scan_site']

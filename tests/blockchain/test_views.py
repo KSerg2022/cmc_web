@@ -23,6 +23,9 @@ class CreateBlockchainPortfolio(TestCase):
                                         email='test@gamil.com',
                                         first_name='test')
 
+    def tearDown(self) -> None:
+        User.objects.all().delete()
+
     def _get_response_for_page_GET(self):
         self.client.force_login(self.user)
         url = reverse('blockchain:create_blockchain_portfolio', args='1')
@@ -119,8 +122,12 @@ class ChangeBlockchainPortfolio(TestCase):
         self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
-                                                  blockchain=Blockchain.objects.first(),
+                                                  blockchain=Blockchain.objects.filter(name='BSC').first(),
                                                   owner=self.user)
+
+    def tearDown(self) -> None:
+        Portfolio.objects.all().delete()
+        User.objects.all().delete()
 
     def _get_response_for_page_GET(self):
         self.client.force_login(self.user)
@@ -218,8 +225,12 @@ class DeleteBlockchainPortfolio(TestCase):
         self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
-                                                  blockchain=Blockchain.objects.first(),
+                                                  blockchain=Blockchain.objects.filter(name='BSC').first(),
                                                   owner=self.user)
+
+    def tearDown(self) -> None:
+        Portfolio.objects.all().delete()
+        User.objects.all().delete()
 
     def _get_response_for_page_GET(self):
         self.client.force_login(self.user)
@@ -292,8 +303,12 @@ class GetBlockchainData(TestCase):
         self.portfolio = Portfolio.objects.create(wallet=self.wallet,
                                                   comments='',
                                                   currencies=self.currencies,
-                                                  blockchain=Blockchain.objects.first(),
+                                                  blockchain=Blockchain.objects.filter(name='BSC').first(),
                                                   owner=self.user)
+
+    def tearDown(self) -> None:
+        Portfolio.objects.all().delete()
+        User.objects.all().delete()
 
     def _get_response_for_page_GET(self):
         self.client.force_login(self.user)

@@ -15,6 +15,9 @@ class UserModelTest(TestCase):
         self.username = 'user_test'
         self.user_password = 'test_password'
 
+    def tearDown(self) -> None:
+        User.objects.all().delete()
+
     def test_user_create(self):
         user = User.objects.create(username=self.username, password=self.user_password)
         self.assertTrue(user)
@@ -53,6 +56,10 @@ class ProfileModelTest(TestCase):
                                         password=self.user_password)
         self.profile_date_of_birth = '2001-01-01'
         self.profile_photo = './data_for_test/black.jpg'
+
+    def tearDown(self) -> None:
+        Profile.objects.all().delete()
+        User.objects.all().delete()
 
     def test_profile_create(self):
         profile = Profile.objects.create(user=self.user)
