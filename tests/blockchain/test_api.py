@@ -18,6 +18,8 @@ class BlockchainBase(TestCase):
         self.api_key = 'api_key'
         self.logo = 'tests/account/data_for_test/black.jpg'
 
+        self.endpoint = 'blockchain-list'
+
     def tearDown(self) -> None:
         Blockchain.objects.all().delete()
 
@@ -39,18 +41,18 @@ class BlockchainBase(TestCase):
                                                       is_active=False,
                                                       logo=self.logo + '3')
 
-    def get_serializer_data(self, url, book=None):
+    def get_serializer_data(self, url, blockchain=None):
         from rest_framework.request import Request
         from rest_framework.test import APIRequestFactory
         factory = APIRequestFactory()
         request = factory.get(url)
         serializer_context = {'request': Request(request), }
 
-        if book is None:
+        if blockchain is None:
             return BlockchainSerializer([self.blockchain_1, self.blockchain_2, self.blockchain_3],
                                         many=True,
                                         context=serializer_context).data
-        return BlockchainSerializer([*book],
+        return BlockchainSerializer([*blockchain],
                                     many=True,
                                     context=serializer_context).data
 
@@ -59,44 +61,44 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url)
 
         serializer_data = self.get_serializer_data(url,
-                                                   book=[self.blockchain_1, self.blockchain_3, self.blockchain_2])
+                                                   blockchain=[self.blockchain_1, self.blockchain_3, self.blockchain_2])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_search(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'search': 'Blockchain test1'})
 
-        serializer_data = self.get_serializer_data(url, book=[self.blockchain_1])
+        serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_filter_is_active(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'is_active': 'False'})
 
-        serializer_data = self.get_serializer_data(url, book=[self.blockchain_3])
+        serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_3])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_filter_name(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'name': 'Blockchain test1'})
 
-        serializer_data = self.get_serializer_data(url, book=[self.blockchain_1])
+        serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_ordering_id(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'ordering': 'id'})
 
         serializer_data = self.get_serializer_data(url)
@@ -111,18 +113,18 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_ordering_name(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'ordering': 'name'})
 
         serializer_data = self.get_serializer_data(url,
-                                                   book=[self.blockchain_1, self.blockchain_3, self.blockchain_2])
+                                                   blockchain=[self.blockchain_1, self.blockchain_3, self.blockchain_2])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
         response = self.client.get(url, data={'ordering': '-name'})
 
         serializer_data = self.get_serializer_data(url,
-                                                   book=[self.blockchain_2, self.blockchain_3, self.blockchain_1])
+                                                   blockchain=[self.blockchain_2, self.blockchain_3, self.blockchain_1])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
@@ -131,8 +133,8 @@ class BlockchainSerializerTestCase(BlockchainBase):
 
     def test_blockchain_serializer(self):
         self.create_blockchains()
-        url = reverse('blockchain-list')
-        serializer_data = self.get_serializer_data(url, book=[self.blockchain_1, self.blockchain_2])
+        url = reverse(self.endpoint)
+        serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1, self.blockchain_2])
         expected_data = [
             {
                 'id': self.blockchain_1.id,
@@ -184,6 +186,7 @@ class BlockchainPortfolioBase(TestCase):
         self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
                            "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
                            "GMI": "0x93D8d25E3C9A847a5Da79F79ecaC89461FEcA846"}
+        self.endpoint = 'portfolio-list'
 
     def tearDown(self) -> None:
         Portfolio.objects.all().delete()
@@ -225,7 +228,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url)
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_1, self.portfolio_3, self.portfolio_2])
@@ -233,10 +236,9 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-
     def test_get_search(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'search': '1'})
 
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_3])
@@ -245,7 +247,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_filter_blockchain(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'blockchain__name': 'Blockchain test2'})
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
 
@@ -254,7 +256,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_filter_owner(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'owner__username': 'User2'})
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
 
@@ -263,7 +265,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_ordering_owner(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'ordering': 'owner'})
         serializer_data = self.get_serializer_data(url)
 
@@ -278,7 +280,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_ordering_blockchain(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         response = self.client.get(url, data={'ordering': 'blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
@@ -298,7 +300,7 @@ class BlockchainPortfolioSerializerTestCase(BlockchainPortfolioBase):
 
     def test_blockchain_portfolio_serializer(self):
         self.create_portfolio()
-        url = reverse('portfolio-list')
+        url = reverse(self.endpoint)
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1])
         expected_data = [
             {
