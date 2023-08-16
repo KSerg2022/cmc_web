@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'django_filters',
+    'social_django',
 
     'cmc.apps.CmcConfig',
     'exchanger.apps.ExchangerConfig',
@@ -85,6 +86,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
             'libraries': {
                 'exchanger_tags': 'exchanger.templatetags.exchanger_tags',
@@ -280,3 +284,14 @@ REST_FRAMEWORK = {
     # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],  # The default filter backends may be set globally, using the DEFAULT_FILTER_BACKENDS setting
 
 }
+
+# SOCIAL OAUTH
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GITHUB_KEY = os.environ.get('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('SOCIAL_AUTH_GITHUB_SECRET')

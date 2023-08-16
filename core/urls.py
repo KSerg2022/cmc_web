@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -37,6 +37,8 @@ urlpatterns = [
     path('send_PDF_by_email/<int:user_id>/<str:portfolio>/', send_PDF_by_email, name='send_PDF_by_email'),
 
     path('', index, name='index'),
+    re_path('', include('social_django.urls', namespace='social'))
+
 ]
 
 from account.api.urls import urlpatterns as users_urlpatterns
