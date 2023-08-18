@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from blockchain.models import Blockchain, Portfolio
@@ -10,7 +10,8 @@ from blockchain.api.serializers import BlockchainSerializer, BlockchainPortfolio
 class BlockchainViewSet(viewsets.ModelViewSet):
     queryset = Blockchain.objects.all()
     serializer_class = BlockchainSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminUser]
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['name', 'is_active']
     search_fields = ['name', 'is_active']
@@ -20,7 +21,8 @@ class BlockchainViewSet(viewsets.ModelViewSet):
 class BlockchainPortfolioViewSet(viewsets.ModelViewSet):
     queryset = Portfolio.objects.all()
     serializer_class = BlockchainPortfolioSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['owner__username', 'blockchain__name']
     search_fields = ['owner__username', 'blockchain__name']
