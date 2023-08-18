@@ -175,3 +175,4 @@ media/
 /exchanger/fixtures/portfolio.json
 /exchanger/fixtures/blockchain.json
 /exchanger/fixtures/portfolio.json
+/blockchain/api/help.py
