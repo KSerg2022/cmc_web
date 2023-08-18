@@ -1,4 +1,7 @@
-from unittest import TestCase
+# from unittest import TestCase
+import json
+
+from django.test import TestCase
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -18,7 +21,8 @@ class BlockchainBase(TestCase):
         self.api_key = 'api_key'
         self.logo = 'tests/account/data_for_test/black.jpg'
 
-        self.endpoint = 'blockchain-list'
+        self.endpoint_list = 'blockchain-list'
+        self.endpoint_detail = 'blockchain-detail'
 
     def tearDown(self) -> None:
         Blockchain.objects.all().delete()
@@ -59,9 +63,18 @@ class BlockchainBase(TestCase):
 
 class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
+    def setUp(self) -> None:
+        super(BlockchainApiTestCase, self).setUp()
+        self.user_admin = User.objects.create_superuser(username='user_admin',
+                                                        password='user_admin')
+        self.client.force_login(user=self.user_admin)
+
+    def tearDown(self) -> None:
+        User.objects.all().delete()
+
     def test_get(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url)
 
         serializer_data = self.get_serializer_data(url,
@@ -71,7 +84,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_search(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'search': 'Blockchain test1'})
 
         serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1])
@@ -80,7 +93,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_filter_is_active(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'is_active': 'False'})
 
         serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_3])
@@ -89,7 +102,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_filter_name(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'name': 'Blockchain test1'})
 
         serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1])
@@ -98,7 +111,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_ordering_id(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'id'})
 
         serializer_data = self.get_serializer_data(url)
@@ -113,7 +126,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
 
     def test_get_ordering_name(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'name'})
 
         serializer_data = self.get_serializer_data(url,
@@ -128,12 +141,67 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
+    def test_create(self):
+        self.assertEqual(0, Blockchain.objects.all().count())
+
+        url = reverse(self.endpoint_list)
+        data = {
+            "name": "TEST",
+            "slug": "_",
+            "host": "https://api.test.com/api",
+            "api_key": "teast_api_key",
+            'is_active': True,
+            "website": "https://test.org/en",
+            "scan_site": "https://test.com/"
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(1, Blockchain.objects.all().count())
+        self.assertEqual(1, response.data['id'])
+        self.assertEqual(data['name'], response.data['name'])
+        self.assertEqual(data['name'].lower(), response.data['slug'])
+
+    def test_update(self):
+        self.create_blockchains()
+
+        self.assertEqual(3, Blockchain.objects.all().count())
+        self.assertTrue(self.blockchain_1.is_active)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id, ))
+        data = {
+            "name": self.name + '1',
+            "slug": "_",
+            "host": self.host + '1',
+            "api_key": self.api_key + '1',
+            'is_active': False,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(3, Blockchain.objects.all().count())
+
+        self.blockchain_1.refresh_from_db()
+        self.assertFalse(self.blockchain_1.is_active)
+
+    def test_delete(self):
+        self.create_blockchains()
+        self.assertEqual(3, Blockchain.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, Blockchain.objects.all().count())
+
 
 class BlockchainSerializerTestCase(BlockchainBase):
 
     def test_blockchain_serializer(self):
         self.create_blockchains()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         serializer_data = self.get_serializer_data(url, blockchain=[self.blockchain_1, self.blockchain_2])
         expected_data = [
             {
@@ -186,7 +254,8 @@ class BlockchainPortfolioBase(TestCase):
         self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
                            "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
                            "GMI": "0x93D8d25E3C9A847a5Da79F79ecaC89461FEcA846"}
-        self.endpoint = 'portfolio-list'
+        self.endpoint_list = 'portfolio-list'
+        self.endpoint_detail = 'portfolio-detail'
 
     def tearDown(self) -> None:
         Portfolio.objects.all().delete()
@@ -226,19 +295,26 @@ class BlockchainPortfolioBase(TestCase):
 
 class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
+    def setUp(self) -> None:
+        super(BlockchainPortfolioApiTestCase, self).setUp()
+        self.client.force_login(user=self.owner1)
+
+    # def tearDown(self) -> None:
+    #     User.objects.all().delete()
+
     def test_get(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url)
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_1, self.portfolio_3, self.portfolio_2])
 
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_search(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'search': '1'})
 
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_3])
@@ -247,7 +323,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_filter_blockchain(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'blockchain__name': 'Blockchain test2'})
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
 
@@ -256,7 +332,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_filter_owner(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'owner__username': 'User2'})
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
 
@@ -265,7 +341,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_ordering_owner(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'owner'})
         serializer_data = self.get_serializer_data(url)
 
@@ -280,7 +356,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_get_ordering_blockchain(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
@@ -295,12 +371,66 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
+    def test_create(self):
+        self.assertEqual(0, Portfolio.objects.all().count())
+
+        url = reverse(self.endpoint_list)
+        data = {
+            'owner': self.owner1.id,
+            'slug': '_',
+            'blockchain': self.blockchain1.id,
+            'wallet': self.wallet,
+            'currencies': self.currencies
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+        self.assertEqual(1, Portfolio.objects.all().count())
+        self.assertEqual(1, response.data['id'])
+
+    def test_update(self):
+        self.create_portfolio()
+
+        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(3, len(self.portfolio_1.currencies))
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        data = {
+            'owner': self.owner1.id,
+            'slug': '_',
+            'blockchain': self.blockchain1.id,
+            'wallet': self.wallet,
+            'currencies': {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD"}
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(3, Portfolio.objects.all().count())
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(1, len(self.portfolio_1.currencies))
+
+    def test_delete(self):
+        self.create_portfolio()
+        self.assertEqual(3, Portfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, Portfolio.objects.all().count())
+
+
 
 class BlockchainPortfolioSerializerTestCase(BlockchainPortfolioBase):
 
     def test_blockchain_portfolio_serializer(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1])
         expected_data = [
             {

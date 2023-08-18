@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest import TestCase
 
@@ -20,7 +21,8 @@ class ExchangerBase(TestCase):
         self.prefix = ''
         self.logo = 'tests/account/data_for_test/black.jpg'
 
-        self.endpoint = 'exchanger-list'
+        self.endpoint_list = 'exchanger-list'
+        self.endpoint_detail = 'exchanger-detail'
         
     def tearDown(self) -> None:
         Exchanger.objects.all().delete()
@@ -62,9 +64,18 @@ class ExchangerBase(TestCase):
 
 class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
+    def setUp(self) -> None:
+        super(ExchangerApiTestCase, self).setUp()
+        self.user_admin = User.objects.create_superuser(username='user_admin',
+                                                        password='user_admin')
+        self.client.force_login(user=self.user_admin)
+
+    def tearDown(self) -> None:
+        User.objects.all().delete()
+
     def test_get(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url)
 
         serializer_data = self.get_serializer_data(url,
@@ -74,7 +85,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
     def test_get_search(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'search': 'name test1'})
 
         serializer_data = self.get_serializer_data(url,
@@ -84,7 +95,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
     def test_get_filter_is_active(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'is_active': 'False'})
 
         serializer_data = self.get_serializer_data(url,
@@ -94,7 +105,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
     def test_get_filter_name(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'name': 'name test5'})
         serializer_data = self.get_serializer_data(url, exchanger=[self.exchanger_2])
 
@@ -103,7 +114,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
     def test_get_ordering_id(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'id'})
 
         serializer_data = self.get_serializer_data(url)
@@ -118,7 +129,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
 
     def test_get_ordering_name(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'name'})
 
         serializer_data = self.get_serializer_data(url,
@@ -133,12 +144,70 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
+    def test_create(self):
+        self.assertEqual(0, Exchanger.objects.all().count())
+
+        url = reverse(self.endpoint_list)
+        data = {
+            "name": "TEST",
+            "slug": "_",
+            "host": "https://test.com/api",
+            "url": "",
+            "prefix": "",
+            'is_active': True,
+            "website": "https://test.org/en",
+        }
+
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(1, Exchanger.objects.all().count())
+        self.assertEqual(1, response.data['id'])
+        self.assertEqual(data['name'], response.data['name'])
+        self.assertEqual(data['name'].lower(), response.data['slug'])
+
+    def test_update(self):
+        self.create_exchangers()
+
+        self.assertEqual(3, Exchanger.objects.all().count())
+        self.assertTrue(self.exchanger_1.is_active)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id, ))
+        data = {
+            "name": self.name + '1',
+            "slug": "_",
+            "host": self.host,
+            'url': self.url + '1',
+            'prefix': self.prefix + '1',
+            'is_active': False,
+        }
+
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual(3, Exchanger.objects.all().count())
+
+        self.exchanger_1.refresh_from_db()
+        self.assertFalse(self.exchanger_1.is_active)
+
+    def test_delete(self):
+        self.create_exchangers()
+        self.assertEqual(3, Exchanger.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, Exchanger.objects.all().count())
+
 
 class ExchangerSerializerTestCase(ExchangerBase):
 
     def test_exchanger_serializer(self):
         self.create_exchangers()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         serializer_data = self.get_serializer_data(url,
                                                    exchanger=[self.exchanger_1, self.exchanger_2])
         expected_data = [
@@ -187,10 +256,12 @@ class ExPortfolioBase(TestCase):
         self.owner3 = User.objects.create(username='User3',
                                           password='password1')
 
-        self.endpoint = 'exportfolio-list'
+        self.endpoint_list = 'exportfolio-list'
+        self.endpoint_detail = 'exportfolio-detail'
 
     def tearDown(self) -> None:
         ExPortfolio.objects.all().delete()
+        Exchanger.objects.all().delete()
         User.objects.all().delete()
 
     def create_portfolio(self):
@@ -224,9 +295,13 @@ class ExPortfolioBase(TestCase):
 
 class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
+    def setUp(self) -> None:
+        super(ExPortfolioApiTestCase, self).setUp()
+        self.client.force_login(user=self.owner1)
+
     def test_get(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url)
         serializer_data = self.get_serializer_data(url)
 
@@ -235,7 +310,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
     def test_get_search(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'search': 'User2'})
         serializer_data = self.get_serializer_data(url, exchanger=[self.portfolio_2])
 
@@ -250,7 +325,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
     def test_get_filter_exchanger(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'exchanger__name': 'Exchanger_2'})
         serializer_data = self.get_serializer_data(url,
                                                    exchanger=[self.portfolio_2])
@@ -260,7 +335,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
     def test_get_filter_owner(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'owner__username': 'User2'})
         serializer_data = self.get_serializer_data(url, exchanger=[self.portfolio_2])
 
@@ -269,7 +344,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
     def test_get_ordering_owner(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'owner'})
         serializer_data = self.get_serializer_data(url,
                                                    exchanger=[self.portfolio_1, self.portfolio_2, self.portfolio_3])
@@ -285,7 +360,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
 
     def test_get_ordering_exchanger(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'exchanger__name'})
 
         serializer_data = self.get_serializer_data(url)
@@ -299,12 +374,65 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
+    def test_create(self):
+        self.assertEqual(0, ExPortfolio.objects.all().count())
+
+        url = reverse(self.endpoint_list)
+        data = {
+            'exchanger': self.exchanger1.id,
+            'slug': '_',
+            'api_key': 'new_api_key',
+            'api_secret': self.api_secret,
+            'owner': self.owner1.id,
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+        self.assertEqual(1, ExPortfolio.objects.all().count())
+        self.assertEqual(1, response.data['id'])
+
+    def test_update(self):
+        self.create_portfolio()
+
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(self.api_key, self.portfolio_1.api_key)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        data = {
+            'exchanger': self.exchanger1.id,
+            'slug': '_',
+            'api_key': 'new_api_key',
+            'api_secret': self.api_secret,
+            'owner': self.owner1.id,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual('new_api_key', self.portfolio_1.api_key)
+
+    def test_delete(self):
+        self.create_portfolio()
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, ExPortfolio.objects.all().count())
+
 
 class ExPortfolioSerializerTestCase(ExPortfolioBase):
 
     def test_ex_portfolio_serializer(self):
         self.create_portfolio()
-        url = reverse(self.endpoint)
+        url = reverse(self.endpoint_list)
         serializer_data = self.get_serializer_data(url,
                                                    exchanger=[self.portfolio_1])
         expected_data = [
