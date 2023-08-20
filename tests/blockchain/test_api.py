@@ -299,9 +299,6 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         super(BlockchainPortfolioApiTestCase, self).setUp()
         self.client.force_login(user=self.owner1)
 
-    # def tearDown(self) -> None:
-    #     User.objects.all().delete()
-
     def test_get(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list)
@@ -423,7 +420,6 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(2, Portfolio.objects.all().count())
-
 
 
 class BlockchainPortfolioSerializerTestCase(BlockchainPortfolioBase):
