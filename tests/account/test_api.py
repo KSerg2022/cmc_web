@@ -4,6 +4,7 @@ from unittest import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
 from account.api.serializers import UserSerializer, ProfileSerializer
@@ -136,6 +137,28 @@ class UserApiTestCase(APITestCase, UserBase):
         self.assertEqual(2, User.objects.all().count())
         self.assertEqual(2, response.data['id'])
 
+    def test_create_not_admin(self):
+        self.assertEqual(1, User.objects.all().count())
+        self.create_users()
+        self.client.logout()
+        self.client.force_login(user=self.user_1)
+        self.assertEqual(4, User.objects.all().count())
+
+        url = reverse(self.endpoint_list)
+        data = {
+            'username': self.username,
+            'password': self.user_password,
+
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+        self.assertEqual(4, User.objects.all().count())
+
     def test_update(self):
         self.create_users()
 
@@ -158,6 +181,32 @@ class UserApiTestCase(APITestCase, UserBase):
         self.assertEqual(2, self.user_1.id)
         self.assertEqual('chacke_test@test.com', self.user_1.email)
 
+    def test_update_not_admin(self):
+        self.create_users()
+        self.client.logout()
+        self.client.force_login(user=self.user_1)
+
+        self.assertEqual(4, User.objects.all().count())
+        self.assertEqual(2, self.user_1.id)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.user_1.id,))
+        data = {
+            'username': self.username,
+            'password': self.user_password,
+            'email': 'chacke_test@test.com'
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+        self.assertEqual(4, User.objects.all().count())
+
+        self.user_1.refresh_from_db()
+        self.assertEqual(2, self.user_1.id)
+        self.assertEqual('', self.user_1.email)
+
     def test_delete(self):
         self.create_users()
         self.assertEqual(4, User.objects.all().count())
@@ -167,6 +216,21 @@ class UserApiTestCase(APITestCase, UserBase):
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(3, User.objects.all().count())
+
+    def test_delete_not_admin(self):
+        self.create_users()
+        self.client.logout()
+        self.client.force_login(user=self.user_1)
+
+        self.assertEqual(4, User.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.user_1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+        self.assertEqual(4, User.objects.all().count())
 
 
 class BlockchainSerializerTestCase(UserBase):
@@ -209,6 +273,9 @@ class UserPortfolioBase(TestCase):
                                               password=self.user_password)
         self.user2 = User.objects.create_user(username=self.username + '2',
                                               password=self.user_password)
+        self.admin = User.objects.create_superuser(username=self.username + '_admin',
+                                                   password=self.user_password,
+                                                   is_staff=True)
 
         self.profile_date_of_birth1 = '2001-01-01'
         self.profile_date_of_birth2 = '2002-02-02'
@@ -342,7 +409,25 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
         self.assertEqual(1, Profile.objects.all().count())
-        self.assertEqual(1, response.data['id'])
+        self.assertEqual(self.user1.id, response.data['user'])
+
+    def test_create_not_user(self):
+        self.assertEqual(0, Profile.objects.all().count())
+        self.client.logout()
+        self.client.force_login(user=self.user2)
+
+        url = reverse(self.endpoint_list)
+        data = {
+            'user': 1,
+            'date_of_birth': self.profile_date_of_birth1,
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+        self.assertEqual(1, Profile.objects.all().count())
+        self.assertNotEqual(self.user1.id, response.data['user'])
+        self.assertEqual(self.user2.id, response.data['user'])
 
     def test_update(self):
         self.create_profile()
@@ -364,8 +449,82 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
         self.assertEqual(1, self.profile1.id)
         self.assertEqual(self.profile_date_of_birth2, self.profile1.date_of_birth.isoformat())
 
+    def test_update_not_user(self):
+        self.create_profile()
+        self.client.logout()
+        self.client.force_login(user=self.user2)
+
+        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id,))
+        data = {
+            'user': 1,
+            'date_of_birth': self.profile_date_of_birth2,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+        self.profile1.refresh_from_db()
+        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth.isoformat())
+
+    def test_update_not_user_but_is_staff(self):
+        self.create_profile()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id,))
+        data = {
+            'user': 1,
+            'date_of_birth': self.profile_date_of_birth2,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        self.profile1.refresh_from_db()
+        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.profile_date_of_birth2, self.profile1.date_of_birth.isoformat())
+
     def test_delete(self):
         self.create_profile()
+        self.assertEqual(2, Profile.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(1, Profile.objects.all().count())
+
+    def test_delete_not_user(self):
+        self.create_profile()
+        self.client.logout()
+        self.client.force_login(user=self.user2)
+
+        self.assertEqual(2, Profile.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id, ))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+        self.assertEqual(2, Profile.objects.all().count())
+
+    def test_delete_not_owner_but_is_staff(self):
+        self.create_profile()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
         self.assertEqual(2, Profile.objects.all().count())
 
         url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id, ))
