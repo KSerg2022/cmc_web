@@ -5,6 +5,7 @@ from unittest import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
 from exchanger.api.serializers import ExchangerSerializer, ExPortfolioSerializer
@@ -23,7 +24,7 @@ class ExchangerBase(TestCase):
 
         self.endpoint_list = 'exchanger-list'
         self.endpoint_detail = 'exchanger-detail'
-        
+
     def tearDown(self) -> None:
         Exchanger.objects.all().delete()
 
@@ -173,7 +174,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
         self.assertEqual(3, Exchanger.objects.all().count())
         self.assertTrue(self.exchanger_1.is_active)
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id,))
         data = {
             "name": self.name + '1',
             "slug": "_",
@@ -196,7 +197,7 @@ class ExchangerApiTestCase(APITestCase, ExchangerBase):
         self.create_exchangers()
         self.assertEqual(3, Exchanger.objects.all().count())
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.exchanger_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
@@ -253,8 +254,9 @@ class ExPortfolioBase(TestCase):
                                           password='password1')
         self.owner2 = User.objects.create(username='User2',
                                           password='password1')
-        self.owner3 = User.objects.create(username='User3',
-                                          password='password1')
+        self.admin = User.objects.create(username='User3',
+                                         password='password1',
+                                         is_staff=True)
 
         self.endpoint_list = 'exportfolio-list'
         self.endpoint_detail = 'exportfolio-detail'
@@ -276,7 +278,7 @@ class ExPortfolioBase(TestCase):
         self.portfolio_3 = ExPortfolio.objects.create(exchanger=self.exchanger1,
                                                       api_key=self.api_key,
                                                       api_secret=self.api_secret,
-                                                      owner=self.owner3)
+                                                      owner=self.admin)
 
     def get_serializer_data(self, url, exchanger=None):
         from rest_framework.request import Request
@@ -399,7 +401,7 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(self.api_key, self.portfolio_1.api_key)
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         data = {
             'exchanger': self.exchanger1.id,
             'slug': '_',
@@ -417,11 +419,95 @@ class ExPortfolioApiTestCase(APITestCase, ExPortfolioBase):
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual('new_api_key', self.portfolio_1.api_key)
 
+    def test_update_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(self.api_key, self.portfolio_1.api_key)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        data = {
+            'exchanger': self.exchanger1.id,
+            'slug': '_',
+            'api_key': 'new_api_key',
+            'api_secret': self.api_secret,
+            'owner': self.owner1.id,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual('new_api_key', self.portfolio_1.api_key)
+
+    def test_update_not_owner(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(self.api_key, self.portfolio_1.api_key)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        data = {
+            'exchanger': self.exchanger1.id,
+            'slug': '_',
+            'api_key': 'new_api_key',
+            'api_secret': self.api_secret,
+            'owner': self.owner1.id,
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual('api_key', self.portfolio_1.api_key)
+
     def test_delete(self):
         self.create_portfolio()
         self.assertEqual(3, ExPortfolio.objects.all().count())
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, ExPortfolio.objects.all().count())
+
+    def test_delete_not_owner(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+    def test_delete_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        self.assertEqual(3, ExPortfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)

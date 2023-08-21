@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 
+from account.api.permissions import IsAuthenticatedAndOwnerOrIsStaff
 from exchanger.models import Exchanger, ExPortfolio
 from exchanger.api.serializers import ExchangerSerializer, ExPortfolioSerializer
 
@@ -22,7 +23,7 @@ class ExchangerViewSet(viewsets.ModelViewSet):
 class ExPortfolioViewSet(viewsets.ModelViewSet):
     queryset = ExPortfolio.objects.all()
     serializer_class = ExPortfolioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedAndOwnerOrIsStaff]
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['owner__username', 'exchanger__name']
