@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
 from blockchain.api.serializers import BlockchainSerializer, BlockchainPortfolioSerializer
@@ -169,7 +170,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
         self.assertEqual(3, Blockchain.objects.all().count())
         self.assertTrue(self.blockchain_1.is_active)
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id,))
         data = {
             "name": self.name + '1',
             "slug": "_",
@@ -190,7 +191,7 @@ class BlockchainApiTestCase(APITestCase, BlockchainBase):
         self.create_blockchains()
         self.assertEqual(3, Blockchain.objects.all().count())
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.blockchain_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
@@ -249,8 +250,9 @@ class BlockchainPortfolioBase(TestCase):
                                           password='password1')
         self.owner2 = User.objects.create(username='User2',
                                           password='password1')
-        self.owner3 = User.objects.create(username='User3',
-                                          password='password1')
+        self.admin = User.objects.create(username='User3',
+                                         password='password1',
+                                         is_staff=True)
         self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
                            "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
                            "GMI": "0x93D8d25E3C9A847a5Da79F79ecaC89461FEcA846"}
@@ -271,7 +273,7 @@ class BlockchainPortfolioBase(TestCase):
                                                     blockchain=self.blockchain2,
                                                     wallet=self.wallet,
                                                     currencies=self.currencies)
-        self.portfolio_3 = Portfolio.objects.create(owner=self.owner3,
+        self.portfolio_3 = Portfolio.objects.create(owner=self.admin,
                                                     blockchain=self.blockchain1,
                                                     wallet=self.wallet,
                                                     currencies=self.currencies)
@@ -373,7 +375,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
         url = reverse(self.endpoint_list)
         data = {
-            'owner': self.owner1.id,
+            'owner': 1,
             'slug': '_',
             'blockchain': self.blockchain1.id,
             'wallet': self.wallet,
@@ -385,6 +387,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
         self.assertEqual(1, Portfolio.objects.all().count())
         self.assertEqual(1, response.data['id'])
+        self.assertEqual(self.owner1.username, Portfolio.objects.last().owner.username)
 
     def test_update(self):
         self.create_portfolio()
@@ -393,7 +396,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(3, len(self.portfolio_1.currencies))
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         data = {
             'owner': self.owner1.id,
             'slug': '_',
@@ -411,11 +414,95 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(1, len(self.portfolio_1.currencies))
 
+    def test_update_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(3, len(self.portfolio_1.currencies))
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        data = {
+            'owner': self.owner1.id,
+            'slug': '_',
+            'blockchain': self.blockchain1.id,
+            'wallet': self.wallet,
+            'currencies': {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD"}
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(3, Portfolio.objects.all().count())
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(1, len(self.portfolio_1.currencies))
+
+    def test_update_not_owner(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(3, len(self.portfolio_1.currencies))
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        data = {
+            'owner': 1,
+            'slug': '_',
+            'blockchain': self.blockchain1.id,
+            'wallet': self.wallet,
+            'currencies': {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD"}
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+        self.portfolio_1.refresh_from_db()
+        self.assertEqual(1, self.portfolio_1.id)
+        self.assertEqual(3, len(self.portfolio_1.currencies))
+
     def test_delete(self):
         self.create_portfolio()
         self.assertEqual(3, Portfolio.objects.all().count())
 
-        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id, ))
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(2, Portfolio.objects.all().count())
+
+    def test_delete_not_owner(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        self.assertEqual(3, Portfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
+        response = self.client.delete(url_for_update)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+                                                code='permission_denied')}, response.data)
+
+    def test_delete_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        self.assertEqual(3, Portfolio.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
