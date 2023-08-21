@@ -22,7 +22,7 @@ class BlockchainAdmin(admin.ModelAdmin):
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'blockchain', 'slug', 'wallet', 'comments')
+    list_display = ('id', 'owner', 'blockchain', 'slug', 'wallet', 'comments')
     list_filter = ('blockchain', 'owner')
     search_fields = ('blockchain', 'owner', )
     prepopulated_fields = {'slug': ('owner', 'blockchain')}
