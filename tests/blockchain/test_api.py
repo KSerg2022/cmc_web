@@ -277,6 +277,10 @@ class BlockchainPortfolioBase(TestCase):
                                                     blockchain=self.blockchain1,
                                                     wallet=self.wallet,
                                                     currencies=self.currencies)
+        self.portfolio_4 = Portfolio.objects.create(owner=self.owner1,
+                                                    blockchain=self.blockchain2,
+                                                    wallet=self.wallet,
+                                                    currencies=self.currencies)
 
     def get_serializer_data(self, url, portfolio=None):
         from rest_framework.request import Request
@@ -287,7 +291,8 @@ class BlockchainPortfolioBase(TestCase):
         serializer_context = {'request': Request(request), }
 
         if portfolio is None:
-            return BlockchainPortfolioSerializer([self.portfolio_1, self.portfolio_2, self.portfolio_3],
+            return BlockchainPortfolioSerializer([self.portfolio_1, self.portfolio_2,
+                                                  self.portfolio_3, self.portfolio_4],
                                                  many=True,
                                                  context=serializer_context).data
         return BlockchainPortfolioSerializer([*portfolio],
@@ -306,7 +311,30 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         url = reverse(self.endpoint_list)
         response = self.client.get(url)
         serializer_data = self.get_serializer_data(url,
-                                                   portfolio=[self.portfolio_1, self.portfolio_3, self.portfolio_2])
+                                                   portfolio=[self.portfolio_1, self.portfolio_4])
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual(serializer_data, response.data['results'])
+
+    def test_get_not_owner(self):
+        self.create_portfolio()
+        url = reverse(self.endpoint_detail, args=(self.portfolio_2.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')},
+                         response.data)
+
+    def test_get_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url)
+        serializer_data = self.get_serializer_data(url,
+                                                   portfolio=[self.portfolio_1, self.portfolio_3,
+                                                              self.portfolio_2, self.portfolio_4])
 
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
         self.assertEqual(serializer_data, response.data['results'])
@@ -314,17 +342,52 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
     def test_get_search(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list)
-        response = self.client.get(url, data={'search': '1'})
+        response = self.client.get(url, data={'search': self.owner1.username})
 
-        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_3])
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_4])
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])
+
+    def test_get_search_not_owner(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'search': self.owner1.username})
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual([], response.data['results'])
+
+    def test_get_search_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'search': self.owner1.username})
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_4])
+
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
     def test_get_filter_blockchain(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list)
-        response = self.client.get(url, data={'blockchain__name': 'Blockchain test2'})
-        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
+        response = self.client.get(url, data={'blockchain__name': self.blockchain2.name})
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_4])
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])
+
+    def test_get_filter_blockchain_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'blockchain__name': self.blockchain2.name})
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2, self.portfolio_4])
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
@@ -332,17 +395,45 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
     def test_get_filter_owner(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list)
-        response = self.client.get(url, data={'owner__username': 'User2'})
-        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_2])
+        response = self.client.get(url, data={'owner__username': self.owner1.username})
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_4])
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-    def test_get_ordering_owner(self):
+    def test_get_filter_not_owner(self):
         self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.owner2)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'owner__username': self.owner1.username})
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual([], response.data['results'])
+
+    def test_get_filter_not_owner_but_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'owner__username': self.owner1.username})
+        serializer_data = self.get_serializer_data(url, portfolio=[self.portfolio_1, self.portfolio_4])
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])
+
+    def test_get_ordering_by_owner_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
         url = reverse(self.endpoint_list)
         response = self.client.get(url, data={'ordering': 'owner'})
-        serializer_data = self.get_serializer_data(url)
+        serializer_data = self.get_serializer_data(url,
+                                                   portfolio=[self.portfolio_1, self.portfolio_4,
+                                                              self.portfolio_2, self.portfolio_3])
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
@@ -359,14 +450,36 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         response = self.client.get(url, data={'ordering': 'blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
-                                                   portfolio=[self.portfolio_1, self.portfolio_3, self.portfolio_2])
+                                                   portfolio=[self.portfolio_1, self.portfolio_4])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
         response = self.client.get(url, data={'ordering': '-blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
-                                                   portfolio=[self.portfolio_2, self.portfolio_1, self.portfolio_3])
+                                                   portfolio=[self.portfolio_4, self.portfolio_1])
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])
+
+    def test_get_ordering_blockchain_is_staff(self):
+        self.create_portfolio()
+        self.client.logout()
+        self.client.force_login(user=self.admin)
+
+        url = reverse(self.endpoint_list)
+        response = self.client.get(url, data={'ordering': 'blockchain__name'})
+
+        serializer_data = self.get_serializer_data(url,
+                                                   portfolio=[self.portfolio_1, self.portfolio_3,
+                                                              self.portfolio_2, self.portfolio_4])
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])
+
+        response = self.client.get(url, data={'ordering': '-blockchain__name'})
+
+        serializer_data = self.get_serializer_data(url,
+                                                   portfolio=[self.portfolio_2, self.portfolio_4,
+                                                              self.portfolio_1, self.portfolio_3])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
@@ -392,7 +505,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
     def test_update(self):
         self.create_portfolio()
 
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(3, len(self.portfolio_1.currencies))
 
@@ -408,7 +521,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         response = self.client.put(url_for_update, data=json_data, content_type='application/json')
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
 
         self.portfolio_1.refresh_from_db()
         self.assertEqual(1, self.portfolio_1.id)
@@ -419,7 +532,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.client.logout()
         self.client.force_login(user=self.admin)
 
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(3, len(self.portfolio_1.currencies))
 
@@ -435,7 +548,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         response = self.client.put(url_for_update, data=json_data, content_type='application/json')
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
 
         self.portfolio_1.refresh_from_db()
         self.assertEqual(1, self.portfolio_1.id)
@@ -446,7 +559,7 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         self.client.logout()
         self.client.force_login(user=self.owner2)
 
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
         self.assertEqual(1, self.portfolio_1.id)
         self.assertEqual(3, len(self.portfolio_1.currencies))
 
@@ -461,10 +574,9 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
         json_data = json.dumps(data)
         response = self.client.put(url_for_update, data=json_data, content_type='application/json')
 
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
-        self.assertEqual(3, Portfolio.objects.all().count())
-        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
-                                                code='permission_denied')}, response.data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(4, Portfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
 
         self.portfolio_1.refresh_from_db()
         self.assertEqual(1, self.portfolio_1.id)
@@ -472,41 +584,40 @@ class BlockchainPortfolioApiTestCase(APITestCase, BlockchainPortfolioBase):
 
     def test_delete(self):
         self.create_portfolio()
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
 
         url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
-        self.assertEqual(2, Portfolio.objects.all().count())
+        self.assertEqual(3, Portfolio.objects.all().count())
 
     def test_delete_not_owner(self):
         self.create_portfolio()
         self.client.logout()
         self.client.force_login(user=self.owner2)
 
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
 
         url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         response = self.client.delete(url_for_update)
 
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
-        self.assertEqual(3, Portfolio.objects.all().count())
-        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
-                                                code='permission_denied')}, response.data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(4, Portfolio.objects.all().count())
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
 
     def test_delete_not_owner_but_is_staff(self):
         self.create_portfolio()
         self.client.logout()
         self.client.force_login(user=self.admin)
 
-        self.assertEqual(3, Portfolio.objects.all().count())
+        self.assertEqual(4, Portfolio.objects.all().count())
 
         url_for_update = reverse(self.endpoint_detail, args=(self.portfolio_1.id,))
         response = self.client.delete(url_for_update)
 
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
-        self.assertEqual(2, Portfolio.objects.all().count())
+        self.assertEqual(3, Portfolio.objects.all().count())
 
 
 class BlockchainPortfolioSerializerTestCase(BlockchainPortfolioBase):

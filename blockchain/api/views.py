@@ -20,14 +20,30 @@ class BlockchainViewSet(viewsets.ModelViewSet):
 
 
 class BlockchainPortfolioViewSet(viewsets.ModelViewSet):
-    queryset = Portfolio.objects.all()
     serializer_class = BlockchainPortfolioSerializer
-    permission_classes = [IsAuthenticatedAndOwnerOrIsStaff]
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['owner__username', 'blockchain__name']
     search_fields = ['owner__username', 'blockchain__name']
     ordering_fields = ['owner', 'blockchain__name']
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.request.user.is_staff:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticatedAndOwnerOrIsStaff]
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Portfolio.objects.all()
+        else:
+            if not self.request.user.id:
+                return Portfolio.objects.none()
+            return Portfolio.objects.filter(owner_id=self.request.user.id)
 
     def perform_create(self, serializer):
         serializer.validated_data['owner'] = self.request.user
