@@ -13,12 +13,21 @@ from account.api.serializers import UserSerializer, ProfileSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['username', 'is_active']
     search_fields = ['username', 'is_active']
     ordering_fields = ['username', ]
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'list':
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticatedAndOwnerOrIsStaff_for_user]
+        return [permission() for permission in permission_classes]
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

@@ -121,7 +121,7 @@ class UserApiTestCase(APITestCase, UserBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-    def test_create(self):
+    def test_create_admin(self):
         self.assertEqual(1, User.objects.all().count())
 
         url = reverse(self.endpoint_list)
@@ -153,13 +153,13 @@ class UserApiTestCase(APITestCase, UserBase):
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
 
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
-        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
-                                                code='permission_denied')}, response.data)
+        # self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
+        # self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+        #                                         code='permission_denied')}, response.data)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
+        self.assertEqual(5, User.objects.all().count())
 
-        self.assertEqual(4, User.objects.all().count())
-
-    def test_update(self):
+    def test_update_admin(self):
         self.create_users()
 
         self.assertEqual(4, User.objects.all().count())
@@ -198,16 +198,45 @@ class UserApiTestCase(APITestCase, UserBase):
         json_data = json.dumps(data)
         response = self.client.put(url_for_update, data=json_data, content_type='application/json')
 
+        # self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        # self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
+        #                                         code='permission_denied')}, response.data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        self.assertEqual(4, User.objects.all().count())
+
+        self.user_1.refresh_from_db()
+        self.assertEqual(2, self.user_1.id)
+        self.assertEqual('chacke_test@test.com', self.user_1.email)
+
+    def test_update_other_user(self):
+        self.create_users()
+        self.client.logout()
+        self.client.force_login(user=self.user_1)
+
+        self.assertEqual(4, User.objects.all().count())
+        self.assertEqual(2, self.user_1.id)
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.user_2.id,))
+        data = {
+            'username': self.username,
+            'password': self.user_password,
+            'email': 'chacke_test@test.com'
+        }
+        json_data = json.dumps(data)
+        response = self.client.put(url_for_update, data=json_data, content_type='application/json')
+
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
         self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
                                                 code='permission_denied')}, response.data)
+
         self.assertEqual(4, User.objects.all().count())
 
         self.user_1.refresh_from_db()
         self.assertEqual(2, self.user_1.id)
         self.assertEqual('', self.user_1.email)
 
-    def test_delete(self):
+    def test_delete_admin(self):
         self.create_users()
         self.assertEqual(4, User.objects.all().count())
 
@@ -227,13 +256,26 @@ class UserApiTestCase(APITestCase, UserBase):
         url_for_update = reverse(self.endpoint_detail, args=(self.user_1.id, ))
         response = self.client.delete(url_for_update)
 
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(3, User.objects.all().count())
+
+    def test_delete_other_user(self):
+        self.create_users()
+        self.client.logout()
+        self.client.force_login(user=self.user_1)
+
+        self.assertEqual(4, User.objects.all().count())
+
+        url_for_update = reverse(self.endpoint_detail, args=(self.user_2.id, ))
+        response = self.client.delete(url_for_update)
+
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
         self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
                                                 code='permission_denied')}, response.data)
         self.assertEqual(4, User.objects.all().count())
 
 
-class BlockchainSerializerTestCase(UserBase):
+class UserSerializerTestCase(UserBase):
 
     def test_user_serializer(self):
         self.create_users()
