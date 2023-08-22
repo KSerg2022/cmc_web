@@ -30,7 +30,7 @@ def register(request):
             new_user.save()
 
             # Создать профиль пользователя
-            Profile.objects.create(user=new_user)
+            Profile.objects.create(owner=new_user)
 
             cache.delete('total_users')
             return render(request,

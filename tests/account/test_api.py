@@ -289,10 +289,10 @@ class UserPortfolioBase(TestCase):
         User.objects.all().delete()
 
     def create_profile(self):
-        self.profile1 = Profile.objects.create(user=self.user1,
+        self.profile1 = Profile.objects.create(owner=self.user1,
                                                date_of_birth=self.profile_date_of_birth1,
                                                photo=self.profile_photo)
-        self.profile2 = Profile.objects.create(user=self.user2,
+        self.profile2 = Profile.objects.create(owner=self.user2,
                                                date_of_birth=self.profile_date_of_birth2,
                                                photo=self.profile_photo)
 
@@ -348,7 +348,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
     def test_get_filter_username(self):
         self.create_profile()
         url = reverse(self.endpoint_list)
-        response = self.client.get(url, data={'user__username': 'user_test2'})
+        response = self.client.get(url, data={'owner__username': 'user_test2'})
         serializer_data = self.get_serializer_data(url,
                                                    profile=[self.profile2])
 
@@ -368,13 +368,13 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
     def test_get_ordering_username(self):
         self.create_profile()
         url = reverse(self.endpoint_list)
-        response = self.client.get(url, data={'ordering': 'user__username'})
+        response = self.client.get(url, data={'ordering': 'owner__username'})
         serializer_data = self.get_serializer_data(url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-        response = self.client.get(url, data={'ordering': '-user__username'})
+        response = self.client.get(url, data={'ordering': '-owner__username'})
         serializer_data = self.get_serializer_data(url)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -401,7 +401,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         url = reverse(self.endpoint_list)
         data = {
-            'user': self.user1.id,
+            'owner': self.user1.id,
             'date_of_birth': self.profile_date_of_birth1,
         }
         json_data = json.dumps(data)
@@ -409,7 +409,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
         self.assertEqual(1, Profile.objects.all().count())
-        self.assertEqual(self.user1.id, response.data['user'])
+        self.assertEqual(self.user1.id, response.data['owner'])
 
     def test_create_not_user(self):
         self.assertEqual(0, Profile.objects.all().count())
@@ -418,7 +418,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         url = reverse(self.endpoint_list)
         data = {
-            'user': 1,
+            'owner': 1,
             'date_of_birth': self.profile_date_of_birth1,
         }
         json_data = json.dumps(data)
@@ -426,8 +426,8 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code, response.data)
         self.assertEqual(1, Profile.objects.all().count())
-        self.assertNotEqual(self.user1.id, response.data['user'])
-        self.assertEqual(self.user2.id, response.data['user'])
+        self.assertNotEqual(self.user1.id, response.data['owner'])
+        self.assertEqual(self.user2.id, response.data['owner'])
 
     def test_update(self):
         self.create_profile()
@@ -437,7 +437,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
         url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id,))
         data = {
-            'user': self.user1.id,
+            'owner': self.user1.id,
             'date_of_birth': self.profile_date_of_birth2,
         }
         json_data = json.dumps(data)
@@ -454,12 +454,12 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
         self.client.logout()
         self.client.force_login(user=self.user2)
 
-        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.user1.id, self.profile1.owner.id)
         self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth)
 
         url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id,))
         data = {
-            'user': 1,
+            'owner': 1,
             'date_of_birth': self.profile_date_of_birth2,
         }
         json_data = json.dumps(data)
@@ -470,7 +470,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
                                                 code='permission_denied')}, response.data)
 
         self.profile1.refresh_from_db()
-        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.user1.id, self.profile1.owner.id)
         self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth.isoformat())
 
     def test_update_not_user_but_is_staff(self):
@@ -478,12 +478,12 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
         self.client.logout()
         self.client.force_login(user=self.admin)
 
-        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.user1.id, self.profile1.owner.id)
         self.assertEqual(self.profile_date_of_birth1, self.profile1.date_of_birth)
 
         url_for_update = reverse(self.endpoint_detail, args=(self.profile1.id,))
         data = {
-            'user': 1,
+            'owner': 1,
             'date_of_birth': self.profile_date_of_birth2,
         }
         json_data = json.dumps(data)
@@ -492,7 +492,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.profile1.refresh_from_db()
-        self.assertEqual(self.user1.id, self.profile1.user.id)
+        self.assertEqual(self.user1.id, self.profile1.owner.id)
         self.assertEqual(self.profile_date_of_birth2, self.profile1.date_of_birth.isoformat())
 
     def test_delete(self):
@@ -536,7 +536,7 @@ class UserPortfolioApiTestCase(APITestCase, UserPortfolioBase):
 
 class ProfileSerializerTestCase(UserPortfolioBase):
 
-    def test_blockchain_portfolio_serializer(self):
+    def test_profile_serializer(self):
         self.create_profile()
         url = reverse(self.endpoint_list)
         serializer_data = self.get_serializer_data(url,
@@ -546,7 +546,7 @@ class ProfileSerializerTestCase(UserPortfolioBase):
                 'id': self.profile1.id,
                 'date_of_birth': self.profile_date_of_birth1,
                 'photo': 'http://testserver/media' + self.profile_photo,
-                'user': self.user1.id,
+                'owner': self.user1.id,
             },
         ]
 

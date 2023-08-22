@@ -39,8 +39,8 @@ class UserModelTest(TestCase):
             user.save()
 
     def test_user_fields(self):
-        fields = ['profile', 'logentry', 'exchanger_created', 'blockchain_created', 'id', 'password', 'last_login', 'is_superuser',
-                  'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',
+        fields = ['profile', 'logentry', 'social_auth', 'exchanger_created', 'blockchain_created', 'id', 'password',
+                  'last_login', 'is_superuser', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',
                   'date_joined', 'groups', 'user_permissions']
         user = User.objects.create()
         model_fields = [field.name for field in user._meta.get_fields()]
@@ -62,44 +62,44 @@ class ProfileModelTest(TestCase):
         User.objects.all().delete()
 
     def test_profile_create(self):
-        profile = Profile.objects.create(user=self.user)
+        profile = Profile.objects.create(owner=self.user)
         self.assertTrue(profile, profile)
-        self.assertEqual(profile.user, self.user, profile)
+        self.assertEqual(profile.owner, self.user, profile)
 
     def test_profile_create_with_data_of_birth(self):
-        profile = Profile.objects.create(user=self.user,
+        profile = Profile.objects.create(owner=self.user,
                                          date_of_birth=self.profile_date_of_birth)
         self.assertTrue(profile, profile)
         self.assertEqual(profile.date_of_birth, self.profile_date_of_birth, profile)
 
     def test_profile_create_with_invalid_format_data_of_birth(self):
-        profile = Profile(user=self.user,
+        profile = Profile(owner=self.user,
                           date_of_birth='01.01.2001')
         with self.assertRaises(ValidationError):
             profile.full_clean()
             profile.save()
 
     def test_profile_create_with_photo(self):
-        profile = Profile.objects.create(user=self.user,
+        profile = Profile.objects.create(owner=self.user,
                                          photo=self.profile_photo)
         self.assertTrue(profile, profile)
         self.assertEqual(profile.photo, self.profile_photo, profile)
 
     def test_profile_create_with_invalid_format_photo(self):
         with self.assertRaises(ValidationError) as e:
-            profile = Profile.objects.create(user=self.user,
+            profile = Profile.objects.create(owner=self.user,
                                              photo='./data_for_test/text.txt')
             profile.full_clean()
             profile.save()
 
     def test_profile_print(self):
-        profile = Profile.objects.create(user=self.user)
+        profile = Profile.objects.create(owner=self.user)
 
         self.assertEqual(str(profile), f'Profile of {self.user.username}', profile)
 
     def test_profile_fields(self):
-        fields = ['id', 'user', 'date_of_birth', 'photo']
-        profile = Profile.objects.create(user=self.user)
+        fields = ['id', 'owner', 'date_of_birth', 'photo']
+        profile = Profile.objects.create(owner=self.user)
         model_fields = [field.name for field in profile._meta.get_fields()]
 
         self.assertEqual(model_fields, fields, model_fields)

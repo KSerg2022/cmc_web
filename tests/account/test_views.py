@@ -84,7 +84,7 @@ class EditTest(TestCase):
                                         email=self.user_email,
                                         password=self.user_password,
                                         )
-        self.profile = Profile.objects.create(user=self.user)
+        self.profile = Profile.objects.create(owner=self.user)
 
     def tearDown(self) -> None:
         Profile.objects.all().delete()
