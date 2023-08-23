@@ -1,5 +1,6 @@
 # from unittest import TestCase
 import json
+import os
 
 from django.test import TestCase
 
@@ -10,8 +11,8 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
 from blockchain.api.serializers import BlockchainSerializer, BlockchainPortfolioSerializer
-from blockchain.api.views import BlockchainViewSet
 from blockchain.models import Blockchain, Portfolio
+from blockchain.fixtures.handlers.load_blockchains_to_db import dump_to_db_blockchain
 
 
 class BlockchainBase(TestCase):
@@ -639,3 +640,54 @@ class BlockchainPortfolioSerializerTestCase(BlockchainPortfolioBase):
         ]
 
         self.assertEqual(expected_data, serializer_data)
+
+
+class BlockchainDataApiTestCase(APITestCase, TestCase):
+
+    def setUp(self) -> None:
+        dump_to_db_blockchain()
+        self.wallet = os.environ.get('WALLET_ADDRESS')
+        self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
+                           "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8"}
+        self.user1 = User.objects.create_user(username='User1',
+                                              password='password1')
+        self.user2 = User.objects.create_user(username='User2',
+                                              password='password2')
+        self.admin = User.objects.create_superuser(username='Admin',
+                                                   password='password2')
+        self.blockchain = Blockchain.objects.get(name='BSC')
+        self.portfolio1 = Portfolio.objects.create(owner=self.user1,
+                                                   blockchain=self.blockchain,
+                                                   wallet=self.wallet,
+                                                   currencies=self.currencies)
+        self.endpoint = 'blockchain-data'
+
+    def tearDown(self) -> None:
+        Portfolio.objects.all().delete()
+        Blockchain.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_get_owner(self):
+        self.client.force_login(user=self.user1)
+        url = reverse(self.endpoint, args=(self.blockchain.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual(self.blockchain.name, list(response.data.keys())[0])
+        self.assertEqual(len(self.currencies), len(list(response.data.values())[0]))
+
+    def test_get_not_owner(self):
+        self.client.force_login(user=self.user2)
+        url = reverse(self.endpoint, args=(self.blockchain.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
+
+    def test_get_is_staff(self):
+        self.client.force_login(user=self.admin)
+        url = reverse(self.endpoint, args=(self.blockchain.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
