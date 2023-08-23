@@ -176,3 +176,6 @@ media/
 /exchanger/fixtures/blockchain.json
 /cmc/fixtures/cryptocurrency.json
 /blockchain/api/help.py
+/exchanger/fixtures/exchanger.json
+/blockchain/fixtures/portfolio.json
+/blockchain/fixtures/blockchain.json
