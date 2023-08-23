@@ -1,16 +1,18 @@
 import json
-import unittest
-from unittest import TestCase
+import os
 
+from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
+from blockchain.fixtures.handlers.load_blockchains_to_db import dump_to_db_blockchain
+from blockchain.models import Blockchain, Portfolio
 from exchanger.api.serializers import ExchangerSerializer, ExPortfolioSerializer
-from exchanger.api.views import ExPortfolioViewSet
 from exchanger.models import Exchanger, ExPortfolio
+from exchanger.fixtures.handlers.load_exchangers_to_db import dump_to_db_exchanger
 
 
 class ExchangerBase(TestCase):
@@ -536,3 +538,124 @@ class ExPortfolioSerializerTestCase(ExPortfolioBase):
         ]
 
         self.assertEqual(expected_data, serializer_data)
+
+
+class ExchangerDataApiTestCase(APITestCase, TestCase):
+
+    def setUp(self) -> None:
+        dump_to_db_exchanger()
+        self.api_key = os.environ.get('OKX_API_KEY')
+        self.api_secret = os.environ.get('OKX_API_SECRET_KEY')
+        self.password = os.environ.get('OKX_PWD')
+        self.user1 = User.objects.create_user(username='User1',
+                                              password='password1')
+        self.user2 = User.objects.create_user(username='User2',
+                                              password='password2')
+        self.admin = User.objects.create_superuser(username='Admin',
+                                                   password='password2')
+        self.exchanger = Exchanger.objects.get(id=1)
+        self.portfolio1 = ExPortfolio.objects.create(owner=self.user1,
+                                                     exchanger=self.exchanger,
+                                                     api_key=self.api_key,
+                                                     api_secret=self.api_secret,
+                                                     password=self.password,
+                                                     )
+        self.endpoint = 'exchanger-data'
+
+    def tearDown(self) -> None:
+        ExPortfolio.objects.all().delete()
+        Exchanger.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_get_owner(self):
+        self.client.force_login(user=self.user1)
+        url = reverse(self.endpoint, args=(self.exchanger.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual(self.exchanger.name, list(response.data.keys())[0])
+
+    def test_get_not_owner(self):
+        self.client.force_login(user=self.user2)
+        url = reverse(self.endpoint, args=(self.exchanger.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
+
+    def test_get_is_staff(self):
+        self.client.force_login(user=self.admin)
+        url = reverse(self.endpoint, args=(self.exchanger.id, ))
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
+
+
+class AllDataApiTestCase(APITestCase, TestCase):
+
+    def setUp(self) -> None:
+        dump_to_db_exchanger()
+        dump_to_db_blockchain()
+        self.wallet = os.environ.get('WALLET_ADDRESS')
+
+        self.api_key = os.environ.get('OKX_API_KEY')
+        self.api_secret = os.environ.get('OKX_API_SECRET_KEY')
+        self.password = os.environ.get('OKX_PWD')
+        self.user1 = User.objects.create_user(username='User1',
+                                              password='password1')
+        self.user2 = User.objects.create_user(username='User2',
+                                              password='password2')
+        self.admin = User.objects.create_superuser(username='Admin',
+                                                   password='password2')
+        self.exchanger = Exchanger.objects.get(id=1)
+        self.portfolio_exchanger = ExPortfolio.objects.create(owner=self.user1,
+                                                     exchanger=self.exchanger,
+                                                     api_key=self.api_key,
+                                                     api_secret=self.api_secret,
+                                                     password=self.password,
+                                                     )
+
+        self.wallet = os.environ.get('WALLET_ADDRESS')
+        self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
+                           "ETH": "0x2170ed0880ac9a755fd29b2688956bd959f933f8"}
+        self.blockchain = Blockchain.objects.get(name='BSC')
+        self.portfolio_blockchain = Portfolio.objects.create(owner=self.user1,
+                                                   blockchain=self.blockchain,
+                                                   wallet=self.wallet,
+                                                   currencies=self.currencies)
+
+        self.endpoint = 'all-data'
+
+    def tearDown(self) -> None:
+        ExPortfolio.objects.all().delete()
+        Exchanger.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_get_owner(self):
+        self.client.force_login(user=self.user1)
+        url = reverse(self.endpoint)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual(self.user1.username, list(response.data.keys())[0])
+        self.assertEqual(self.portfolio_exchanger.exchanger.name,
+                         list(list(response.data.values())[0][0].keys())[0].upper())
+        self.assertEqual(self.portfolio_blockchain.blockchain.name,
+                         list(list(response.data.values())[0][1].keys())[0].upper())
+
+    def test_get_not_owner(self):
+        self.client.force_login(user=self.user2)
+        url = reverse(self.endpoint)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual({self.user2.username: []}, response.data)
+
+    def test_get_is_staff(self):
+        self.client.force_login(user=self.admin)
+        url = reverse(self.endpoint)
+        response = self.client.get(url)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
+        self.assertEqual({self.admin.username: []}, response.data)

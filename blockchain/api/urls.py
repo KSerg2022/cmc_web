@@ -9,6 +9,9 @@ router.register(r'api/blockchain-portfolio', BlockchainPortfolioViewSet, basenam
 router.register(r'api/blockchain', BlockchainViewSet)
 
 
+from blockchain.api.views import BlockchainData
+
 urlpatterns = [
+    path('api/blockchain/data/<int:blockchain_id>/', BlockchainData.as_view(), name='blockchain-data'),
     path('', include(router.urls)),
     ]
