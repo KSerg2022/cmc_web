@@ -308,6 +308,7 @@ class GetBlockchainData(TestCase):
 
     def tearDown(self) -> None:
         Portfolio.objects.all().delete()
+        Blockchain.objects.all().delete()
         User.objects.all().delete()
 
     def _get_response_for_page_GET(self):
