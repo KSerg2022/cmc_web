@@ -48,7 +48,7 @@ def get_portfolio_data(user, portfolio):
         portfolio = Portfolio.objects.get(owner=user,
                                           blockchain__slug=portfolio.lower())
         user_portfolios_data, total_sum = check_caches_blockchain_data(portfolio)
-    return user_portfolios_data, total_sum
+    return user_portfolios_data, total_sum, portfolio
 
 
 @shared_task()
@@ -70,7 +70,7 @@ def sending_XLSX_by_email(user_id, path_to_file, portfolio):
     from exchanger.cache import check_cache_user_portfolios_data
 
     if portfolio != ALL_PORTFOLIOS:
-        user_portfolios_data, total_sum = get_portfolio_data(user, portfolio)
+        user_portfolios_data, total_sum, _ = get_portfolio_data(user, portfolio)
         save_portfolio_to_xlsx_file(user_id,
                                     [{portfolio: user_portfolios_data}],
                                     portfolio)
@@ -104,8 +104,8 @@ def sending_PDF_by_email(user_id, path_to_file, portfolio):
                        os.environ.get('EMAIL'),
                        [email])
     if portfolio != ALL_PORTFOLIOS:
-        user_portfolios_data, total_sum = get_portfolio_data(user, portfolio)
-        pdf = get_exchanger_pdf(portfolio, user_portfolios_data, total_sum)
+        user_portfolios_data, total_sum, portfolio_obj = get_portfolio_data(user, portfolio)
+        pdf = get_exchanger_pdf(portfolio_obj, user_portfolios_data, total_sum)
 
     else:
         user_portfolios_data = check_cache_user_portfolios_data(user_id)

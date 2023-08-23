@@ -14,8 +14,11 @@
 <div class="container">
     <h1>Users portfolio data in PDF.</h1>
 
-
-    <h3>Users portfolio {{ portfolio.exchanger.name|upper }}:</h3>
+    {% if portfolio.exchanger.name %}
+        <h3>Users portfolio {{ portfolio.exchanger.name|upper }}:</h3>
+    {% else %}
+        <h3>Users portfolio {{ portfolio.blockchain.name|upper }}:</h3>
+    {% endif %}
 
     <table id="">
         <thead>
