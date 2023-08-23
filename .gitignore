@@ -174,5 +174,5 @@ media/
 **/logo_axchangers/**
 /exchanger/fixtures/portfolio.json
 /exchanger/fixtures/blockchain.json
-/exchanger/fixtures/portfolio.json
+/cmc/fixtures/cryptocurrency.json
 /blockchain/api/help.py
