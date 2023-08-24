@@ -75,20 +75,16 @@ class SendEmailData(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticatedAndOwner]
 
-    def get(self, request, name='all', format=None):
-        portfolio = name
-        if name == 'all':
+    def get(self, request, portfolio='all', format=None):
+        if portfolio == 'all':
             portfolio = ALL_PORTFOLIOS
         xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
-        filename = f'{request.user.id}_{request.user.username.lower()}_{ALL_PORTFOLIOS}.pdf'
+        filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
         path_to_file = xlsx_dir + filename
-        if portfolio:
-            filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
-            path_to_file = xlsx_dir + filename
+
 
         sending_PDF_by_email.delay(user_id=self.request.user.id,
                                    path_to_file=path_to_file,
                                    portfolio=portfolio)
         messages = f'Portfolios "{portfolio.capitalize()}" were send to your email.'
-
         return Response({'messages': messages})
