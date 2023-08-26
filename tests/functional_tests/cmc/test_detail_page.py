@@ -6,14 +6,14 @@ from selenium.webdriver.common.by import By
 from tests.functional_tests.base import BaseTest
 
 from cmc.models import Cryptocurrency
-from cmc.utils.load_data_to_db import dump_to_db
+from cmc.fixtures.handlers.load_currencies_to_db import dump_to_db_currencies
 
 
 class DetailPageTest(BaseTest):
     """test new visitor"""
 
     def test_detail_page(self):
-        dump_to_db(3)
+        dump_to_db_currencies(3)
         crypto = 'Litecoin'
         self.browser.get(self.live_server_url)
         q = self.browser.find_element(By.PARTIAL_LINK_TEXT, crypto).click()
