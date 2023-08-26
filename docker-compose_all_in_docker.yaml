@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   web_cmc:
-    image: cmc:v1
+    image: cmc:v3
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
@@ -50,7 +50,7 @@ services:
 
 
   worker:
-    image: cmc:v1
+    image: cmc:v3
     restart: unless-stopped
     hostname: worker
     entrypoint: celery
@@ -68,7 +68,7 @@ services:
       - DB_NAME=${POSTGRES_DB}
 
   worker2:
-    image: cmc:v1
+    image: cmc:v3
     restart: unless-stopped
     hostname: worker2
     entrypoint: celery
@@ -86,7 +86,7 @@ services:
       - DB_NAME=${POSTGRES_DB}
 
   celery-beat:
-    image: cmc:v1
+    image: cmc:v3
     restart: unless-stopped
     hostname: worker2
     entrypoint: celery
@@ -105,7 +105,7 @@ services:
 
 
   flower:
-    image: cmc:v1
+    image: cmc:v3
     hostname: flower
     entrypoint: celery
     command: -A celery_app.app flower
@@ -119,6 +119,31 @@ services:
       - worker
     ports:
       - "5555:5555"
+
+
+
+#  firefox:
+#    image: selenium/node-firefox:4.11.0-20230801
+#    shm_size: 2gb
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - SE_EVENT_BUS_HOST=selenium-hub
+#      - SE_EVENT_BUS_PUBLISH_PORT=4442
+#      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+#    ports:
+#      - "5901:5900"
+#
+#  selenium-hub:
+#    image: selenium/hub:4.11.0-20230801
+#    container_name: selenium-hub
+#    ports:
+#      - "4442:4442"
+#      - "4443:4443"
+#      - "4444:4444"
+
+#self.browser = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
+#                                options=self.firefox_options)
 
 volumes:
   postgres_data:
