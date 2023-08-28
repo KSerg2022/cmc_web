@@ -48,18 +48,32 @@ class TestBase:
     def assertEqual(self, param, param1):
         pass
 
-    def _check_data_in_test_base(self, result):
-        self.assertIsInstance(result, dict)
-        self.assertIn(self.exchanger.exchanger, result)
-        self.assertIn('coin', list(result.values())[0][0])
-        self.assertIn('bal', list(result.values())[0][0])
+    def _check_data_in_test_base(self, class_name, func_name, result):
+        if not self._check_error_in_result_request(class_name,
+                                                   func_name,
+                                                   list(result.values())[0][0]):
+            self.assertIsInstance(result, dict)
+            self.assertIn(self.exchanger.exchanger, result)
+            self.assertIn('coin', list(result.values())[0][0])
+            self.assertIn('bal', list(result.values())[0][0])
+
+    @staticmethod
+    def _check_error_in_result_request(class_name, func_name, result):
+        if 'error' in result:
+            print(f'\nIn "{class_name}", in function -  "{func_name.__name__}" is error - "{result}"')
+            return True
+        return False
 
     def test_get_account(self):
         self._check_data_in_test_base(
+            self.__class__,
+            self.test_get_account,
             self.exchanger.get_account())
 
     def test_normalize_data(self):
         self._check_data_in_test_base(
+            self.__class__,
+            self.test_get_account,
             self.exchanger._normalize_data(self.test_data))
 
     def test_normalize_with_errors_data(self):

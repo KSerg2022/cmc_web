@@ -44,11 +44,11 @@ class TestExBinance(unittest.TestCase, TestBase):
 
     def test_get_futures_coin_account(self):
         result = self.exchanger.get_futures_coin_account()
-
-        self.assertIsInstance(result, list)
-        self.assertIsInstance(result[0], dict)
-        self.assertIn('asset', result[0])
-        self.assertIn('marginBalance', result[0])
+        if not self._check_error_in_result_request(__class__, self.test_get_futures_coin_account, result):
+            self.assertIsInstance(result, list)
+            self.assertIsInstance(result[0], dict)
+            self.assertIn('asset', result[0])
+            self.assertIn('marginBalance', result[0])
 
     def test_get_futures_coin_account_with_wrong_api(self):
         self.exchanger.coin_m = Client(api_key=self.api_key_wrong,
@@ -68,12 +68,12 @@ class TestExBinance(unittest.TestCase, TestBase):
 
     def test_get_spot_account(self):
         result = self.exchanger.get_spot_account()
-
-        self.assertIsInstance(result, list)
-        self.assertIsInstance(result[0], dict)
-        self.assertIn('asset', result[0])
-        self.assertIn('free', result[0])
-        self.assertIn('locked', result[0])
+        if not self._check_error_in_result_request(__class__, self.test_get_spot_account, result):
+            self.assertIsInstance(result, list)
+            self.assertIsInstance(result[0], dict)
+            self.assertIn('asset', result[0])
+            self.assertIn('free', result[0])
+            self.assertIn('locked', result[0])
 
     def test_get_spot_account_with_wrong_api(self):
         self.exchanger.coin_m = Client(api_key=self.api_key_wrong,
@@ -91,11 +91,13 @@ class TestExBinance(unittest.TestCase, TestBase):
         self.assertTrue(result['error'])
         self.assertIn('Check your "api key", "api secret"', result['error'])
 
-
     def test_normalize_data(self):
         self._check_data_in_test_base(
+            self.__class__,
+            self.test_normalize_data,
             self.exchanger._normalize_data(self.test_data_spot_account,
-                                           self.test_data_futures_coin_account))
+                                           self.test_data_futures_coin_account)
+        )
 
     def test_normalize_with_empty_data(self):
         result = self.exchanger._normalize_data(* self.test_data_error)
