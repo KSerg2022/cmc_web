@@ -12,7 +12,6 @@ RUN apt-get install -y --no-install-recommends firefox
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-#COPY requirements.txt /cmc/requirements.txt
 COPY . /cmc
 WORKDIR /cmc
 
