@@ -351,12 +351,9 @@ class GetBlockchainData(TestCase):
 
     def test_get_blockchain_data_with_not_correct_api(self):
         self.client.force_login(self.user)
-        blockchain = Blockchain.objects.last()
-        portfolio_wrong_apy = Portfolio.objects.create(wallet=self.wallet,
-                                                       comments='',
-                                                       currencies=self.currencies,
-                                                       blockchain=blockchain,
-                                                       owner=self.user)
+        blockchain = Blockchain.objects.filter(name='BSC').first()
+        blockchain.api_key = 'wrong_api'
+        blockchain.save()
 
         url = reverse('blockchain:get_blockchain_data', args=f'{blockchain.id}')
         response = self.client.get(url)
