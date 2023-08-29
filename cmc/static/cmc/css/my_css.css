@@ -96,3 +96,7 @@ footer {
     text-decoration: underline;
 }
 
+.custom {
+    width: 78px !important;
+    height: 30px;
+}

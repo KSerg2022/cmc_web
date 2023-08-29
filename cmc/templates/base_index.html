@@ -4,12 +4,6 @@
 
 {% block bootstrap5_content %}
 
-    {% get_exchanger_portfolios user as exchanger_portfolios %}
-    {% get_blockchain_portfolios user as blockchain_portfolios %}
-    {% get_path_to_users_xlsx_file_all user as path_to_users_xlsx_file_all %}
-
-
-
     <div class="height100 main">
 
         <div class="main_content">
@@ -19,193 +13,151 @@
             {% endblock main_content %}
         </div>
 
-
         <aside class="sidebar">
-            <div class="container">
-                <ul>
-                    <li>Total coins on site: {% total_coins %}</li>
-                    <li>Total users on site: {% total_users %}</li>
-                    <li>Total exchanger portfolio on site: {% total_exchanger_portfolios %}</li>
-                    <li>Total blockchain portfolio on site: {% total_blockchain_portfolios %}</li>
-                </ul>
-            </div>
 
+            {% if user.is_staff %}
+                <div class="container">
+                    <ul>
+                        <li>Total coins on site: {% total_coins %}</li>
+                        <li>Total users on site: {% total_users %}</li>
+                        <li>Total exchanger portfolio on site: {% total_exchanger_portfolios %}</li>
+                        <li>Total blockchain portfolio on site: {% total_blockchain_portfolios %}</li>
+                    </ul>
+                </div>
+            {% endif %}
 
             <div class="container">
                 {% if user.is_authenticated %}
 
                     <h2 class="text-center">{{ user }}.</h2>
 
-                    {% if exchanger_portfolios %}
+                    <div class="row">
+                        <div class="col">
+                            <h5> Exchangers:</h5>
+                            {% if exchanger_portfolios %}
+                                {% for exchanger_portfolio in exchanger_portfolios %}
 
-                        <table class="table table-borderless align-middle" id="">
-                            <thead class="table-primary">
-                            <tr>
-                                <th scope="col">Exchangers</th>
-                                <th scope="col" class="text-center">Info</th>
-                            </tr>
-                            </thead>
+                                    <div class="dropdown dropend">
 
-                            <tbody>
-                            {% for exchanger_portfolio in exchanger_portfolios %}
-                                <tr>
-                                    <td>{{ exchanger_portfolio }}</td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info">
-                                            <a href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}"
-                                               class=" link">Data</a>
-                                        </span>
-                                        <div class="btn-group">
-                                                <span class="badge bg-success dropdown-toggle link-wight"
-                                                      data-bs-toggle="dropdown"
-                                                      aria-expanded="false">XLSX</span>
+                                        <a type="button" class="nav-link dropdown-toggle custom"
+                                           data-bs-toggle="dropdown"
+                                           href="#">
+                                            {{ exchanger_portfolio }}
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}"
+                                                   class="dropdown-item link">data</a>
+                                            </li>
 
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="{% get_path_to_users_xlsx_file_one user exchanger_portfolio %}"
-                                                       class="dropdown-item link"
-                                                       download>Save</a></li>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li><a class="dropdown-item link"
-                                                       href="{% url "send_XLSX_by_email" portfolio=exchanger_portfolio %}">Email</a>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                            <hr class="dropdown-divider">
+                                            <li>
+                                                <a href="{% get_path_to_users_xlsx_file_one user exchanger_portfolio %}"
+                                                   class="dropdown-item link"
+                                                   download>XLSX Save</a></li>
+                                            <li>
+                                            </li>
+                                            <li><a class="dropdown-item link"
+                                                   href="{% url "send_XLSX_by_email" portfolio=exchanger_portfolio %}">XLSX
+                                                to Email</a>
+                                            </li>
 
-                                        <div class="btn-group">
-                                                <span class="badge bg-danger dropdown-toggle link-wight"
-                                                      data-bs-toggle="dropdown"
-                                                      aria-expanded="false">PDF</span>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="{% url "exchanger:get_exchanger_data_pdf" exchanger_portfolio.id %}"
-                                                       class="dropdown-item link" target="_blank">Save</a>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li><a class="dropdown-item link"
-                                                       href="{% url "send_PDF_by_email" user_id=user.id portfolio=exchanger_portfolio %}">Email</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-
-
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-
-
-                    {% else %}
-                        <p>You did not create exchanger yet.</p>
-                    {% endif %}
-
-
-                    {% if blockchain_portfolios %}
-                        <table class="table table-borderless align-middle" id="">
-                            <thead class="table-primary">
-                            <tr>
-                                <th scope="col">Blockchains</th>
-                                <th scope="col" class="text-center">Info</th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            {% for blockchain_portfolio in blockchain_portfolios %}
-                                <tr>
-                                    <td>{{ blockchain_portfolio }}</td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info">
-                                            <a href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}"
-                                               class=" link">Data</a>
-                                        </span>
-                                        <div class="btn-group">
-                                                <span class="badge bg-success dropdown-toggle link-wight"
-                                                      data-bs-toggle="dropdown"
-                                                      aria-expanded="false">XLSX</span>
-
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="{% get_path_to_users_xlsx_file_one user blockchain_portfolio %}"
-                                                       class="dropdown-item link" download>Save</a></li>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li><a class="dropdown-item link"
-                                                       href="{% url "send_XLSX_by_email" portfolio=blockchain_portfolio %}">Email
-                                                </a></li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="btn-group">
-                                                <span class="badge bg-danger dropdown-toggle link-wight"
-                                                      data-bs-toggle="dropdown"
-                                                      aria-expanded="false">PDF</span>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="{% url "blockchain:get_blockchain_data_pdf" blockchain_portfolio.id %}"
-                                                       class="dropdown-item link" target="_blank">Save</a>
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li><a class="dropdown-item link"
-                                                       href="{% url "send_PDF_by_email" user_id=user.id portfolio=blockchain_portfolio %}">Email</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            {% endfor %}
-                            </tbody>
-                        </table>
-
-                        <p class="text-center">
-                            <a href="{% url "exchanger:get_all_data" user.id %}" class="badge bg-warning bg-lg link">
-                                Get data for all portfolios</a>
-                        </p>
-
-
-                        <div class="container d-flex align-items-center justify-content-center">
-                            <div class="btn-group">
-                                <button class="btn btn-success btn-sm dropdown-toggle link-wight" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">XLSX
-                                </button>
-
-                                <ul class="dropdown-menu">
-                                    <li><a href="{{ path_to_users_xlsx_file_all }}" class="dropdown-item link"
-                                           download>Save</a></li>
-                                    <li>
-                                    <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item link"
-                                           href="{% url "send_XLSX_by_email" path_to_file=path_to_users_xlsx_file_all %}">Email</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-danger btn-sm dropdown-toggle link-wight" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">PDF
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="{% url "exchanger:get_all_data_pdf" user.id %}"
-                                           class="dropdown-item link" target="_blank">PDF</a>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item link"
-                                           href="{% url "send_PDF_by_email" user_id=user.id %}">Email</a></li>
-                                </ul>
-                            </div>
+                                            <hr class="dropdown-divider">
+                                            <li>
+                                                <a href="{% url "exchanger:get_exchanger_data_pdf" exchanger_portfolio.id %}"
+                                                   class="dropdown-item link" target="_blank">PDF Save</a>
+                                            <li>
+                                            </li>
+                                            <li><a class="dropdown-item link"
+                                                   href="{% url "send_PDF_by_email" user_id=user.id portfolio=exchanger_portfolio %}">PDF
+                                                to Email</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>You did not create yet.</p>
+                            {% endif %}
                         </div>
 
-                    {% else %}
-                        <p>You did not create blockchain yet.</p>
-                    {% endif %}
+                        <div class="col">
+                            <h5>Blockchains:</h5>
+                            {% if blockchain_portfolios %}
+                                {% for blockchain_portfolio in blockchain_portfolios %}
 
+                                    <div class="dropdown dropend">
+
+                                        <a type="button" class="nav-link dropdown-toggle custom"
+                                           data-bs-toggle="dropdown"
+                                           href="#">
+                                            {{ blockchain_portfolio }}
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="{% url "exchanger:get_exchanger_data" blockchain_portfolio.id %}"
+                                                   class="dropdown-item link">data</a>
+                                            </li>
+
+                                            <hr class="dropdown-divider">
+                                            <li><a href="{{ path_to_users_xlsx_file_all }}" class="dropdown-item link"
+                                                   download>XLSX Save</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item link"
+                                                   href="{% url "send_XLSX_by_email" path_to_file=path_to_users_xlsx_file_all %}">XLSX
+                                                to Email</a>
+                                            </li>
+
+                                            <hr class="dropdown-divider">
+                                            <li>
+                                                <a href="{% url "blockchain:get_blockchain_data_pdf" blockchain_portfolio.id %}"
+                                                   class="dropdown-item link" target="_blank">PDF Save</a>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item link"
+                                                   href="{% url "send_PDF_by_email" user_id=user.id portfolio=blockchain_portfolio %}">PDF
+                                                to Email</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>You did not create yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if blockchain_portfolios or exchanger_portfolios %}
+                        <div class="dropdown container d-flex align-items-center justify-content-center">
+
+                            <button type="button" class="btn btn-success btn-sm dropdown-toggle"
+                                    data-bs-toggle="dropdown">
+                                ALL PORTFOLIOS
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item link" data-bs-toggle="dropdown"
+                                       href="{% url "exchanger:get_all_data" user.id %}">
+                                    Get data for all portfolios</a>
+                                </li>
+                                <hr class="dropdown-divider">
+
+                                <li><a href="{{ path_to_users_xlsx_file_all }}" class="dropdown-item link"
+                                       download>XLSX Save</a></li>
+                                <li><a class="dropdown-item link"
+                                       href="{% url "send_XLSX_by_email" path_to_file=path_to_users_xlsx_file_all %}">XLSX
+                                    to Email</a>
+                                </li>
+                                <hr class="dropdown-divider">
+
+                                <li><a href="{% url "exchanger:get_all_data_pdf" user.id %}"
+                                       class="dropdown-item link" target="_blank">PDF save</a>
+                                <li><a class="dropdown-item link"
+                                       href="{% url "send_PDF_by_email" user_id=user.id %}">PDF to Email</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
 
