@@ -17,27 +17,44 @@
             {% else %} {{ user.username }}
             {% endif %}
             </a>
-
         </li>
 
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#"
-               data-bs-toggle="dropdown" aria-expanded="false">Exchangers</a>
-            <ul class="dropdown-menu">
+               data-bs-toggle="dropdown" aria-expanded="false">Exchangers
+            </a>
+{#            <ul class="dropdown-menu">#}
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 
                 {% if exchanger_portfolios %}
                     {% for exchanger_portfolio in exchanger_portfolios %}
                         <li>
-                            <a href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}"
-                               class="dropdown-item link">{{ exchanger_portfolio }}</a>
+                            <a href="#"
+                               class="dropdown-item link">{{ exchanger_portfolio }} &raquo
+                            </a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li>
+                                        <a class="dropdown-item link"
+                                           href="{% url "exchanger:get_exchanger_data" exchanger_portfolio.id %}">Data</a>
+                                    </li>
+                                    <hr class="dropdown-divider">
+                                    <li>
+                                        <a class="dropdown-item link" href="{% url "exchanger:change_portfolio" exchanger_portfolio.id %}">Change</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item link" href="{% url "exchanger:delete_portfolio" exchanger_portfolio.id %}">Delete</a>
+                                    </li>
+                                </ul>
                         </li>
+
+
                     {% endfor %}
                 {% else %}
                     <p>You did not create yet.</p>
                 {% endif %}
 
                 <hr class="dropdown-divider">
-                <li><a class="dropdown-item" href="{% url "exchanger:exchangers" %}">All</a></li>
+                <li><a class="dropdown-item link" href="{% url "exchanger:exchangers" %}">All</a></li>
 
             </ul>
         </li>
@@ -51,8 +68,22 @@
                 {% if blockchain_portfolios %}
                     {% for blockchain_portfolio in blockchain_portfolios %}
                         <li>
-                            <a href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}"
-                               class="dropdown-item link">{{ blockchain_portfolio }}</a>
+                            <a href="#"
+                               class="dropdown-item link">{{ blockchain_portfolio }} &raquo
+                            </a>
+                                <ul class="dropdown-menu dropdown-submenu">
+                                    <li>
+                                        <a class="dropdown-item link"
+                                           href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}">Data</a>
+                                    </li>
+                                    <hr class="dropdown-divider">
+                                    <li>
+                                        <a class="dropdown-item link" href="{% url "blockchain:change_blockchain_portfolio" blockchain_portfolio.id %}">Change</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item link" href="{% url "blockchain:delete_blockchain_portfolio" blockchain_portfolio.id %}">Delete</a>
+                                    </li>
+                                </ul>
                         </li>
 
                     {% endfor %}
@@ -61,7 +92,7 @@
                 {% endif %}
 
                 <hr class="dropdown-divider">
-                <li><a class="dropdown-item" href="{% url "exchanger:exchangers" %}">All</a></li>
+                <li><a class="dropdown-item link" href="{% url "exchanger:exchangers" %}">All</a></li>
 
             </ul>
         </li>
@@ -70,7 +101,7 @@
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
             <ul class="dropdown-menu">
                 <li>
-                    <a class="dropdown-item" href="{% url "edit" %}">Edit_detail</a>
+                    <a class="dropdown-item link" href="{% url "edit" %}">Edit_detail</a>
                     {#                    <a class="dropdown-item" href="#">1111111</a>#}
                 </li>
             </ul>
