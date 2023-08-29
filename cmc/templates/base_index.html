@@ -94,7 +94,7 @@
                                         </a>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a href="{% url "exchanger:get_exchanger_data" blockchain_portfolio.id %}"
+                                                <a href="{% url "blockchain:get_blockchain_data" blockchain_portfolio.id %}"
                                                    class="dropdown-item link">data</a>
                                             </li>
 
@@ -133,12 +133,10 @@
                         <div class="dropdown container d-flex align-items-center justify-content-center">
 
                             <button type="button" class="btn btn-success btn-sm dropdown-toggle"
-                                    data-bs-toggle="dropdown">
-                                ALL PORTFOLIOS
-                            </button>
+                                    data-bs-toggle="dropdown">ALL PORTFOLIOS</button>
+
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item link" data-bs-toggle="dropdown"
-                                       href="{% url "exchanger:get_all_data" user.id %}">
+                                <li><a href="{% url "exchanger:get_all_data" user.id %}" class="dropdown-item link">
                                     Get data for all portfolios</a>
                                 </li>
                                 <hr class="dropdown-divider">
