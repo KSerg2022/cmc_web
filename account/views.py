@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
 
@@ -45,17 +46,25 @@ def register(request):
 
 @login_required
 def edit(request):
+    user = get_object_or_404(User, id=request.user.id)
+    profile_user = get_object_or_404(Profile, owner=request.user.id)
+
     user_form = UserEditForm(instance=request.user)
     profile_form = ProfileEditForm(instance=request.user.profile)
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user,
                                  data=request.POST)
-        profile_form = ProfileEditForm(instance=request.user.profile,
+        profile_form = ProfileEditForm(instance=request.user,
                                        data=request.POST,
                                        files=request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
+
+            profile_user.telegram = profile_form.cleaned_data.get('telegram')
+            profile_user.date_of_birth = profile_form.cleaned_data.get('date_of_birth')
+            profile_user.photo = profile_form.cleaned_data.get('photo')
+            profile_user.save()
+
             messages.success(request, 'Profile updated successfully')
         else:
             messages.error(request, 'Error updating your profile')
@@ -64,4 +73,3 @@ def edit(request):
                   'account/user/edit.html',
                   {'user_form': user_form,
                    'profile_form': profile_form})
-
