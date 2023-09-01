@@ -172,7 +172,7 @@ help
 media/
 **/migrations/**
 **/logo_axchangers/**
-/exchanger/fixtures/portfolio.json
+/exchanger/fixtures/exportfolio.json
 /exchanger/fixtures/blockchain.json
 /cmc/fixtures/cryptocurrency.json
 /blockchain/api/help.py
