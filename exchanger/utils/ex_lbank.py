@@ -40,6 +40,6 @@ class ExLbank(ExchangerBase):
             if float(value) != 0:
                 currencies.append({
                     'coin': symbol.upper(),
-                    'bal': value
+                    'bal': float(value)
                 })
         return {self.exchanger: sorted(currencies, key=lambda x: x['coin'])}
