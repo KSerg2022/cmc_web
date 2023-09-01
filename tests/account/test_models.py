@@ -56,6 +56,7 @@ class ProfileModelTest(TestCase):
                                         password=self.user_password)
         self.profile_date_of_birth = '2001-01-01'
         self.profile_photo = './data_for_test/black.jpg'
+        self.telegram = '@telegram'
 
     def tearDown(self) -> None:
         Profile.objects.all().delete()
@@ -92,13 +93,30 @@ class ProfileModelTest(TestCase):
             profile.full_clean()
             profile.save()
 
+    def test_profile_create_with_telegram(self):
+        profile = Profile.objects.create(owner=self.user,
+                                         telegram=self.telegram)
+        self.assertTrue(profile, profile)
+        self.assertEqual(profile.telegram, self.telegram, profile)
+
+    def test_profile_create_with_telegram_wrong_name(self):
+        telegrams = ['@rrr', '@rrr$%!', '@fsgafgDDDf!', '@asfgw56wF_п', 'q@asfgw56wF', '@asfgw56w F', '@a sfgw56w']
+        for telegram in telegrams:
+            with self.assertRaises(ValidationError) as e:
+                profile = Profile.objects.create(owner=User.objects.create(username=telegram,
+                                                                           password=telegram),
+                                                 telegram=telegram)
+                profile.full_clean()
+                profile.save()
+            self.assertIn('Telegram username not correct.', str(e.exception))
+
     def test_profile_print(self):
         profile = Profile.objects.create(owner=self.user)
 
         self.assertEqual(str(profile), f'Profile of {self.user.username}', profile)
 
     def test_profile_fields(self):
-        fields = ['id', 'owner', 'date_of_birth', 'photo']
+        fields = ['id', 'owner', 'date_of_birth', 'photo', 'telegram']
         profile = Profile.objects.create(owner=self.user)
         model_fields = [field.name for field in profile._meta.get_fields()]
 

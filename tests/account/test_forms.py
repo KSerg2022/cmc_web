@@ -6,6 +6,8 @@ from account.forms import (LoginForm,
                            UserEditForm,
                            ProfileEditForm,
                            EMPTY_FIELD_ERROR, VALID_ERROR)
+from django.contrib.auth.models import User
+from account.models import Profile
 
 
 class LoginFormTest(TestCase):
@@ -40,6 +42,27 @@ class ProfileEditFormTest(TestCase):
         form = ProfileEditForm()
         self.assertIn('placeholder="Enter a date of birth"', form.as_p())
         self.assertIn('placeholder="Choose a user photo"', form.as_p())
+        self.assertIn('placeholder="Enter a telegram username (example: @nik)"', form.as_p())
+
+    def test_form_validation_for_wrong_telegram(self):
+        form = ProfileEditForm(data={'telegram': '@telegram_!!!'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['telegram'], ['Telegram username not correct.'])
+
+    def test_form_validation_with_duplicate_telegram(self):
+        user1 = User.objects.create(username='user1',
+                                    password='password')
+        profile_user1 = Profile.objects.create(owner=user1,
+                                               telegram='@telegram')
+
+        form = ProfileEditForm(data={'telegram': '@telegram'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['telegram'], ['Telegram username already exists.'])
+
+    def test_form_validation_for_wrong_data(self):
+        form = ProfileEditForm(data={'date_of_birth': '11.11.1111'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['date_of_birth'], [VALID_ERROR + 'data (01/21/2011 or 2011-01-21)'])
 
 
 class RegistrationUser(TestCase):
