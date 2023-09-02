@@ -100,7 +100,7 @@ class ProfileModelTest(TestCase):
         self.assertEqual(profile.telegram, self.telegram, profile)
 
     def test_profile_create_with_telegram_wrong_name(self):
-        telegrams = ['@rrr', '@rrr$%!', '@fsgafgDDDf!', '@asfgw56wF_п', 'q@asfgw56wF', '@asfgw56w F', '@a sfgw56w']
+        telegrams = ['rrr', 'rrr$%!', 'fsgafgDDDf!', 'asfgw56wF_п', 'q@asfgw56wF', 'asfgw56w F', 'a sfgw56w']
         for telegram in telegrams:
             with self.assertRaises(ValidationError) as e:
                 profile = Profile.objects.create(owner=User.objects.create(username=telegram,

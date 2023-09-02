@@ -125,7 +125,7 @@ class ProfileEditForm(forms.ModelForm):
     def clean_telegram(self):
         if data := self.cleaned_data['telegram']:
             import re
-            pattern = re.compile(r'^(?:@[a-zA-Z0-9_]{6,}$)')
+            pattern = re.compile(r'^(?:[a-zA-Z0-9_]{5,}$)')
             if not pattern.search(data):
                 raise forms.ValidationError("Telegram username not correct.")
 

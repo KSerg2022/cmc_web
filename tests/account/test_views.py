@@ -84,7 +84,7 @@ class EditTest(TestCase):
                                         email=self.user_email,
                                         password=self.user_password,
                                         )
-        self.telegram = '@telegram'
+        self.telegram = 'telegram'
         self.date_of_birth = '2011-01-21'
         self.profile = Profile.objects.create(owner=self.user,
                                               telegram=self.telegram,
@@ -150,7 +150,7 @@ class EditTest(TestCase):
         self.assertEqual(profile.telegram, self.telegram)
 
         url = reverse('edit')
-        new_telegram = '@telegram___'
+        new_telegram = 'telegram___'
         response = self.client.post(url,
                                     data={
                                           'telegram': new_telegram
@@ -183,7 +183,7 @@ class EditTest(TestCase):
         profile.refresh_from_db()
         self.assertNotEqual(profile.telegram, wrong_telegram)
 
-    def test_edit_POST_with_new_data(self):
+    def test_edit_POST_with_new_date_of_birth(self):
         self.client.force_login(self.user)
         profile = Profile.objects.get()
         self.assertEqual(profile.date_of_birth.isoformat(), self.date_of_birth)
@@ -202,7 +202,7 @@ class EditTest(TestCase):
         profile.refresh_from_db()
         self.assertEqual(profile.date_of_birth.strftime('%m/%d/%Y'), new_date_of_birth)
 
-    def test_edit_POST_with_wrong_data(self):
+    def test_edit_POST_with_wrong_date_of_birth(self):
         self.client.force_login(self.user)
         profile = Profile.objects.get()
         self.assertEqual(profile.date_of_birth.isoformat(), self.date_of_birth)

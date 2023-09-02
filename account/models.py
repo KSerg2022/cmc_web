@@ -7,7 +7,7 @@ from django.conf import settings
 def validate_telegram(value):
     from django.core.exceptions import ValidationError
     import re
-    pattern = re.compile(r'^(?:@[a-zA-Z0-9_]{6,}$)')
+    pattern = re.compile(r'^(?:[a-zA-Z0-9_]{5,}$)')
     if not pattern.search(value):
         raise ValidationError("Telegram username not correct.")
     return value
@@ -24,7 +24,7 @@ class Profile(models.Model):
                                 verbose_name="telegram user's name",
                                 unique=True,
                                 null=True,
-                                help_text='Example: @nik',
+                                help_text='Example: after "@" -  nik',
                                 blank=True,
                                 validators=[validate_telegram])
 

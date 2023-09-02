@@ -45,7 +45,7 @@ class ProfileEditFormTest(TestCase):
         self.assertIn('placeholder="Enter a telegram username (example: @nik)"', form.as_p())
 
     def test_form_validation_for_wrong_telegram(self):
-        form = ProfileEditForm(data={'telegram': '@telegram_!!!'})
+        form = ProfileEditForm(data={'telegram': 'telegram_!!!'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['telegram'], ['Telegram username not correct.'])
 
@@ -53,9 +53,9 @@ class ProfileEditFormTest(TestCase):
         user1 = User.objects.create(username='user1',
                                     password='password')
         profile_user1 = Profile.objects.create(owner=user1,
-                                               telegram='@telegram')
+                                               telegram='telegram')
 
-        form = ProfileEditForm(data={'telegram': '@telegram'})
+        form = ProfileEditForm(data={'telegram': 'telegram'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['telegram'], ['Telegram username already exists.'])
 
