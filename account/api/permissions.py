@@ -38,12 +38,17 @@ class IsAuthenticatedBot(BasePermission):
             request.user.profile.telegram == view.kwargs['tel_username'])
 
 
-class IsAuthenticatedAndOwnerOrIsStaff_for_user(BasePermission):
-    """
-    Allows access only to authenticated users and (current user or user is is_staff==True)
-    """
+class UserTelegramAuthentication(BaseAuthentication):
+    def authenticate(self, request):
+        # tel_username = request.parser_context['kwargs']['tel_username']
 
-    def has_object_permission(self, request, view, obj):
-        return bool(request.user
-                    and request.user.is_authenticated
-                    and (obj == request.user or request.user.is_staff))
+        tel_username = request.META.get('HTTP_TEL_USERNAME')
+        if not tel_username:
+            return None
+        try:
+            user = User.objects.get(profile__telegram=tel_username)
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such user')
+
+        if user and user.is_active:
+            return (user, None)
