@@ -3,6 +3,7 @@ version: '3.1'
 services:
   web_cmc:
     image: cmc:v3
+    hostname: web-cmc
     environment:
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
@@ -17,6 +18,8 @@ services:
     depends_on:
        - postgres
        - redis
+    networks:
+      - cmc_network
 
   postgres:
     container_name: postgres
@@ -28,6 +31,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/postgres_data:/var/lib/postgresql/data
+    networks:
+      - cmc_network
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -41,13 +46,15 @@ services:
       - postgres
     depends_on:
       - postgres
-
+    networks:
+      - cmc_network
 
   redis:
     image: redis:latest
     hostname: cache_redis
     restart: unless-stopped
-
+    networks:
+      - cmc_network
 
   worker:
     image: cmc:v3
@@ -66,6 +73,8 @@ services:
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
+    networks:
+      - cmc_network
 
   worker2:
     image: cmc:v3
@@ -84,6 +93,8 @@ services:
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
+    networks:
+      - cmc_network
 
   celery-beat:
     image: cmc:v3
@@ -102,7 +113,8 @@ services:
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
-
+    networks:
+      - cmc_network
 
   flower:
     image: cmc:v3
@@ -119,7 +131,8 @@ services:
       - worker
     ports:
       - "5555:5555"
-
+    networks:
+      - cmc_network
 
 
 #  firefox:
@@ -148,3 +161,7 @@ services:
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  cmc_network:
+    driver: bridge
