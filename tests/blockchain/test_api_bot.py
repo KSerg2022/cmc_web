@@ -34,12 +34,12 @@ class BlockchainPortfolioForBotBase(TestCase):
         self.admin = User.objects.create(username='User3',
                                          password='password1',
                                          is_staff=True)
-        self.telegram1 = '@telegram1'
-        self.telegram2 = '@telegram2'
-        self.telegram3 = '@admin'
-        self.profile_user1 = Profile.objects.create(owner=self.owner1,
+        self.telegram1 = 'telegram1'
+        self.telegram2 = 'telegram2'
+        self.telegram3 = 'admin'
+        self.profile_owner1 = Profile.objects.create(owner=self.owner1,
                                                     telegram=self.telegram1)
-        self.profile_user1 = Profile.objects.create(owner=self.owner2,
+        self.profile_owner2 = Profile.objects.create(owner=self.owner2,
                                                     telegram=self.telegram2)
         self.profile_admin = Profile.objects.create(owner=self.admin,
                                                     telegram=self.telegram3)
@@ -93,50 +93,52 @@ class BlockchainPortfolioForBotBase(TestCase):
 
 class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBotBase):
 
-    def setUp(self) -> None:
-        super(BlockchainPortfolioForBotApiTestCase, self).setUp()
-        self.client.force_login(user=self.owner1)
-
     def test_get(self):
+        self.client.logout()
         self.create_portfolio()
-        url = reverse(self.endpoint_list, args=(self.telegram1,))
-        response = self.client.get(url)
+        url = reverse(self.endpoint_list, )
+        headers = {'TEL_USERNAME': self.telegram1}
+        response = self.client.get(url, headers=headers)
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_1, self.portfolio_4])
 
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
         self.assertEqual(serializer_data, response.data['results'])
 
-    def test_get_not_owner_telegram(self):
+    def test_get_not_exist_telegram(self):
         self.create_portfolio()
-        url = reverse(self.endpoint_list, args=('@telegram4',))
-        response = self.client.get(url)
+        url = reverse(self.endpoint_list, )
+        headers = {'TEL_USERNAME': 'telegram4'}
+        response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
-        self.assertEqual({'detail': ErrorDetail(string='You do not have permission to perform this action.',
-                                                code='permission_denied')}, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='No such user', code='authentication_failed')}, response.data)
 
     def test_get_ordering_blockchain(self):
         self.create_portfolio()
-        url = reverse(self.endpoint_list,  args=(self.telegram1,))
-        response = self.client.get(url, data={'ordering': 'blockchain__name'})
+        url = reverse(self.endpoint_list, )
+        headers = {'TEL_USERNAME': self.telegram1}
+        response = self.client.get(url,
+                                   headers=headers,
+                                   data={'ordering': 'blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_1, self.portfolio_4])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-        response = self.client.get(url, data={'ordering': '-blockchain__name'})
+        response = self.client.get(url,
+                                   headers=headers,
+                                   data={'ordering': '-blockchain__name'})
 
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_4, self.portfolio_1])
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(serializer_data, response.data)
+        self.assertEqual(serializer_data, response.data['results'])
 
     def test_create(self):
         self.assertEqual(0, Portfolio.objects.all().count())
-
-        url = reverse(self.endpoint_list,  args=(self.telegram1,))
+        url = reverse(self.endpoint_list, )
         data = {
             'owner': 1,
             'slug': '_',
@@ -145,10 +147,13 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
             'currencies': self.currencies
         }
         json_data = json.dumps(data)
-        response = self.client.post(url, data=json_data, content_type='application/json')
+        headers = {'TEL_USERNAME': self.telegram1}
+        response = self.client.post(url,
+                                    headers=headers,
+                                    data=json_data, content_type='application/json')
 
         self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code, response.data)
-        self.assertEqual({'detail':  ErrorDetail(string='Method "POST" not allowed.', code='method_not_allowed')},
+        self.assertEqual({'detail': ErrorDetail(string='Method "POST" not allowed.', code='method_not_allowed')},
                          response.data)
 
 
@@ -166,12 +171,12 @@ class BlockchainDataForBot(APITestCase, TestCase):
                                               password='password2')
         self.admin = User.objects.create_superuser(username='Admin',
                                                    password='password2')
-        self.telegram1 = '@telegram1'
-        self.telegram2 = '@telegram2'
-        self.telegram3 = '@admin'
+        self.telegram1 = 'telegram1'
+        self.telegram2 = 'telegram2'
+        self.telegram3 = 'admin'
         self.profile_user1 = Profile.objects.create(owner=self.user1,
                                                     telegram=self.telegram1)
-        self.profile_user1 = Profile.objects.create(owner=self.user2,
+        self.profile_user2 = Profile.objects.create(owner=self.user2,
                                                     telegram=self.telegram2)
         self.profile_admin = Profile.objects.create(owner=self.admin,
                                                     telegram=self.telegram3)
@@ -189,19 +194,29 @@ class BlockchainDataForBot(APITestCase, TestCase):
         User.objects.all().delete()
 
     def test_get_owner(self):
-        self.client.force_login(user=self.user1)
-        url = reverse(self.endpoint, args=(self.blockchain.id, self.telegram1, ))
-        response = self.client.get(url)
+        url = reverse(self.endpoint, )
+        headers = {'TEL_USERNAME': self.telegram1,
+                   'USER_PORTFOLIO_ID': self.blockchain.id}
+        response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
-        self.assertEqual(self.blockchain.name, list(response.data.keys())[0])
+        self.assertEqual(self.blockchain.name, list(response.data.keys())[0], response.data)
         self.assertEqual(len(self.currencies), len(list(response.data.values())[0]))
 
-    def test_get_not_owner(self):
-        self.client.force_login(user=self.user2)
-        url = reverse(self.endpoint, args=(self.blockchain.id, self.telegram2, ))
-        response = self.client.get(url)
+    def test_get_not_exist_user(self):
+        url = reverse(self.endpoint, )
+        headers = {'TEL_USERNAME': 'telegram',
+                   'USER_PORTFOLIO_ID': self.blockchain.id}
+        response = self.client.get(url, headers=headers)
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
+        self.assertEqual({'detail': ErrorDetail(string='No such user', code='authentication_failed')}, response.data)
+
+    def test_get_owner_and_not_exist_portfolio(self):
+        url = reverse(self.endpoint, )
+        headers = {'TEL_USERNAME': self.telegram1,
+                   'USER_PORTFOLIO_ID': 25}
+        response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
         self.assertEqual({'detail': ErrorDetail(string='Not found.', code='not_found')}, response.data)
-

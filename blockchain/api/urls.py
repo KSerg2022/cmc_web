@@ -17,9 +17,10 @@ urlpatterns = [
     path('api/send-email/data/<str:portfolio>/', SendEmailData.as_view(),
          name='send-email-data'),
 
-    path('api/bot/blockchain-portfolio/<str:tel_username>/', BlockchainPortfolioForBot.as_view(),
+
+    path('api/bot/blockchain-portfolio/', BlockchainPortfolioForBot.as_view(),
          name='portfolio-bot'),
-    path('api/bot/blockchain/data/<int:blockchain_id>/<str:tel_username>/', BlockchainDataForBot.as_view(),
+    path('api/bot/blockchain-portfolio-data/', BlockchainDataForBot.as_view(),
          name='blockchain-data-bot'),
 
     path('', include(router.urls)),
