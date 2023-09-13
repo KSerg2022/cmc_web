@@ -18,7 +18,11 @@ class BlockchainPortfolioForBot(generics.ListAPIView):
     ordering_fields = ['blockchain__name']
 
     def get(self, request, *args, **kwargs):
-        """headers = {'TEL_USERNAME': tel_username}"""
+        """headers = {'TEL-USERNAME': telegram_username,
+               'BOT-NAME': 'BOTNAME',
+               'USER-NAME': 'USERNAME',
+               'CHAT-ID': str(chat_id)
+               }"""
         user = get_object_or_404(User, profile__telegram=request.META.get('HTTP_TEL_USERNAME'))
         portfolio = Portfolio.objects.filter(owner=user.id)
         portfolio = BlockchainPortfolioSerializer(portfolio, many=True)
@@ -32,8 +36,12 @@ class BlockchainDataForBot(generics.ListAPIView):
     permission_classes = [IsAuthenticatedBot]
 
     def get(self, request, *args, **kwargs):
-        """headers = {'TEL_USERNAME': tel_username},
-                       'USER_PORTFOLIO_ID': user_portfolio_id}"""
+        """headers = {'TEL-USERNAME': telegram_username,
+                       'USER-PORTFOLIO-ID': exchanger_id,
+                       'BOT-NAME': 'BOTNAME',
+                       'USER-NAME': 'USERNAME',
+                       'CHAT-ID': str(chat_id)
+                       }"""
         user = get_object_or_404(User, profile__telegram=request.META.get('HTTP_TEL_USERNAME'))
         portfolio = get_object_or_404(Portfolio,
                                       owner=user.id,

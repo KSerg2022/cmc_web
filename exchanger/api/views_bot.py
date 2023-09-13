@@ -20,7 +20,11 @@ class ExchangerPortfolioForBot(generics.ListAPIView):
     ordering_fields = ['exchanger__name']
 
     def get(self, request, *args, **kwargs):
-        """headers = {'TEL_USERNAME': tel_username}"""
+        """headers = {'TEL-USERNAME': telegram_username,
+                       'BOT-NAME': 'BOTNAME',
+                       'USER-NAME': 'USERNAME',
+                       'CHAT-ID': str(chat_id)
+                       }"""
         user = get_object_or_404(User, profile__telegram=request.META.get('HTTP_TEL_USERNAME'))
         portfolio = ExPortfolio.objects.filter(owner=user.id)
         portfolio = ExPortfolioSerializer(portfolio, many=True)
@@ -34,8 +38,12 @@ class ExchangerDataForBot(generics.ListAPIView):
     permission_classes = [IsAuthenticatedBot]
 
     def get(self, request, *args, **kwargs):
-        """headers = {'TEL_USERNAME': tel_username},
-                       'USER_PORTFOLIO_ID': user_portfolio_id}"""
+        """headers = {'TEL-USERNAME': telegram_username,
+                       'USER-PORTFOLIO-ID': exchanger_id,
+                       'BOT-NAME': 'BOTNAME',
+                       'USER-NAME': 'USERNAME',
+                       'CHAT-ID': str(chat_id)
+                       }"""
         user = get_object_or_404(User, profile__telegram=request.META.get('HTTP_TEL_USERNAME'))
         portfolio = get_object_or_404(ExPortfolio,
                                       owner=user.id,
@@ -51,7 +59,11 @@ class AllDataForBot(generics.ListAPIView):
     permission_classes = [IsAuthenticatedBot]
 
     def get(self, request, *args, **kwargs):
-        """headers = {'TEL_USERNAME': tel_username}"""
+        """headers = {'TEL-USERNAME': telegram_username,
+                       'BOT-NAME': 'BOTNAME',
+                       'USER-NAME': 'USERNAME',
+                       'CHAT-ID': str(chat_id)
+                       }"""
         user = get_object_or_404(User, profile__telegram=request.META.get('HTTP_TEL_USERNAME'))
         if user:
             user_portfolios_data = check_cache_user_portfolios_data(user.id)
