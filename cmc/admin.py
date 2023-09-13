@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Cryptocurrency
+from .models import Cryptocurrency, TelegramBot
 
 
 @admin.register(Cryptocurrency)
@@ -11,3 +11,7 @@ class CryptocurrencyAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     ordering = ('name', 'symbol')
 
+
+@admin.register(TelegramBot)
+class TelegramBotAdmin(admin.ModelAdmin):
+    list_display = ('bot_name', 'username', 'bot_token', 'chat_id', 'hash_password')
