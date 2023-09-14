@@ -12,11 +12,20 @@ from account.models import Profile
 from blockchain.api.serializers import BlockchainPortfolioSerializer
 from blockchain.models import Blockchain, Portfolio
 from blockchain.fixtures.handlers.load_blockchains_to_db import dump_to_db_blockchain
+from cmc.models import TelegramBot
 
 
 class BlockchainPortfolioForBotBase(TestCase):
 
     def setUp(self) -> None:
+        self.bot_name = 'bot_name',
+        self.username = 'username',
+        self.bot_token = 'bot_token',
+        self.chat_id = '123456'
+        self.telegram = TelegramBot.objects.create(bot_name=self.bot_name,
+                                                   username=self.username,
+                                                   bot_token=self.bot_token,
+                                                   chat_id=self.chat_id)
         self.name = 'Blockchain test'
         self.host = 'https://api.bscscan.com/api'
         self.api_key = 'api_key'
@@ -97,7 +106,11 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
         self.client.logout()
         self.create_portfolio()
         url = reverse(self.endpoint_list, )
-        headers = {'TEL_USERNAME': self.telegram1}
+        headers = {'TEL-USERNAME': self.telegram1,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                   }
         response = self.client.get(url, headers=headers)
         serializer_data = self.get_serializer_data(url,
                                                    portfolio=[self.portfolio_1, self.portfolio_4])
@@ -108,7 +121,11 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
     def test_get_not_exist_telegram(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list, )
-        headers = {'TEL_USERNAME': 'telegram4'}
+        headers = {'TEL_USERNAME': 'telegram4',
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
@@ -117,7 +134,11 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
     def test_get_ordering_blockchain(self):
         self.create_portfolio()
         url = reverse(self.endpoint_list, )
-        headers = {'TEL_USERNAME': self.telegram1}
+        headers = {'TEL_USERNAME': self.telegram1,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.get(url,
                                    headers=headers,
                                    data={'ordering': 'blockchain__name'})
@@ -147,7 +168,11 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
             'currencies': self.currencies
         }
         json_data = json.dumps(data)
-        headers = {'TEL_USERNAME': self.telegram1}
+        headers = {'TEL_USERNAME': self.telegram1,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.post(url,
                                     headers=headers,
                                     data=json_data, content_type='application/json')
@@ -160,6 +185,14 @@ class BlockchainPortfolioForBotApiTestCase(APITestCase, BlockchainPortfolioForBo
 class BlockchainDataForBot(APITestCase, TestCase):
 
     def setUp(self) -> None:
+        self.bot_name = 'bot_name',
+        self.username = 'username',
+        self.bot_token = 'bot_token',
+        self.chat_id = '123456'
+        self.telegram = TelegramBot.objects.create(bot_name=self.bot_name,
+                                                   username=self.username,
+                                                   bot_token=self.bot_token,
+                                                   chat_id=self.chat_id)
         dump_to_db_blockchain()
         self.wallet = os.environ.get('WALLET_ADDRESS')
         self.currencies = {"DIA": "0x99956D38059cf7bEDA96Ec91Aa7BB2477E0901DD",
@@ -196,7 +229,11 @@ class BlockchainDataForBot(APITestCase, TestCase):
     def test_get_owner(self):
         url = reverse(self.endpoint, )
         headers = {'TEL_USERNAME': self.telegram1,
-                   'USER_PORTFOLIO_ID': self.blockchain.id}
+                   'USER_PORTFOLIO_ID': self.blockchain.id,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code, response.data)
@@ -206,7 +243,11 @@ class BlockchainDataForBot(APITestCase, TestCase):
     def test_get_not_exist_user(self):
         url = reverse(self.endpoint, )
         headers = {'TEL_USERNAME': 'telegram',
-                   'USER_PORTFOLIO_ID': self.blockchain.id}
+                   'USER_PORTFOLIO_ID': self.blockchain.id,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code, response.data)
@@ -215,7 +256,11 @@ class BlockchainDataForBot(APITestCase, TestCase):
     def test_get_owner_and_not_exist_portfolio(self):
         url = reverse(self.endpoint, )
         headers = {'TEL_USERNAME': self.telegram1,
-                   'USER_PORTFOLIO_ID': 25}
+                   'USER_PORTFOLIO_ID': 25,
+                   'BOT-NAME': self.bot_name,
+                   'USER-NAME': self.username,
+                   'CHAT-ID': str(self.chat_id)
+                  }
         response = self.client.get(url, headers=headers)
 
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code, response.data)
