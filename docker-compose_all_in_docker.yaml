@@ -5,6 +5,7 @@ services:
     image: cmc:v3
     hostname: web-cmc
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
@@ -58,71 +59,78 @@ services:
 
   worker:
     image: cmc:v3
+    volumes:
+      - .:/cmc
     restart: unless-stopped
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    networks:
+      - cmc_network
     hostname: worker
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
-    volumes:
-      - .:/cmc
     links:
       - redis
     depends_on:
       - redis
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_NAME=${POSTGRES_DB}
-    networks:
-      - cmc_network
 
   worker2:
     image: cmc:v3
+    volumes:
+      - .:/cmc
     restart: unless-stopped
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    networks:
+      - cmc_network
     hostname: worker2
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
-    volumes:
-      - .:/cmc
     links:
       - redis
     depends_on:
       - redis
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_NAME=${POSTGRES_DB}
-    networks:
-      - cmc_network
 
   celery-beat:
     image: cmc:v3
-    restart: unless-stopped
-    hostname: worker2
-    entrypoint: celery
-    command: -A celery_app.app beat --loglevel=info
     volumes:
       - .:/cmc
-    links:
-      - redis
-    depends_on:
-      - redis
+    restart: unless-stopped
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
     networks:
       - cmc_network
+    hostname: worker2
+    entrypoint: celery
+    command: -A celery_app.app beat --loglevel=info
+    links:
+      - redis
+    depends_on:
+      - redis
 
   flower:
     image: cmc:v3
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+    volumes:
+      - .:/cmc
+    networks:
+      - cmc_network
     hostname: flower
     entrypoint: celery
     command: -A celery_app.app flower
-    volumes:
-      - .:/cmc
     links:
       - redis
       - worker
@@ -131,8 +139,6 @@ services:
       - worker
     ports:
       - "5555:5555"
-    networks:
-      - cmc_network
 
 
 #  firefox:
