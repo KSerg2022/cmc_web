@@ -5,7 +5,7 @@ from django.core.mail import BadHeaderError
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 
-from core.settings import BASE_DIR
+from django.conf import settings
 
 from celery import shared_task
 
@@ -78,7 +78,7 @@ def sending_XLSX_by_email(user_id, path_to_file, portfolio):
         user_portfolios_data = check_cache_user_portfolios_data(user_id)
         save_all_to_xlsx_file(user_id, user_portfolios_data, portfolio_name=ALL_PORTFOLIOS)
 
-    msg.attach_file(str(BASE_DIR) + path_to_file, mimetype='text/*')
+    msg.attach_file(str(settings.BASE_DIR) + path_to_file, mimetype='text/*')
     try:
         msg.send()
     except BadHeaderError:
@@ -111,7 +111,7 @@ def sending_PDF_by_email(user_id, path_to_file, portfolio):
         user_portfolios_data = check_cache_user_portfolios_data(user_id)
         pdf = get_pdf(user_portfolios_data)
 
-    path_to_file = str(BASE_DIR) + path_to_file
+    path_to_file = str(settings.BASE_DIR) + path_to_file
     with open(path_to_file, 'wb') as f:
         f.write(pdf)
     msg.attach_file(path_to_file, mimetype='text/*')
