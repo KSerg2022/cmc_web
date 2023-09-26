@@ -5,19 +5,20 @@ RUN apt-get update && apt-get -y upgrade
 
 RUN apt-get install -y wkhtmltopdf && apt-get install -y xvfb
 
-RUN echo "deb http://deb.debian.org/debian/ unstable main contrib non-free" >> /etc/apt/sources.list.d/debian.list
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends firefox
+RUN echo "deb http://deb.debian.org/debian/ unstable main contrib non-free" >> /etc/apt/sources.list.d/debian.list \
+    && apt-get update && apt-get install -y --no-install-recommends firefox
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY . /cmc
 WORKDIR /cmc
+COPY requirements.txt /cmc
+RUN pip install -r /cmc/requirements.txt
+
+COPY . /cmc
 
 EXPOSE 8000
 
-RUN pip install -r /cmc/requirements.txt
 
 RUN adduser --disabled-password cmc-user
 
