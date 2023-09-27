@@ -1,0 +1,21 @@
+FROM python:3.10
+
+
+RUN apt-get update && apt-get -y upgrade
+
+RUN apt-get install -y wkhtmltopdf && apt-get install -y xvfb
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /cmc
+COPY requirements_prod.txt /cmc
+RUN pip install -r /cmc/requirements_prod.txt
+
+COPY . /cmc
+
+EXPOSE 8000
+
+#RUN adduser --disabled-password cmc-user
+#
+#USER cmc-user
