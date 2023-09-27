@@ -12,6 +12,8 @@ class ExchangerSerializer(serializers.ModelSerializer):
 
 
 class ExPortfolioSerializer(serializers.ModelSerializer):
+    # owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = ExPortfolio
         fields = '__all__'

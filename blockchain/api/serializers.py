@@ -10,6 +10,8 @@ class BlockchainSerializer(serializers.ModelSerializer):
 
 
 class BlockchainPortfolioSerializer(serializers.ModelSerializer):
+    # owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Portfolio
         fields = '__all__'
