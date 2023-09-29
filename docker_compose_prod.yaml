@@ -4,7 +4,7 @@ x-function: &function
   build:
     context: .
     dockerfile: Dockerfile_prod
-  image: cmc:v1
+  image: cmc:v1.0
   volumes:
     - .:/cmc
   restart: unless-stopped
