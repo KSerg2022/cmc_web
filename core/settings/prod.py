@@ -9,7 +9,8 @@ ADMINS = [
     ('Sergey K', 'koshevoys@gmain.com'),
 ]
 
-ALLOWED_HOSTS = ['*', '0.0.0.0.']
+# ALLOWED_HOSTS = ['0.0.0.0.', 'www.cmc.com', 'cmc.com', 'localhost']
+ALLOWED_HOSTS = ['*', 'www.cmc.com', 'cmc.com', 'localhost']
 
 
 EMAIL_HOST = 'smtp.gmail.com'

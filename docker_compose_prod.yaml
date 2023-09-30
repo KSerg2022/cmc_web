@@ -4,7 +4,7 @@ x-function: &function
   build:
     context: .
     dockerfile: Dockerfile_prod
-  image: cmc:v1.0
+  image: cmc:v1.01-gunicorn-nginx
   volumes:
     - .:/cmc
   restart: unless-stopped
@@ -55,14 +55,31 @@ services:
       - cmc_network
 
 
+  nginx:
+    build: ./config/nginx
+    volumes:
+      - ./static:/cmc/static
+      - ./media:/cmc/media
+    ports:
+      - "9000:9000"
+    depends_on:
+      - web_cmc
+    networks:
+      - cmc_network
+
+
   web_cmc:
     <<: *function
+    volumes:
+      - .:/cmc
+      - ./static:/cmc/static
+      - ./media:/cmc/media
+#      - ./config/nginx/nginx.conf:/cmc/nginx/
     hostname: web-cmc
     ports:
       - "8000:8000"
     command: [ "./wait-for-it.sh", "postgres:5432", "--",
-               "python", "manage.py", "runserver",
-               "0.0.0.0:8000" ]
+               "gunicorn", "core.wsgi:application", "--bind", "localhost:8000"]
 
     depends_on:
       - redis
@@ -116,6 +133,8 @@ services:
 volumes:
   postgres_data:
     driver: local
+  static:
+  media:
 
 networks:
   cmc_network:
