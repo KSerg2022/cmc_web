@@ -19,12 +19,14 @@ class ExchangerBase:
                 response = fn()
         except (Exception, *exception) as e:
             # print(f'{exchanger.upper()} -- {e}')
+            print('1~~~~~exchanger~~~~~', e)
             return {'error': f'"{error_label.upper()}" - ERROR - "{ERROR_MSG}"'}
-
 
         try:
             if response.status_code != 200:
+                print('2~~~~~exchanger~~~~~', response)
                 return {'error': f'"{error_label.upper()}" - ERROR - "{ERROR_MSG}"'}
         except AttributeError as e:
+            print('3~~~~~exchanger~~~~~', e)
             pass
         return response
