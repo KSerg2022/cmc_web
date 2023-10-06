@@ -36,7 +36,7 @@ class ExPortfolioViewSet(viewsets.ModelViewSet):
 
 
 class ExchangerData(APIView):
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticatedAndOwner]
 
     def get(self, request, exchanger_id, format=None):
@@ -49,7 +49,7 @@ class ExchangerData(APIView):
 
 
 class AllData(APIView):
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticatedAndOwner]
 
     def get(self, request, format=None):

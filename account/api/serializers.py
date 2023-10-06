@@ -13,6 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    # owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Profile
         fields = '__all__'

@@ -21,9 +21,10 @@ def get_exchanger_portfolios(user):
     else:
         try:
             user = User.objects.get(id=user.id)
+            user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
         except ObjectDoesNotExist:
             return 0
-        user_exchangers = ExPortfolio.objects.filter(owner=user.id).prefetch_related('exchanger')
+
         exchangers = [user_exchanger.exchanger for user_exchanger in user_exchangers]
         cache.set(f'user_{user.id}_exchangers', exchangers, TIME_CACHES_DATA)
     return exchangers
@@ -35,8 +36,11 @@ def total_coins():
     if cache_total_coins:
         coins = cache_total_coins
     else:
-        coins = Cryptocurrency.objects.all().count()
-        cache.set('total_coins', coins, TIME_CACHES_COINS)
+        try:
+            coins = Cryptocurrency.objects.all().count()
+            cache.set('total_coins', coins, TIME_CACHES_COINS)
+        except ObjectDoesNotExist:
+            return 0
     return coins
 
 
@@ -46,8 +50,11 @@ def total_users():
     if cache_total_users:
         qty_users = cache_total_users
     else:
-        qty_users = User.objects.all().count()
-        cache.set('total_users', qty_users, TIME_CACHES_USERS)
+        try:
+            qty_users = User.objects.all().count()
+            cache.set('total_users', qty_users, TIME_CACHES_USERS)
+        except ObjectDoesNotExist:
+            return 0
     return qty_users
 
 
@@ -57,8 +64,11 @@ def total_exchanger_portfolios():
     if cache_total_exchanger_portfolios:
         qty_exchanger_portfolios = cache_total_exchanger_portfolios
     else:
-        qty_exchanger_portfolios = ExPortfolio.objects.all().count()
-        cache.set('total_exchanger_portfolios', qty_exchanger_portfolios, TIME_CACHES_DATA)
+        try:
+            qty_exchanger_portfolios = ExPortfolio.objects.all().count()
+            cache.set('total_exchanger_portfolios', qty_exchanger_portfolios, TIME_CACHES_DATA)
+        except ObjectDoesNotExist:
+            return 0
     return qty_exchanger_portfolios
 
 

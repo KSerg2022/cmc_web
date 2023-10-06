@@ -57,12 +57,15 @@ class Base:
                                         headers=headers).json()
             try:
                 if response.get('message', '') == 'NOTOK' or 'error' in response:
+                    print('1~~~~blockchain~~~~~', response)
+                    # raise ValueError(f"{age} - {text.err_age}")
                     return {'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG}"'}
             except AttributeError:
                 return response
 
         except RequestException as e:
             # print(f"Ошибка подключения: {str(e)}")
+            print('2~~~~blockchain~~~~~', e)
             return {'error': f'"{self.blockchain.upper()}" - ERROR - "{e}"'}
         return response
 

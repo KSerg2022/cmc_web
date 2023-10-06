@@ -553,6 +553,7 @@ class ExchangerDataApiTestCase(APITestCase, TestCase):
                                               password='password2')
         self.admin = User.objects.create_superuser(username='Admin',
                                                    password='password2')
+
         self.exchanger = Exchanger.objects.get(id=1)
         self.portfolio1 = ExPortfolio.objects.create(owner=self.user1,
                                                      exchanger=self.exchanger,

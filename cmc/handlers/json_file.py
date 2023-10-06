@@ -2,8 +2,8 @@
 import os
 import json
 import datetime
+
 from django.conf import settings
-from core.settings import BASE_DIR
 from pathlib import Path
 
 base_dir = Path(__file__).parent
@@ -14,7 +14,7 @@ class JsonFile:
     def __init__(self):
         self.time_stamp = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
         # self.data_dir = base_dir / 'data'
-        self.data_dir = BASE_DIR / 'cmc' / 'fixtures'
+        self.data_dir = settings.BASE_DIR / 'cmc' / 'fixtures'
 
     def wright_data_to_json(self, data: list[dict] | dict[dict], filename):
         """Writing to file human-readable data."""

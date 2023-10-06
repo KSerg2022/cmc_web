@@ -8,10 +8,6 @@ EMPTY_FIELD_ERROR = "You can't have an empty field - "
 VALID_ERROR = 'Enter a valid - '
 
 
-# class LoginForm(forms.Form):
-#     username = forms.CharField()
-#     password = forms.CharField(widget=forms.PasswordInput)
-
 class LoginForm(forms.ModelForm):
     class Meta:
         model = User
@@ -113,9 +109,27 @@ class UserEditForm(forms.ModelForm):
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['date_of_birth', 'photo']
+        fields = ['telegram', 'date_of_birth', 'photo']
 
         widgets = {
+            'telegram': forms.DateInput(attrs={'placeholder': "Enter a telegram username (example: @nik)"}),
             'date_of_birth': forms.DateInput(attrs={'placeholder': "Enter a date of birth"}),
             'photo': forms.FileInput(attrs={'placeholder': "Choose a user photo"}),
         }
+
+        error_messages = {
+            'date_of_birth': {'invalid': VALID_ERROR + 'data (01/21/2011 or 2011-01-21)'},
+            # 'photo': {'invalid': VALID_ERROR + 'data. Format - 11/11/2011'},
+        }
+
+    def clean_telegram(self):
+        if data := self.cleaned_data['telegram']:
+            import re
+            pattern = re.compile(r'^(?:[a-zA-Z0-9_]{5,}$)')
+            if not pattern.search(data):
+                raise forms.ValidationError("Telegram username not correct.")
+
+            qs = User.objects.exclude(id=self.instance.id).filter(profile__telegram=data)
+            if qs.exists():
+                raise forms.ValidationError("Telegram username already exists.")
+        return data

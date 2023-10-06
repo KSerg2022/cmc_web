@@ -11,7 +11,7 @@ class TestPasswordReset(BaseTest):
 
     def setUp(self) -> None:
         super(TestPasswordReset, self).setUp()
-        # self.live_server_url = self.live_server_url + reverse('login')
+        self.live_server_url = self.live_server_url + reverse('login')
 
     def signup_and_goto_page_login(self):
         self.browser.get(self.live_server_url)

@@ -1,8 +1,9 @@
 import json
-from unittest import TestCase
 
+from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
@@ -322,6 +323,8 @@ class UserPortfolioBase(TestCase):
         self.profile_date_of_birth1 = '2001-01-01'
         self.profile_date_of_birth2 = '2002-02-02'
         self.profile_photo = '/data_for_test/black.jpg'
+        self.telegram1 = '@telegram1'
+        self.telegram2 = '@telegram2'
 
         self.endpoint_list = 'profile-list'
         self.endpoint_detail = 'profile-detail'
@@ -332,9 +335,11 @@ class UserPortfolioBase(TestCase):
 
     def create_profile(self):
         self.profile1 = Profile.objects.create(owner=self.user1,
+                                               telegram=self.telegram1,
                                                date_of_birth=self.profile_date_of_birth1,
                                                photo=self.profile_photo)
         self.profile2 = Profile.objects.create(owner=self.user2,
+                                               telegram=self.telegram2,
                                                date_of_birth=self.profile_date_of_birth2,
                                                photo=self.profile_photo)
 
@@ -588,6 +593,7 @@ class ProfileSerializerTestCase(UserPortfolioBase):
                 'id': self.profile1.id,
                 'date_of_birth': self.profile_date_of_birth1,
                 'photo': 'http://testserver/media' + self.profile_photo,
+                'telegram': self.telegram1,
                 'owner': self.user1.id,
             },
         ]

@@ -173,6 +173,8 @@ class TestExOkx(TestCase, TestBase):
 
     def test_normalize_data(self):
         self._check_data_in_test_base(
+            self.__class__,
+            self.test_normalize_data,
             self.exchanger._normalize_data(self.currencies_trading,
                                            self.currencies_funding))
 

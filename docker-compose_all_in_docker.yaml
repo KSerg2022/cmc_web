@@ -2,8 +2,10 @@ version: '3.1'
 
 services:
   web_cmc:
-    image: cmc:v1
+    image: cmc:v3
+    hostname: web-cmc
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
@@ -17,6 +19,8 @@ services:
     depends_on:
        - postgres
        - redis
+    networks:
+      - cmc_network
 
   postgres:
     container_name: postgres
@@ -28,6 +32,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./data/postgres_data:/var/lib/postgresql/data
+    networks:
+      - cmc_network
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -41,76 +47,90 @@ services:
       - postgres
     depends_on:
       - postgres
-
+    networks:
+      - cmc_network
 
   redis:
     image: redis:latest
     hostname: cache_redis
     restart: unless-stopped
-
+    networks:
+      - cmc_network
 
   worker:
-    image: cmc:v1
+    image: cmc:v3
+    volumes:
+      - .:/cmc
     restart: unless-stopped
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    networks:
+      - cmc_network
     hostname: worker
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
-    volumes:
-      - .:/cmc
     links:
       - redis
     depends_on:
       - redis
+
+  worker2:
+    image: cmc:v3
+    volumes:
+      - .:/cmc
+    restart: unless-stopped
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
-
-  worker2:
-    image: cmc:v1
-    restart: unless-stopped
+    networks:
+      - cmc_network
     hostname: worker2
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
-    volumes:
-      - .:/cmc
     links:
       - redis
     depends_on:
       - redis
+
+  celery-beat:
+    image: cmc:v3
+    volumes:
+      - .:/cmc
+    restart: unless-stopped
     environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
       - DB_HOST=postgres
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
-
-  celery-beat:
-    image: cmc:v1
-    restart: unless-stopped
+    networks:
+      - cmc_network
     hostname: worker2
     entrypoint: celery
     command: -A celery_app.app beat --loglevel=info
-    volumes:
-      - .:/cmc
     links:
       - redis
     depends_on:
       - redis
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_NAME=${POSTGRES_DB}
-
 
   flower:
-    image: cmc:v1
+    image: cmc:v3
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.dev
+    volumes:
+      - .:/cmc
+    networks:
+      - cmc_network
     hostname: flower
     entrypoint: celery
     command: -A celery_app.app flower
-    volumes:
-      - .:/cmc
     links:
       - redis
       - worker
@@ -120,6 +140,34 @@ services:
     ports:
       - "5555:5555"
 
+
+#  firefox:
+#    image: selenium/node-firefox:4.11.0-20230801
+#    shm_size: 2gb
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - SE_EVENT_BUS_HOST=selenium-hub
+#      - SE_EVENT_BUS_PUBLISH_PORT=4442
+#      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+#    ports:
+#      - "5901:5900"
+#
+#  selenium-hub:
+#    image: selenium/hub:4.11.0-20230801
+#    container_name: selenium-hub
+#    ports:
+#      - "4442:4442"
+#      - "4443:4443"
+#      - "4444:4444"
+
+#self.browser = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
+#                                options=self.firefox_options)
+
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  cmc_network:
+    driver: bridge

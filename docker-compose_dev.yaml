@@ -1,0 +1,122 @@
+version: '3.7'
+
+x-function: &function
+  build:
+    context: .
+  image: cmc:v3
+  restart: unless-stopped
+  env_file:
+    - .env
+  environment:
+    - DJANGO_SETTINGS_MODULE=core.settings.dev
+  networks:
+    - cmc_network
+
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15.1
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data
+    networks:
+      - cmc_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4
+    ports:
+      - "3333:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    networks:
+      - cmc_network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: cache_redis
+    restart: unless-stopped
+    networks:
+      - cmc_network
+
+  web_cmc:
+    <<: *function
+    hostname: web-cmc
+    volumes:
+      - static_volume:/cmc_pr/static
+      - media_volume:/cmc_pr/media
+    ports:
+      - "8000:8000"
+    command: [ "./wait-for-it.sh", "postgres:5432", "--",
+               "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+    depends_on:
+      - redis
+      - postgres
+
+
+  worker:
+    <<: *function
+    container_name: worker1
+    hostname: worker1
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  worker2:
+    <<: *function
+    container_name: worker2
+    hostname: worker2
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  celery-beat:
+    <<: *function
+    container_name: celery_beat
+    hostname: celery-beat
+    entrypoint: celery
+    command: -A celery_app.app beat --loglevel=info
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  flower:
+    <<: *function
+    container_name: flower
+    hostname: flower
+    entrypoint: celery
+    command: -A celery_app.app flower
+    links:
+      - redis
+      - worker
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "5555:5555"
+
+volumes:
+  postgres_data:
+    driver: local
+  static_volume:
+  media_volume:
+
+networks:
+  cmc_network:
+    driver: bridge

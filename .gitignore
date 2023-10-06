@@ -172,10 +172,15 @@ help
 media/
 **/migrations/**
 **/logo_axchangers/**
-/exchanger/fixtures/portfolio.json
+/exchanger/fixtures/exportfolio.json
 /exchanger/fixtures/blockchain.json
 /cmc/fixtures/cryptocurrency.json
 /blockchain/api/help.py
 /exchanger/fixtures/exchanger.json
 /blockchain/fixtures/portfolio.json
 /blockchain/fixtures/blockchain.json
+/data/fixtures/blockchain.json
+/data/fixtures/portfolio.json
+/data/fixtures/cryptocurrency.json
+/data/fixtures/exchanger.json
+/data/fixtures/exportfolio.json

@@ -3,6 +3,10 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
+{% load exchanger_tags %}
+{% load blockchain_tags %}
+
+
 {% load static %}
 
 <html lang="{{ LANGUAGE_CODE|default:'en_us' }}">
@@ -32,6 +36,10 @@
 </head>
 
 <body>
+    {% get_exchanger_portfolios user as exchanger_portfolios %}
+    {% get_blockchain_portfolios user as blockchain_portfolios %}
+    {% get_path_to_users_xlsx_file_all user as path_to_users_xlsx_file_all %}
+
 {% include 'include/navbar.html' %}
 
 <main role="main">

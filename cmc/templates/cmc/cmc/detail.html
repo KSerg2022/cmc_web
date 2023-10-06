@@ -1,13 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_index.html" %}
 
 {% block bootstrap5_title %}detail_crypto{% endblock %}
 
 {% block bootstrap5_extra_head %}
 {% endblock bootstrap5_extra_head %}
 
-{% block bootstrap5_content %}
-
-    <div class="height100 main text-center">
+{% block main_content %}
 
         <div class="main_content">
 
@@ -67,13 +65,8 @@
             </div>
         </div>
 
-        <aside class="sidebar">
-            <div class="">
-                <h2>Sidebar.</h2>
-            </div>
+{% endblock main_content %}
 
-        </aside>
 
-    </div>
-
-{% endblock %}
+{% block sidebar %}
+{% endblock sidebar %}

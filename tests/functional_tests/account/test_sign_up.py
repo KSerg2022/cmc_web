@@ -20,7 +20,6 @@ class TestSignUpPage(BaseTest):
 
     def setUp(self) -> None:
         super(TestSignUpPage, self).setUp()
-        # self.live_server_url = self.live_server_url + '/account/register/'
         self.live_server_url = self.live_server_url + reverse('register')
 
     def test_sign_up_user(self):

@@ -84,7 +84,11 @@ class EditTest(TestCase):
                                         email=self.user_email,
                                         password=self.user_password,
                                         )
-        self.profile = Profile.objects.create(owner=self.user)
+        self.telegram = 'telegram'
+        self.date_of_birth = '2011-01-21'
+        self.profile = Profile.objects.create(owner=self.user,
+                                              telegram=self.telegram,
+                                              date_of_birth=self.date_of_birth)
 
     def tearDown(self) -> None:
         Profile.objects.all().delete()
@@ -139,3 +143,81 @@ class EditTest(TestCase):
         self.assertEqual(response.status_code, 200, response)
         self.assertTemplateUsed(response, 'account/user/edit.html')
         self.assertNotEqual(user.email, wrong_email, user)
+
+    def test_edit_POST_with_new_telegram(self):
+        self.client.force_login(self.user)
+        profile = Profile.objects.get()
+        self.assertEqual(profile.telegram, self.telegram)
+
+        url = reverse('edit')
+        new_telegram = 'telegram___'
+        response = self.client.post(url,
+                                    data={
+                                          'telegram': new_telegram
+                                          }
+                                    )
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'account/user/edit.html')
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.telegram, new_telegram)
+
+    def test_edit_POST_with_wrong_telegram(self):
+        self.client.force_login(self.user)
+        profile = Profile.objects.get()
+        self.assertEqual(profile.telegram, self.telegram)
+
+        url = reverse('edit')
+        wrong_telegram = '@telegram_!'
+        response = self.client.post(url,
+                                    data={
+                                          'telegram': wrong_telegram
+                                          }
+                                    )
+
+        profile = Profile.objects.get()
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'account/user/edit.html')
+        profile.refresh_from_db()
+        self.assertNotEqual(profile.telegram, wrong_telegram)
+
+    def test_edit_POST_with_new_date_of_birth(self):
+        self.client.force_login(self.user)
+        profile = Profile.objects.get()
+        self.assertEqual(profile.date_of_birth.isoformat(), self.date_of_birth)
+
+        url = reverse('edit')
+        new_date_of_birth = '10/30/2002'
+        response = self.client.post(url,
+                                    data={
+                                          'date_of_birth': new_date_of_birth
+                                          }
+                                    )
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'account/user/edit.html')
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.date_of_birth.strftime('%m/%d/%Y'), new_date_of_birth)
+
+    def test_edit_POST_with_wrong_date_of_birth(self):
+        self.client.force_login(self.user)
+        profile = Profile.objects.get()
+        self.assertEqual(profile.date_of_birth.isoformat(), self.date_of_birth)
+
+        url = reverse('edit')
+        wrong_date_of_birth = '10.30.2002'
+        response = self.client.post(url,
+                                    data={
+                                          'date_of_birth': wrong_date_of_birth
+                                          }
+                                    )
+
+        self.assertEqual(response.status_code, 200, response)
+        self.assertTemplateUsed(response, 'account/user/edit.html')
+
+        profile.refresh_from_db()
+        self.assertNotEqual(profile.date_of_birth.isoformat(), wrong_date_of_birth)
+        self.assertEqual(profile.date_of_birth.isoformat(), self.date_of_birth)

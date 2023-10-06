@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from rest_framework import viewsets
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, RemoteUserAuthentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
@@ -58,7 +58,7 @@ class BlockchainPortfolioViewSet(viewsets.ModelViewSet):
 
 
 class BlockchainData(APIView):
-    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticatedAndOwner]
 
     def get(self, request, blockchain_id, format=None):
@@ -75,20 +75,15 @@ class SendEmailData(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticatedAndOwner]
 
-    def get(self, request, name='all', format=None):
-        portfolio = name
-        if name == 'all':
+    def get(self, request, portfolio='all', format=None):
+        if portfolio == 'all':
             portfolio = ALL_PORTFOLIOS
         xlsx_dir = settings.MEDIA_URL + 'xlsx_files/' + f'{request.user.id}_{request.user.username.lower()}/'
-        filename = f'{request.user.id}_{request.user.username.lower()}_{ALL_PORTFOLIOS}.pdf'
+        filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
         path_to_file = xlsx_dir + filename
-        if portfolio:
-            filename = f'{request.user.id}_{request.user.username.lower()}_{portfolio}.pdf'
-            path_to_file = xlsx_dir + filename
 
         sending_PDF_by_email.delay(user_id=self.request.user.id,
                                    path_to_file=path_to_file,
                                    portfolio=portfolio)
         messages = f'Portfolios "{portfolio.capitalize()}" were send to your email.'
-
         return Response({'messages': messages})
