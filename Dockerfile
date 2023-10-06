@@ -11,11 +11,11 @@ RUN echo "deb http://deb.debian.org/debian/ unstable main contrib non-free" >> /
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-WORKDIR /cmc
-COPY requirements.txt /cmc
-RUN pip install -r /cmc/requirements.txt
+WORKDIR /cmc_pr
+COPY requirements.txt /cmc_pr
+RUN pip install -r /cmc_pr/requirements.txt
 
-COPY . /cmc
+COPY . /cmc_pr
 
 EXPOSE 8000
 

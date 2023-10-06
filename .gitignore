@@ -179,3 +179,8 @@ media/
 /exchanger/fixtures/exchanger.json
 /blockchain/fixtures/portfolio.json
 /blockchain/fixtures/blockchain.json
+/data/fixtures/blockchain.json
+/data/fixtures/portfolio.json
+/data/fixtures/cryptocurrency.json
+/data/fixtures/exchanger.json
+/data/fixtures/exportfolio.json

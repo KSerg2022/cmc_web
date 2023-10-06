@@ -4,16 +4,12 @@ x-function: &function
   build:
     context: .
     dockerfile: Dockerfile_prod
-  image: cmc:v1.0
-  volumes:
-    - .:/cmc
+  image: cmc:v1.01-gunicorn-nginx
   restart: unless-stopped
+  env_file:
+    - .env
   environment:
     - DJANGO_SETTINGS_MODULE=core.settings.prod
-    - DB_HOST=postgres
-    - DB_USER=${POSTGRES_USER}
-    - DB_PASSWORD=${POSTGRES_PASSWORD}
-    - DB_NAME=${POSTGRES_DB}
   networks:
     - cmc_network
 
@@ -22,19 +18,19 @@ services:
   postgres:
     container_name: postgres
     image: postgres:15.1
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+    hostname: postgres
+    env_file:
+      - .env
     restart: unless-stopped
     networks:
       - cmc_network
-  #    volumes:
-  #      - ./data/postgres_data:/cmc/var/lib/postgresql/data
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin4
+    container_name: pgadmin
+    hostname: pgadmin
     ports:
       - "3333:80"
     environment:
@@ -49,27 +45,45 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     hostname: cache_redis
     restart: unless-stopped
     networks:
       - cmc_network
 
 
+  nginx:
+    build:
+      dockerfile: ./Dockerfile_nginx
+      context: ./config/nginx
+    container_name: nginx
+    volumes:
+      - static_volume:/cmc_pr/static
+      - media_volume:/cmc_pr/media
+    ports:
+      - "${NGINX_EXTERNAL_PORT}:${NGINX_INTERNAL_PORT}"
+    depends_on:
+      - web_cmc
+    networks:
+      - cmc_network
+
+
   web_cmc:
     <<: *function
+    container_name: web_cmc
+    volumes:
+      - static_volume:/cmc_pr/static
+      - media_volume:/cmc_pr/media
     hostname: web-cmc
-    ports:
-      - "8000:8000"
     command: [ "./wait-for-it.sh", "postgres:5432", "--",
-               "python", "manage.py", "runserver",
-               "0.0.0.0:8000" ]
-
+               "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
     depends_on:
       - redis
       - postgres
 
   worker:
     <<: *function
+    container_name: worker1
     hostname: worker
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
@@ -80,6 +94,7 @@ services:
 
   worker2:
     <<: *function
+    container_name: worker2
     hostname: worker2
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
@@ -90,6 +105,7 @@ services:
 
   celery-beat:
     <<: *function
+    container_name: celery_beat
     hostname: worker2
     entrypoint: celery
     command: -A celery_app.app beat --loglevel=info
@@ -99,6 +115,7 @@ services:
       - redis
 
   flower:
+    container_name: flower
     <<: *function
     hostname: flower
     entrypoint: celery
@@ -116,6 +133,9 @@ services:
 volumes:
   postgres_data:
     driver: local
+  static_volume:
+  media_volume:
+
 
 networks:
   cmc_network:

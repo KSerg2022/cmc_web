@@ -4,12 +4,13 @@ python manage.py runserver --settings=core.settings.prod
 from .base import *
 
 DEBUG = False
+# DEBUG = True
 
 ADMINS = [
     ('Sergey K', 'koshevoys@gmain.com'),
 ]
 
-ALLOWED_HOSTS = ['*', '0.0.0.0.']
+ALLOWED_HOSTS = ['*', 'www.cmc.com', 'cmc.com', 'localhost']
 
 
 EMAIL_HOST = 'smtp.gmail.com'
@@ -17,7 +18,6 @@ EMAIL_HOST_USER = os.environ.get('EMAIL')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 
 # Django REST framework
 REST_FRAMEWORK = {
@@ -42,8 +42,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
 
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],  # The default filter backends may be set globally, using the DEFAULT_FILTER_BACKENDS setting
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    # The default filter backends may be set globally, using the DEFAULT_FILTER_BACKENDS setting
 
 }
-
-
