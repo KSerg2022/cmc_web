@@ -16,10 +16,9 @@ RUN pip install -r /cmc_pr/requirements_prod.txt
 
 COPY . /cmc_pr
 
-#
-#RUN chmod +x /docker-web-cmc-entrypoint.sh
-#RUN chmod +x /wait-for-it.sh.sh
-#
+RUN chmod +x ./docker-web-cmc-entrypoint.sh
+RUN chmod +x ./wait-for-it.sh
+
 
 
 #RUN adduser --disabled-password cmc-user

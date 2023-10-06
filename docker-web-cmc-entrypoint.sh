@@ -3,7 +3,6 @@
 # https://stackoverflow.com/questions/52942913/docker-compose-docker-entrypoint
 # https://github.com/vishnubob/wait-for-it/blob/master/README.md
 
-
 # Collect static files
 echo "Collect static files"
 python manage.py collectstatic --noinput && echo "Successful collectstatic" || echo "Not successful collectstatic"

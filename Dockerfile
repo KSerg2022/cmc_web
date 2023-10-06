@@ -1,5 +1,5 @@
 FROM python:3.10
-#FROM python:3.10-alpine3.17
+
 
 RUN apt-get update && apt-get -y upgrade
 
@@ -11,15 +11,15 @@ RUN echo "deb http://deb.debian.org/debian/ unstable main contrib non-free" >> /
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+EXPOSE 8000
+
 WORKDIR /cmc_pr
 COPY requirements.txt /cmc_pr
 RUN pip install -r /cmc_pr/requirements.txt
 
 COPY . /cmc_pr
 
-EXPOSE 8000
 
-
-RUN adduser --disabled-password cmc-user
-
-USER cmc-user
+#RUN adduser --disabled-password cmc-user
+#
+#USER cmc-user

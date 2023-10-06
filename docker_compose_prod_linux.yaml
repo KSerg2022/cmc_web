@@ -78,13 +78,7 @@ services:
       - media_volume:/cmc_pr/media
     hostname: web-cmc
     command: [ "./wait-for-it.sh", "postgres:5432", "--",
-               "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
-
-#
-#    command: [ "./wait-for-it.sh", "postgres:5432", "--",
-#               "/docker-web-cmc-entrypoint.sh" ]
-#    entrypoint: [ "/docker-web-cmc-entrypoint.sh" ]
-
+               "bash", "./docker-web-cmc-entrypoint.sh" ]
     depends_on:
       - redis
       - postgres
