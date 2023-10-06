@@ -21,9 +21,10 @@ def get_blockchain_portfolios(user):
     else:
         try:
             user = User.objects.get(id=user.id)
+            user_blockchains = Portfolio.objects.filter(owner=user.id).prefetch_related('blockchain')
         except ObjectDoesNotExist:
             return 0
-        user_blockchains = Portfolio.objects.filter(owner=user.id).prefetch_related('blockchain')
+
         blockchains = [user_blockchain.blockchain for user_blockchain in user_blockchains]
         cache.set(f'user_{user.id}_blockchains', blockchains, TIME_CACHES_DATA)
     return blockchains
@@ -35,8 +36,11 @@ def total_blockchain_portfolios():
     if cache_total_blockchain_portfolios:
         qty_blockchain_portfolios = cache_total_blockchain_portfolios
     else:
-        qty_blockchain_portfolios = Portfolio.objects.all().count()
-        cache.set('total_blockchain_portfolios', qty_blockchain_portfolios, TIME_CACHES_DATA)
+        try:
+            qty_blockchain_portfolios = Portfolio.objects.all().count()
+            cache.set('total_blockchain_portfolios', qty_blockchain_portfolios, TIME_CACHES_DATA)
+        except ObjectDoesNotExist:
+            return 0
     return qty_blockchain_portfolios
 
 
