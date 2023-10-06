@@ -67,7 +67,7 @@ services:
   worker:
     <<: *function
     container_name: worker1
-    hostname: worker
+    hostname: worker1
     entrypoint: celery
     command: -A celery_app.app worker --loglevel=info
     links:
@@ -89,7 +89,7 @@ services:
   celery-beat:
     <<: *function
     container_name: celery_beat
-    hostname: worker2
+    hostname: celery-beat
     entrypoint: celery
     command: -A celery_app.app beat --loglevel=info
     links:

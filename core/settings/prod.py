@@ -3,8 +3,8 @@ python manage.py runserver --settings=core.settings.prod
 """
 from .base import *
 
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
 ADMINS = [
     ('Sergey K', 'koshevoys@gmain.com'),
