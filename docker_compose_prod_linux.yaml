@@ -24,7 +24,7 @@ services:
     networks:
       - cmc_network
     volumes:
-      - ~/cmc/data/postgres_data:/var/lib/postgresql/data
+      - ./data/postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     user: root
@@ -32,7 +32,7 @@ services:
     container_name: pgadmin
     hostname: pgadmin
     volumes:
-      - ~/cmc/data/pgadmin:/var/lib/pgadmin
+      - ./data/pgadmin:/var/lib/pgadmin
     ports:
       - "3333:80"
     environment:
@@ -74,6 +74,7 @@ services:
     <<: *function
     container_name: web_cmc
     volumes:
+      - .:/cmc_pr
       - static_volume:/cmc_pr/static
       - media_volume:/cmc_pr/media
     hostname: web-cmc
