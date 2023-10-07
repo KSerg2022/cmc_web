@@ -7,6 +7,10 @@
 echo "Collect static files"
 python manage.py collectstatic --noinput && echo "Successful collectstatic" || echo "Not successful collectstatic"
 
+# Apply database makemigrations
+echo "Apply database makemigrations"
+python manage.py makemigrations && echo "Successful makemigrations" || echo "Not successful makemigrations"
+
 # Apply database migrations
 echo "Apply database migrations"
 python manage.py migrate && echo "Successful migrate" || echo "Not successful migrate"
