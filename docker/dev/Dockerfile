@@ -14,10 +14,10 @@ ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
 
 WORKDIR /cmc_pr
-COPY requirements.txt /cmc_pr
+COPY ../../requirements.txt /cmc_pr
 RUN pip install -r /cmc_pr/requirements.txt
 
-COPY . /cmc_pr
+COPY ../.. /cmc_pr
 
 
 #RUN adduser --disabled-password cmc-user

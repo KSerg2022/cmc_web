@@ -1,0 +1,22 @@
+FROM python:3.10
+
+
+RUN apt-get update && apt-get -y upgrade && apt-get install -y wkhtmltopdf xvfb
+RUN groupadd -g 1000 cmc-user && useradd -m -u 1000 -g cmc-user cmc-user
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+EXPOSE 8000
+
+WORKDIR /cmc_pr
+
+COPY ../../requirements_prod.txt /cmc_pr
+RUN pip install -r /cmc_pr/requirements_prod.txt
+COPY ../.. /cmc_pr
+
+RUN chown -R cmc-user:cmc-user /cmc_pr
+USER cmc-user
+
+RUN chmod +x docker/prod/docker-web-cmc-entrypoint.sh docker/wait-for-it.sh
+

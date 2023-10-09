@@ -6,7 +6,7 @@ x-function: &function
   image: cmc:v3
   restart: unless-stopped
   env_file:
-    - .env
+    - ../../.env
   environment:
     - DJANGO_SETTINGS_MODULE=core.settings.dev
   networks:
@@ -18,10 +18,10 @@ services:
     container_name: postgres
     image: postgres:15.1
     env_file:
-      - .env
+      - ../../.env
     restart: unless-stopped
     volumes:
-      - ./data/postgres_data:/var/lib/postgresql/data
+      - ../../data/postgres_data:/var/lib/postgresql/data
     networks:
       - cmc_network
 
@@ -52,11 +52,12 @@ services:
     <<: *function
     hostname: web-cmc
     volumes:
+      - ../../:/cmc_pr
       - static_volume:/cmc_pr/static
       - media_volume:/cmc_pr/media
     ports:
       - "8000:8000"
-    command: [ "./wait-for-it.sh", "postgres:5432", "--",
+    command: [ "./docker/wait-for-it.sh", "postgres:5432", "--",
                "python", "manage.py", "runserver", "0.0.0.0:8000" ]
     depends_on:
       - redis
