@@ -1,4 +1,16 @@
 #!/usr/bin/python3
+import os
+import django
+
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Установите переменную окружения DJANGO_SETTINGS_MODULE, чтобы указать на файл настроек Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings.prod")
+
+# Загрузите настройки Django
+django.setup()
+
 
 import subprocess
 from django.core.management import call_command
