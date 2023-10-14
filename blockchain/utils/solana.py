@@ -3,6 +3,8 @@ https://solscan.io/
 """
 import os
 
+from requests import RequestException, HTTPError
+
 from blockchain.utils.base import Base
 
 
@@ -25,9 +27,14 @@ class Solana(Base):
 
     def get_account(self) -> dict[dict]:
         """"""
-        response = self._get_request(url=self.host, params=self.params, headers=self.headers)
-        if 'error' in response:
-            return {self.blockchain: [response]}
+
+        try:
+            response = self._get_request(url=self.host, params=self.params, headers=self.headers)
+        except (ValueError, AttributeError, RequestException, HTTPError) as e:
+            e: RequestException
+            # return {self.blockchain: [{'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG}"'}]}
+            return {self.blockchain: [{'error': e.args[0]}]}
+
         currencies = self._normalize_data(response)
         return {self.blockchain: sorted(currencies, key=lambda x: x['coin'])}
 
@@ -45,5 +52,4 @@ class Solana(Base):
                             results.append({'coin': symbol,
                                             'bal': int(currency['tokenAmount']['amount']) /
                                                    10 ** currency['tokenAmount']['decimals']})
-
         return results

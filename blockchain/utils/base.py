@@ -2,8 +2,7 @@
 Base class bo blockchains.
 """
 import requests
-from requests.exceptions import RequestException
-
+from requests.exceptions import RequestException, HTTPError
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -37,10 +36,11 @@ class Base:
         for currency, contractaddress in self.currencies.items():
             self.params['contractaddress'] = contractaddress
 
-            response = self._get_request(self.host, self.params, self.headers)
-            if 'error' in response:
-                # print(f"Error - {response['error']}, host={self.host}")
-                return {self.blockchain: [response]}
+            try:
+                response = self._get_request(self.host, self.params, self.headers)
+            except (ValueError, AttributeError, RequestException, HTTPError) as e:
+                # return {self.blockchain: [{'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG}"'}]}
+                return {self.blockchain: [{'error': e.args[0]}]}
 
             if currency in RATE_DECIMALS_9:
                 currencies.append({self.COIN: currency, self.BAL: float(response['result']) / (10 ** 9)})
@@ -54,20 +54,20 @@ class Base:
             response = requests.request(method='GET',
                                         url=url,
                                         params=params,
-                                        headers=headers).json()
+                                        headers=headers)
+            if response.status_code == 404:
+                raise HTTPError(response)
+            response = response.json()
             try:
-                if response.get('message', '') == 'NOTOK' or 'error' in response:
-                    print('1~~~~blockchain~~~~~', response)
-                    # raise ValueError(f"{age} - {text.err_age}")
-                    return {'error': f'"{self.blockchain.upper()}" - ERROR - "{ERROR_MSG}"'}
-            except AttributeError:
-                return response
-
+                if (response.get('message', '') == 'NOTOK') or ('error' in response):
+                    raise ValueError({'error': f"{self.blockchain.upper()} - {response}"})
+            except AttributeError as e:
+                raise AttributeError({'error': f"{self.blockchain.upper()} - {e}"})
         except RequestException as e:
-            # print(f"Ошибка подключения: {str(e)}")
-            print('2~~~~blockchain~~~~~', e)
-            return {'error': f'"{self.blockchain.upper()}" - ERROR - "{e}"'}
+            raise RequestException({'error': f"{self.blockchain.upper()} - {e}"})
         return response
+
+
 
     # def get_account_balance(self) -> dict | None:
     #     """"""
